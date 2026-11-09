@@ -1,0 +1,29 @@
+{
+  "name": "share-provider-disposal",
+  "displayName": "Share Provider Disposal",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "share-provider-disposal.setup",
+        "title": "Share Provider Disposal: Setup"
+      },
+      {
+        "command": "share-provider-disposal.run",
+        "title": "Share Provider Disposal: Run"
+      },
+      {
+        "command": "share-provider-disposal.cleanup",
+        "title": "Share Provider Disposal: Cleanup"
+      }
+    ]
+  },
+  "enabledApiProposals": [
+    "shareProvider"
+  ]
+}

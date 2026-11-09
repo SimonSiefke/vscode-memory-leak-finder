@@ -1,0 +1,26 @@
+{
+  "name": "integrated-browser-favicon-replacement",
+  "displayName": "Integrated Browser Favicon Replacement",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "integrated-browser-favicon-replacement.setup",
+        "title": "Integrated Browser Favicon Replacement: Setup"
+      },
+      {
+        "command": "integrated-browser-favicon-replacement.run",
+        "title": "Integrated Browser Favicon Replacement: Run"
+      },
+      {
+        "command": "integrated-browser-favicon-replacement.cleanup",
+        "title": "Integrated Browser Favicon Replacement: Cleanup"
+      }
+    ]
+  }
+}

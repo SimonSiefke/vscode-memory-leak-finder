@@ -1,0 +1,21 @@
+{
+  "name": "mocha-test-runs-fixture",
+  "version": "1.0.0",
+  "private": true,
+  "publisher": "vscode-memory-leak-finder",
+  "engines": {
+    "vscode": "^1.96.0"
+  },
+  "main": "./extension.cjs",
+  "contributes": {
+    "commands": [
+      {
+        "command": "mocha_test_runs.discover",
+        "title": "Mocha Bulk Tests: Discover"
+      }
+    ]
+  },
+  "dependencies": {
+    "mocha": "11.7.5"
+  }
+}

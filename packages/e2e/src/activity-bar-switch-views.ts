@@ -2,7 +2,10 @@ import type { TestContext } from '../types.ts'
 
 export const skip = true
 
-export const setup = async ({ SideBar }: TestContext) => {
+export const setup = async ({ ActivityBar, Extensions, SideBar }: TestContext) => {
+  // Finish loading Marketplace results before measuring their list rows and hovers.
+  await ActivityBar.showExtensions()
+  await Extensions.waitForProgressToBeHidden({ timeout: 60_000 })
   await SideBar.hide()
 }
 

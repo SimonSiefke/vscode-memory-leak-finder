@@ -103,7 +103,8 @@ export const start = async (session: Session, state: { trace: TraceState }) => {
 export const stop = async (session: Session, state: { trace: TraceState }) => {
   await DevtoolsProtocolTracing.end(session, {})
   await state.trace.complete
-  return CssSelectorStats.getCssSelectorStats(state.trace.events)
+  // Reports need every selector so sorting by other metrics is not limited to the slowest 20.
+  return CssSelectorStats.getCssSelectorStats(state.trace.events, Infinity)
 }
 
 export const releaseResources = async (_session: Session, state: { trace: TraceState }) => {

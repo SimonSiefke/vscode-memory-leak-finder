@@ -1,0 +1,26 @@
+{
+  "name": "web-page-loader-disposal",
+  "displayName": "Web Page Loader Disposal",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "web-page-loader-disposal.setup",
+        "title": "Web Page Loader Disposal: Setup"
+      },
+      {
+        "command": "web-page-loader-disposal.run",
+        "title": "Web Page Loader Disposal: Run"
+      },
+      {
+        "command": "web-page-loader-disposal.cleanup",
+        "title": "Web Page Loader Disposal: Cleanup"
+      }
+    ]
+  }
+}

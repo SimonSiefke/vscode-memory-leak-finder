@@ -1,0 +1,26 @@
+{
+  "name": "integrated-browser-selected-element-disposal",
+  "displayName": "Integrated Browser Selected Element Disposal",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "integrated-browser-selected-element-disposal.setup",
+        "title": "Integrated Browser Selected Element Disposal: Setup"
+      },
+      {
+        "command": "integrated-browser-selected-element-disposal.run",
+        "title": "Integrated Browser Selected Element Disposal: Run"
+      },
+      {
+        "command": "integrated-browser-selected-element-disposal.cleanup",
+        "title": "Integrated Browser Selected Element Disposal: Cleanup"
+      }
+    ]
+  }
+}

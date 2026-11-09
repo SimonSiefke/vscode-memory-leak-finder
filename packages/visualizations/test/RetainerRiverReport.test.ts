@@ -1,6 +1,6 @@
 import { describe, expect, test } from '@jest/globals'
 import { fixtureReport } from '../src/retainerRiver/fixture.ts'
-import { formatBytes, getFilteredReport, validateRetainerRiverReport } from '../src/retainerRiver/report.ts'
+import { formatBytes, getEvidenceSummary, getFilteredReport, validateRetainerRiverReport } from '../src/retainerRiver/report.ts'
 
 describe('formatBytes', () => {
   test.each([
@@ -12,6 +12,17 @@ describe('formatBytes', () => {
     [2.5 * 1024 * 1024, '2.50 MB'],
   ])('formats %s bytes', (bytes, expected) => {
     expect(formatBytes(bytes)).toBe(expected)
+  })
+})
+
+describe('getEvidenceSummary', () => {
+  test('discloses sampled paths while retaining the complete object count', () => {
+    const link = { ...fixtureReport.links[0], evidenceTruncated: true, objectCount: 1000 }
+    expect(getEvidenceSummary(link)).toBe(`Showing ${link.evidence.length} sampled paths for 1,000 objects. Counts include every object.`)
+  })
+
+  test('leaves older exhaustive reports unchanged', () => {
+    expect(getEvidenceSummary(fixtureReport.links[0])).toBeUndefined()
   })
 })
 

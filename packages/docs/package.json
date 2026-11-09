@@ -1,0 +1,16 @@
+{
+  "name": "@vscode-memory-leak-finder/docs",
+  "version": "0.0.0-dev",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "docs:catalog": "node scripts/generate-measure-catalog.js",
+    "docs:dev": "vitepress dev site",
+    "docs:build": "npm run docs:catalog && vitepress build site --outDir ../../.vscode-charts/docs",
+    "docs:preview": "vitepress preview site --outDir ../../.vscode-charts/docs"
+  },
+  "devDependencies": {
+    "vitepress": "^1.6.4"
+  }
+}

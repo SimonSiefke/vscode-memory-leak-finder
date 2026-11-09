@@ -1,0 +1,48 @@
+{
+  "name": "debug-visualization-session-disposal",
+  "displayName": "Debug Visualization Session Disposal",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "debuggers": [
+      {
+        "type": "lifecycle-tree",
+        "label": "Lifecycle tree",
+        "languages": [
+          "javascript"
+        ]
+      }
+    ],
+    "debugVisualizers": [
+      {
+        "id": "tree-session",
+        "when": "true"
+      }
+    ],
+    "commands": [
+      {
+        "command": "debug-visualization-session-disposal.setup",
+        "title": "Debug Visualization Session Disposal: Setup"
+      },
+      {
+        "command": "debug-visualization-session-disposal.run",
+        "title": "Debug Visualization Session Disposal: Run"
+      },
+      {
+        "command": "debug-visualization-session-disposal.cleanup",
+        "title": "Debug Visualization Session Disposal: Cleanup"
+      },
+      {
+        "command": "debug-visualization-session-disposal.stop",
+        "title": "Stop Lifecycle Debug Session"
+      }
+    ]
+  },
+  "enabledApiProposals": [
+    "debugVisualization"
+  ]
+}

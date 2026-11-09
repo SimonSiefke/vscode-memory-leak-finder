@@ -199,6 +199,4 @@ test('examineNodeById - should find and examine node by ID 67', () => {
   expect(result!.nodeName).toBe('Object')
   expect(result!.nodeType).toBe('object')
   expect(result!.edges).toHaveLength(2)
-
-  console.log('Node ID 67 examination result:', JSON.stringify(result, null, 2))
 })

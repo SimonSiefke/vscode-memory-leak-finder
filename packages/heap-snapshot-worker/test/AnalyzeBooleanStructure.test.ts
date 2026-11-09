@@ -222,17 +222,8 @@ test('analyze boolean structure with type and value edges', (): void => {
     locations: new Uint32Array([]),
   }
 
-  console.log('\n=== Boolean Structure Analysis ===')
-
   // Analyze Node 75's breakpointsExpanded property
   const node75Analysis = analyzeBooleanStructure(snapshot, 75, 'breakpointsExpanded')
-  console.log('\nNode 75 breakpointsExpanded analysis:')
-  console.log(JSON.stringify(node75Analysis, null, 2))
-
-  // Analyze Node 50's someFlag property for comparison
-  const node50Analysis = analyzeBooleanStructure(snapshot, 50, 'someFlag')
-  console.log('\nNode 50 someFlag analysis:')
-  console.log(JSON.stringify(node50Analysis, null, 2))
 
   // Verify our analysis
   expect(node75Analysis.relatedEdges).toHaveLength(2) // Should find both property and internal edges
@@ -313,11 +304,7 @@ test('enhanced boolean detection in GetObjectsWithPropertiesInternal', async ():
     locations: new Uint32Array([]),
   }
 
-  console.log('\n=== Testing Enhanced Boolean Detection ===')
-
   const results = getObjectsWithPropertiesInternal(snapshot, 'breakpointsExpanded')
-  console.log('Results:', JSON.stringify(results, null, 2))
-
   expect(results).toHaveLength(1)
   expect(results[0].id).toBe(75)
   expect(results[0].propertyValue).toBe(false) // Should detect the typed boolean pattern and return actual boolean

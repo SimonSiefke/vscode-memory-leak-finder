@@ -1,0 +1,218 @@
+name: Large Performance Over Time
+
+run-name: Large Performance Over Time (${{ inputs.measure || 'function-count' }})
+
+on:
+  workflow_dispatch:
+    inputs:
+      measure:
+        description: Comma-separated numeric collectors (e.g. function-count,object-count,string-object-bytes), or all
+        type: string
+        default: function-count
+      build_source:
+        description: Build Code OSS from source or download official stable release packages
+        type: choice
+        options: [source, release]
+        default: source
+      suite:
+        description: Full default suite or a fixed set of core actions for historical releases
+        type: choice
+        options: [default, historical-core]
+        default: default
+      version_range:
+        description: Inclusive stable version range; empty selects the last N releases
+        type: string
+        default: ''
+      last_versions:
+        description: Number of latest stable releases (including patches), used when range is empty
+        type: string
+        default: '20'
+      frame_duration_ms:
+        description: Milliseconds per video frame
+        type: string
+        default: '400'
+
+permissions:
+  contents: read
+
+jobs:
+  initialize:
+    runs-on: ubuntu-24.04
+    outputs:
+      matrix: ${{ steps.manifest.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: '.nvmrc'
+      - name: Freeze release list
+        id: manifest
+        env:
+          VERSION_RANGE: ${{ inputs.version_range }}
+          LAST_VERSIONS: ${{ inputs.last_versions }}
+          FRAME_DURATION: ${{ inputs.frame_duration_ms }}
+          MEASURE: ${{ inputs.measure }}
+          SUITE: ${{ inputs.suite }}
+        run: |
+          revisions=(--last-versions "$LAST_VERSIONS")
+          [[ -z "$VERSION_RANGE" ]] || revisions=(--version-range "$VERSION_RANGE")
+          node packages/large-benchmark/src/main.ts history-matrix "${revisions[@]}" \
+            --measure "$MEASURE" --suite "$SUITE" --frame-duration-ms "$FRAME_DURATION" --output-dir .large-manifest
+      - uses: actions/upload-artifact@v7
+        with:
+          name: large-history-manifest
+          path: .large-manifest/manifest.json
+          retention-days: 30
+
+  build:
+    needs: initialize
+    if: ${{ inputs.build_source != 'release' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 350
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.initialize.outputs.matrix) }}
+    env:
+      COMMIT: ${{ matrix.commit }}
+      VSCODE_VERSION: ${{ matrix.version }}
+      MEASURE: ${{ inputs.measure }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: '.nvmrc'
+      - name: Install native build dependencies
+        run: sudo apt-get update && sudo apt-get install -y libkrb5-dev libx11-dev libxkbfile-dev pkg-config xvfb x11-xserver-utils
+      - name: Install harness
+        run: npm run install:ci
+      - name: Build harness
+        run: npm run build
+      - name: Build and archive the minified VS Code package
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          node packages/large-benchmark/src/main.ts prepare \
+            --commit "$COMMIT" --output-dir .large-build
+      - name: Upload executable package
+        uses: actions/upload-artifact@v7
+        with:
+          name: large-build-${{ matrix.artifact }}
+          path: |
+            .large-build/vscode.tar.gz
+            .large-build/build.json
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30
+          overwrite: true
+      - name: Upload build status
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: large-build-status-${{ matrix.artifact }}
+          path: .large-build/status.json
+          retention-days: 30
+          overwrite: true
+
+  measure:
+    needs: [initialize, build]
+    if: ${{ always() && needs.initialize.result == 'success' && !cancelled() }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 350
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.initialize.outputs.matrix) }}
+    env:
+      COMMIT: ${{ matrix.commit }}
+      VSCODE_VERSION: ${{ matrix.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: '.nvmrc'
+      - run: npm run install:ci
+      - run: npm run build
+      - name: Install desktop dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb libasound2t64 libnss3 libgbm1 libgtk-3-0 libxkbfile1 bubblewrap socat
+      - uses: actions/download-artifact@v8
+        if: ${{ inputs.build_source != 'release' }}
+        with:
+          name: large-build-${{ matrix.artifact }}
+          path: .large-build
+      - name: Verify and extract build
+        id: build
+        if: ${{ inputs.build_source != 'release' }}
+        run: node packages/large-benchmark/src/main.ts extract --input-dir .large-build --commit "$COMMIT" --output-name executable
+      - name: Run the same E2E suite separately for each selected collector
+        env:
+          BUILD_PATH: ${{ steps.build.outputs.executable }}
+          MEASURE: ${{ inputs.measure }}
+          SUITE: ${{ inputs.suite }}
+        run: |
+          xvfb-run --auto-servernum --server-args='-screen 0 1440x1000x24' \
+            node packages/large-benchmark/src/main.ts history-measure \
+            --commit "$COMMIT" --vscode-version "$VSCODE_VERSION" --measure "$MEASURE" --suite "$SUITE" --build-path "$BUILD_PATH" --output-dir .large-history-results
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: large-history-result-${{ matrix.artifact }}
+          path: .large-history-results
+          include-hidden-files: true
+          retention-days: 30
+
+  report:
+    needs: [initialize, build, measure]
+    if: ${{ always() && needs.initialize.result == 'success' }}
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: '.nvmrc'
+      - name: Install video tools
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg fonts-dejavu-core
+      - uses: actions/download-artifact@v8
+        with:
+          name: large-history-manifest
+          path: .large-manifest
+      - uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
+          pattern: large-history-result-*
+          path: .large-history-results
+      - name: Render labeled charts and video
+        run: |
+          mkdir -p .large-history-results
+          node packages/large-benchmark/src/main.ts history-report \
+            --manifest .large-manifest/manifest.json --input-dir .large-history-results \
+            --output-dir .large-history-report
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: large-performance-over-time
+          path: |
+            .large-history-report
+            !.large-history-report/**/frames/**
+          include-hidden-files: true
+          retention-days: 30
+          if-no-files-found: error
+
+  cleanup:
+    needs: [initialize, build, measure, report]
+    if: ${{ always() && !cancelled() && needs.report.result == 'success' }}
+    runs-on: ubuntu-24.04
+    permissions:
+      actions: write
+      contents: read
+    steps:
+      - name: Delete intermediate artifacts
+        uses: geekyeggo/delete-artifact@v6
+        with:
+          name: |
+            large-history-manifest
+            large-build-*
+            large-build-status-*
+            large-history-result-*

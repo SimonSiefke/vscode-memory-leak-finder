@@ -1,6 +1,7 @@
 import { beforeEach, expect, jest, test } from '@jest/globals'
 
 const mockEvaluate = jest.fn<(_options: unknown) => Promise<boolean>>()
+let idleTransportTimeout: number | undefined
 
 jest.unstable_mockModule('../src/parts/PageObjectState/PageObjectState.ts', () => ({
   getPageObjectContext() {
@@ -8,6 +9,7 @@ jest.unstable_mockModule('../src/parts/PageObjectState/PageObjectState.ts', () =
       utilityContext: {
         evaluate: mockEvaluate,
       },
+      idleTransportTimeout,
     }
   },
 }))
@@ -17,6 +19,7 @@ const PageWaitForIdle = await import('../src/parts/PageWaitForIdle/PageWaitForId
 beforeEach(() => {
   jest.clearAllMocks()
   PageWaitForIdle.resetIdleTimeoutWarning()
+  idleTransportTimeout = undefined
 })
 
 test('waitForIdle returns a genuine idle callback result', async () => {
@@ -75,4 +78,20 @@ test('timer fallback is a successful scheduler yield', async () => {
       expression: expect.stringContaining('setTimeout(() => resolve(false), 16)'),
     }),
   )
+})
+
+test('selector instrumentation may extend the transport watchdog while preserving the scheduler yield', async () => {
+  jest.useFakeTimers()
+  idleTransportTimeout = 30_000
+  mockEvaluate.mockImplementation(() => new Promise((resolve) => setTimeout(() => resolve(false), 6000)))
+  try {
+    const promise = PageWaitForIdle.waitForIdle({}, false, 0)
+    await jest.advanceTimersByTimeAsync(6000)
+    await expect(promise).resolves.toEqual({ didTimeout: false })
+    expect(mockEvaluate).toHaveBeenCalledWith(
+      expect.objectContaining({ expression: expect.stringContaining('setTimeout(() => resolve(false), 16)') }),
+    )
+  } finally {
+    jest.useRealTimers()
+  }
 })

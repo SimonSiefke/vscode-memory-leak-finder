@@ -1,0 +1,26 @@
+{
+  "name": "output-channel-immediate-disposal",
+  "displayName": "Output Channel Immediate Disposal",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "output-channel-immediate-disposal.setup",
+        "title": "Output Channel Immediate Disposal: Setup"
+      },
+      {
+        "command": "output-channel-immediate-disposal.run",
+        "title": "Output Channel Immediate Disposal: Run"
+      },
+      {
+        "command": "output-channel-immediate-disposal.cleanup",
+        "title": "Output Channel Immediate Disposal: Cleanup"
+      }
+    ]
+  }
+}

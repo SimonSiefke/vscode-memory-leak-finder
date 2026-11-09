@@ -16,15 +16,10 @@ export const createRpc = (ipc, canUseIdleCallback) => {
       }
       delete callbacks[message.id]
     } else {
-      const listener = listeners[message.method]
-      if (listener) {
-        listener(message)
-      }
-      const onceListener = onceListeners[message.method]
-      if (onceListener) {
-        onceListener(message)
-        delete onceListener[message.method]
-      }
+      const currentOnceListeners = onceListeners[message.method]
+      delete onceListeners[message.method]
+      for (const listener of [...(listeners[message.method] || [])]) listener(message)
+      for (const listener of currentOnceListeners || []) listener(message)
     }
   }
   ipc.onmessage = handleMessage
@@ -74,14 +69,17 @@ export const createRpc = (ipc, canUseIdleCallback) => {
     listeners,
     objectType: ObjectType.Rpc,
     off(event, listener) {
-      delete listener[event]
+      const handlers = listeners[event]
+      if (!handlers) return
+      handlers.delete(listener)
+      if (!handlers.size) delete listeners[event]
     },
     on(event, listener) {
-      listeners[event] = listener
+      ;(listeners[event] ||= new Set()).add(listener)
     },
     once(event) {
       const { promise, resolve } = Promise.withResolvers()
-      onceListeners[event] = resolve
+      ;(onceListeners[event] ||= new Set()).add(resolve)
       return promise
     },
     onceListeners,

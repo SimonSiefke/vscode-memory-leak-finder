@@ -5,10 +5,6 @@ on:
     branches:
       - main
 
-concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: true
-
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
@@ -61,6 +57,24 @@ jobs:
       - run: npm run lint
       - run: npm run build
       - run: npm test
+      - name: Prepare short Inbox runtime directory
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/inbox-runtime"
+          chmod 700 "$RUNNER_TEMP/inbox-runtime"
+          printf 'XDG_RUNTIME_DIR=%s/inbox-runtime\n' "$RUNNER_TEMP" >> "$GITHUB_ENV"
+      - name: Run Inbox canvas subscription regression
+        timeout-minutes: 10
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: node packages/cli/bin/test.js --cwd packages/agents-e2e --launch-agent-window --enable-extensions --use-proxy-mock --only agents-window-inbox-canvas-subscriptions.ts --vscode-version 1.145.0 --runs 1
+      - name: Run chat-window terminal lifecycle regression
+        if: matrix.os == 'ubuntu-24.04'
+        timeout-minutes: 10
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: node packages/cli/bin/test.js --cwd packages/agents-e2e --launch-agent-window --enable-extensions --use-proxy-mock --only agents-window-chat-terminal-lifecycle.ts --vscode-version insiders:d9cccddf6b34357c58b5bbfb60ea03d4c4d1df65 --runs 2
       - name: Run headless test (with videos)
         if: matrix.os != 'macos-26'
         uses: coactions/setup-xvfb@v1
@@ -128,7 +142,7 @@ jobs:
             **/.vscode-sources
           key: ${{ runner.os }}-cacheSourceMaps-${{ steps.sourceMapsCacheKey.outputs.value }}
       - name: npm ci
-        run: npm ci --ignore-scripts && npm run postinstall
+        run: npm run install:ci
         if: steps.npm-cache.outputs.cache-hit != 'true'
       - run: npm run build
       - name: Locate PoolMon
@@ -194,6 +208,8 @@ jobs:
             args: --measure dom-counters
           - name: detached-dom-node-count
             args: --measure detached-dom-node-count --timeout-between 10000
+          - name: pending-promise-count
+            args: --measure pending-promise-count
           - name: promise-count
             args: --measure promise-count
           - name: promises-with-stack-trace-shard-1
@@ -210,6 +226,10 @@ jobs:
             args: --measure array-count
           - name: array-element-count
             args: --measure array-element-count
+          - name: forced-layout-count
+            args: --measure forced-layout-count --runs 1 --restart-between
+          - name: css-selector-stats
+            args: --measure css-selector-stats --runs 1 --restart-between --run-skipped-tests-anyway
           - name: css-rule-count
             args: --measure css-rule-count
           - name: regex-count
@@ -218,6 +238,8 @@ jobs:
             args: --measure edit-context-count
           - name: function-count
             args: --measure function-count
+          - name: gc-statistics
+            args: --measure gc-statistics --runs 1 --restart-between
           - name: named-function-count3
             args: --measure named-function-count3 --runs 37 --restart-between --run-skipped-tests-anyway
           - name: named-function-count3-shared-process
@@ -266,8 +288,14 @@ jobs:
             args: --measure message-port-count
           - name: symbol-count
             args: --measure symbol-count
+          - name: object-shape-count
+            args: --measure object-shape-count
           - name: object-count
             args: --measure object-count
+          - name: string-object-count
+            args: --measure string-object-count
+          - name: string-object-bytes
+            args: --measure string-object-bytes
           - name: disposable-count
             args: --measure disposable-count
           - name: worker-count
@@ -280,6 +308,44 @@ jobs:
             args: --measure file-descriptors --runs 37 --restart-between --run-skipped-tests-anyway
           - name: file-watcher-count
             args: --measure file-watcher-count --runs 37 --restart-between --run-skipped-tests-anyway
+          - name: pending-promise-count-extensions
+            args: --measure pending-promise-count --inspect-extensions
+          - name: promise-count-extensions
+            args: --measure promise-count --inspect-extensions
+          - name: array-count-extensions
+            args: --measure array-count --inspect-extensions
+          - name: array-element-count-extensions
+            args: --measure array-element-count --inspect-extensions
+          - name: regex-count-extensions
+            args: --measure regex-count --inspect-extensions
+          - name: function-count-extensions
+            args: --measure function-count --inspect-extensions
+          - name: weak-map-count-extensions
+            args: --measure weak-map-count --inspect-extensions
+          - name: number-count-extensions
+            args: --measure number-count --inspect-extensions
+          - name: error-count-extensions
+            args: --measure error-count --inspect-extensions
+          - name: weak-set-count-extensions
+            args: --measure weak-set-count --inspect-extensions
+          - name: map-size-extensions
+            args: --measure map-size --inspect-extensions
+          - name: set-size-extensions
+            args: --measure set-size --inspect-extensions
+          - name: message-port-count-extensions
+            args: --measure message-port-count --inspect-extensions
+          - name: symbol-count-extensions
+            args: --measure symbol-count --inspect-extensions
+          - name: object-shape-count-extensions
+            args: --measure object-shape-count --inspect-extensions
+          - name: object-count-extensions
+            args: --measure object-count --inspect-extensions
+          - name: string-object-count-extensions
+            args: --measure string-object-count --inspect-extensions
+          - name: string-object-bytes-extensions
+            args: --measure string-object-bytes --inspect-extensions
+          - name: disposable-count-extensions
+            args: --measure disposable-count --inspect-extensions
     timeout-minutes: 360
     steps:
       - uses: actions/checkout@v7
@@ -328,11 +394,67 @@ jobs:
           name: vscode-memory-leak-finder-results-linux-${{ matrix.measure.name }}
           path: ./.vscode-memory-leak-finder-results
           include-hidden-files: true
+      - name: Upload extracted source files
+        if: always() && matrix.measure.name == 'promises-with-stack-trace-shard-1'
+        uses: actions/upload-artifact@v7
+        with:
+          name: vscode-memory-leak-finder-sources-linux
+          path: ./.vscode-sources
+          include-hidden-files: true
+          if-no-files-found: error
+
+  ci-linux-instruction-count:
+    runs-on: ubuntu-24.04-arm
+    needs: ci
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: '.nvmrc'
+      - name: Compute node modules cache key
+        id: nodeModulesCacheKey
+        run: echo "value=$(node scripts/computeNodeModulesCacheKey.js)" >> $GITHUB_OUTPUT
+        shell: bash
+      - uses: actions/cache@v6
+        id: npm-cache
+        with:
+          path: |
+            **/node_modules
+            **/.vscode-test
+            **/.vscode-insiders-versions
+            **/.vscode-user-data-dir
+            **/.vscode-ffmpeg
+            **/.vscode-resolve-source-map-cache
+          key: ${{ runner.os }}-${{ runner.arch }}-instruction-count-${{ steps.nodeModulesCacheKey.outputs.value }}
+      - name: npm ci
+        run: npm run install:ci
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+      - run: npm run build
+      - name: Install perf
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y linux-tools-common linux-tools-generic "linux-tools-$(uname -r)"
+          sudo sysctl -w kernel.perf_event_paranoid=1
+      - name: Verify hardware instruction counters
+        run: node packages/memory-leak-finder/src/verifyCpuPerformanceCounters.ts
+      - name: Measure instruction counts
+        timeout-minutes: 350
+        continue-on-error: true
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure cpu-performance-counters --runs 1 --restart-between
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: vscode-memory-leak-finder-results-linux-instruction-count-arm64
+          path: ./.vscode-memory-leak-finder-results
+          include-hidden-files: true
 
   ci-linux-charts:
     runs-on: ubuntu-24.04
-    needs: ci-linux-measures
-    if: always()
+    needs: [ci-linux-measures, ci-linux-instruction-count]
+    if: ${{ always() && needs.ci-linux-measures.result != 'cancelled' }}
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v7
@@ -354,18 +476,49 @@ jobs:
             **/.vscode-ffmpeg
             **/.vscode-resolve-source-map-cache
           key: ${{ runner.os }}-cacheNodeModules-${{ steps.nodeModulesCacheKey.outputs.value }}
+      - name: Compute source maps cache key
+        id: sourceMapsCacheKey
+        run: echo "value=$(node packages/build/src/computeSourceMapsCacheKey.ts)" >> $GITHUB_OUTPUT
+        shell: bash
+      - uses: actions/cache/restore@v6
+        with:
+          path: |
+            **/.vscode-source-maps
+            **/.vscode-sources
+          key: ${{ runner.os }}-cacheSourceMaps-${{ steps.sourceMapsCacheKey.outputs.value }}
+      - name: Download extracted source files
+        uses: actions/download-artifact@v8
+        with:
+          name: vscode-memory-leak-finder-sources-linux
+          path: ./.vscode-sources
       - name: npm ci
         run: npm run install:ci
         if: steps.npm-cache.outputs.cache-hit != 'true'
       - run: npm run type-check
       - run: npm run lint
       - run: npm run build
+      - name: Download CSS selector stats
+        uses: actions/download-artifact@v8
+        with:
+          name: vscode-memory-leak-finder-results-linux-css-selector-stats
+          path: ./vscode-memory-leak-finder-results-linux-css-selector-stats
+      - name: Download extension-host measure results
+        uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
+          pattern: vscode-memory-leak-finder-results-linux-*-extensions
+          path: ./vscode-memory-leak-finder-results-linux-extensions
       - name: Download all measure results
         uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-event-listeners
           path: ./vscode-memory-leak-finder-results-linux-event-listeners
+      - uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-instruction-count-arm64
+          path: ./vscode-memory-leak-finder-results-linux-instruction-count-arm64
       - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
@@ -574,6 +727,16 @@ jobs:
       - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
+          name: vscode-memory-leak-finder-results-linux-string-object-count
+          path: ./vscode-memory-leak-finder-results-linux-string-object-count
+      - uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-string-object-bytes
+          path: ./vscode-memory-leak-finder-results-linux-string-object-bytes
+      - uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
           name: vscode-memory-leak-finder-results-linux-disposable-count
           path: ./vscode-memory-leak-finder-results-linux-disposable-count
       - uses: actions/download-artifact@v8
@@ -601,6 +764,11 @@ jobs:
         with:
           name: vscode-memory-leak-finder-results-linux-file-watcher-count
           path: ./vscode-memory-leak-finder-results-linux-file-watcher-count
+      - uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-pending-promise-count
+          path: ./vscode-memory-leak-finder-results-linux-pending-promise-count
       - name: Merge all measure results
         run: node packages/build/src/mergeArtifacts.ts
       - name: Upload merged artifact
@@ -844,9 +1012,134 @@ jobs:
         uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
         with:
+          name: vscode-memory-leak-finder-results-linux-string-object-count
+      - name: Delete individual artifacts
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-string-object-bytes
+      - name: Delete individual artifacts
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
           name: vscode-memory-leak-finder-results-linux-disposable-count
+      - name: Delete extension-host artifact (pending-promise-count-extensions)
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-pending-promise-count-extensions
+      - name: Delete extension-host artifact (promise-count-extensions)
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-promise-count-extensions
+      - name: Delete extension-host artifact (array-count-extensions)
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-array-count-extensions
+      - name: Delete extension-host artifact (array-element-count-extensions)
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-array-element-count-extensions
+      - name: Delete extension-host artifact (regex-count-extensions)
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-regex-count-extensions
+      - name: Delete extension-host artifact (function-count-extensions)
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-function-count-extensions
+      - name: Delete extension-host artifact (weak-map-count-extensions)
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-weak-map-count-extensions
+      - name: Delete extension-host artifact (number-count-extensions)
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-number-count-extensions
+      - name: Delete extension-host artifact (error-count-extensions)
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-error-count-extensions
+      - name: Delete extension-host artifact (weak-set-count-extensions)
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-weak-set-count-extensions
+      - name: Delete extension-host artifact (map-size-extensions)
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-map-size-extensions
+      - name: Delete extension-host artifact (set-size-extensions)
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-set-size-extensions
+      - name: Delete extension-host artifact (message-port-count-extensions)
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-message-port-count-extensions
+      - name: Delete extension-host artifact (symbol-count-extensions)
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-symbol-count-extensions
+      - name: Delete extension-host artifact (object-shape-count-extensions)
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-object-shape-count-extensions
+      - name: Delete extension-host artifact (object-count-extensions)
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-object-count-extensions
+      - name: Delete extension-host artifact (string-object-count-extensions)
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-string-object-count-extensions
+      - name: Delete extension-host artifact (string-object-bytes-extensions)
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-string-object-bytes-extensions
+      - name: Delete extension-host artifact (disposable-count-extensions)
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-disposable-count-extensions
+      - name: Delete individual instruction count artifact
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-instruction-count-arm64
+      - name: Delete individual artifacts
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-pending-promise-count
       - name: Generate charts
         run: node packages/charts/src/main.ts
+      - name: Verify extension-host overview charts
+        run: |
+          test -s .vscode-charts/extension-host/index.html
+          grep -q './array-count/index.html' .vscode-charts/extension-host/index.html
+          grep -q './function-count/index.html' .vscode-charts/extension-host/index.html
+          grep -q './extension-host/index.html' .vscode-charts/index.html
+      - name: Verify CSS selector report
+        run: test -s .vscode-charts/css-selector-stats/index.html
+      - name: Build documentation site
+        run: npm run docs:build --workspace packages/docs
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v5
         with:
@@ -854,12 +1147,30 @@ jobs:
 
   deploy:
     if: ${{ always() && needs.ci.result == 'success' && needs.ci-linux-charts.result == 'success' }}
+    concurrency:
+      group: github-pages-deploy
+      cancel-in-progress: false
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-24.04
     needs: [ci, ci-linux-charts]
     steps:
+      - name: Check whether this run is for the latest main commit
+        id: latest-main
+        run: |
+          latest_sha=$(git ls-remote "https://github.com/${GITHUB_REPOSITORY}.git" refs/heads/main | cut -f1)
+          if [ -z "$latest_sha" ]; then
+            echo "Could not determine the latest main commit" >&2
+            exit 1
+          fi
+          if [ "$GITHUB_SHA" = "$latest_sha" ]; then
+            echo "is-latest=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "is-latest=false" >> "$GITHUB_OUTPUT"
+          fi
+        shell: bash
       - name: Deploy to GitHub Pages
+        if: steps.latest-main.outputs.is-latest == 'true'
         id: deployment
         uses: actions/deploy-pages@v5

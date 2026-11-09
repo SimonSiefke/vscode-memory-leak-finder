@@ -1,0 +1,66 @@
+{
+  "name": "chat-failed-handoffs",
+  "displayName": "Chat Failed Handoffs",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.146.0"
+  },
+  "main": "./extension.js",
+  "enabledApiProposals": [
+    "chatParticipantAdditions",
+    "defaultChatParticipant"
+  ],
+  "contributes": {
+    "languageModelChatProviders": [
+      {
+        "vendor": "handoff-fixture",
+        "displayName": "Mock handoff model"
+      }
+    ],
+    "chatParticipants": [
+      {
+        "id": "chat-failed-handoffs.participant",
+        "name": "handofffixture",
+        "fullName": "Mock handoff participant",
+        "description": "Local inline and panel handoff fixture",
+        "isDefault": true,
+        "locations": [
+          "panel",
+          "editor"
+        ],
+        "modes": [
+          "ask",
+          "edit",
+          "agent"
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "command": "chat-failed-handoffs.setup",
+        "title": "Chat Failed Handoffs: Setup"
+      },
+      {
+        "command": "chat-failed-handoffs.start",
+        "title": "Chat Failed Handoffs: Start"
+      },
+      {
+        "command": "chat-failed-handoffs.handoff",
+        "title": "Chat Failed Handoffs: Handoff"
+      },
+      {
+        "command": "chat-failed-handoffs.cancel",
+        "title": "Chat Failed Handoffs: Cancel"
+      },
+      {
+        "command": "chat-failed-handoffs.cleanup",
+        "title": "Chat Failed Handoffs: Cleanup"
+      },
+      {
+        "command": "chat-failed-handoffs.verify",
+        "title": "Chat Failed Handoffs: Verify"
+      }
+    ]
+  }
+}

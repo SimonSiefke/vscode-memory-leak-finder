@@ -1,4 +1,6 @@
 .vscode-webview-load-time-results
+.vscode-duplicate-code/
+.large-*/
 .vscode-webview-memory-results
 .vscode-codex-webview-load-time-results
 .vscode-codex-warm-webview-load-time-results
@@ -10,6 +12,7 @@
 .vscode-user-data-dir.zip
 .vscode-sse-data
 .vscode-project-cache
+packages/docs/site/.vitepress/cache/
 .vscode-workbench-tracked
 .vscode-workbench-tracked-allocations
 .vscode-workbench-tracked-modules

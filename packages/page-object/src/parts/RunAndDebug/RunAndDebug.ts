@@ -493,7 +493,8 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       await expect(sessionLabel).toBeVisible()
       await expect(sessionLabel).toHaveText(/Paused/)
       await page.waitForIdle()
-      const stackFrame = page.locator('.debug-call-stack .monaco-list-row.selected')
+      // The session row can remain selected after the debugger pauses.
+      const stackFrame = page.locator('.debug-call-stack .monaco-list-row:has(.stack-frame)').first()
       await expect(stackFrame).toBeVisible()
       await expect(stackFrame).toHaveAttribute('aria-label', getStackFrameLabelPattern(file, line))
       if (callStackSize) {
@@ -525,7 +526,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       await expect(sessionLabel).toBeVisible()
       await expect(sessionLabel).toHaveText(/Paused/)
       await page.waitForIdle()
-      const stackFrame = page.locator('.debug-call-stack .monaco-list-row.selected')
+      const stackFrame = page.locator('.debug-call-stack .monaco-list-row:has(.stack-frame)').first()
       await expect(stackFrame).toBeVisible()
       await expect(stackFrame).toHaveAttribute('aria-label', `Stack Frame <anonymous>, line ${line}, ${file}`)
       await page.waitForIdle()
