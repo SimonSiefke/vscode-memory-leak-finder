@@ -16,6 +16,6 @@ Measurements have different scopes. Some inspect a renderer or extension host th
 - `packages/charts` turns result files into browsable reports.
 - `packages/electron-e2e` measures standalone Electron lifecycle scenarios.
 - `packages/large-benchmark` runs paired, version-to-version performance investigations.
-- `docs/measures` and `docs/scenarios` contain detailed source notes.
+- The [measure catalog](/measures/) and [scenario guides](/guide/scenarios) contain detailed measurement and workflow notes.
 
 [Read the execution flow](/guide/execution-flow) or [start a local run](/guide/quick-start).

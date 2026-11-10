@@ -85,8 +85,9 @@ const mergeOriginal = (items: Dynamic, cleanInstances: Dynamic) => {
       originalIndex++
       const instance = reverseMap[originalIndex]
       if (instance && instance.originalStack) {
+        const isFirstOriginalFrame = originalStack.length === 0
         originalStack.push(instance.originalStack[0])
-        if (i === 0 && instance.sourcesHash) {
+        if (isFirstOriginalFrame && instance.sourcesHash) {
           sourcesHash = instance.sourcesHash
         }
       }

@@ -5,6 +5,7 @@ interface CpuProfileFrame {
   readonly hitCount?: number
   readonly location?: string
   readonly name?: string
+  readonly originalLocation?: string
   readonly selfTimeMs?: number
   readonly startMs?: number
   readonly totalTimeMs?: number
@@ -17,6 +18,7 @@ interface NormalizedCpuProfileFrame {
   readonly hitCount: number
   readonly location: string
   readonly name: string
+  readonly originalLocation: string
   readonly selfTimeMs: number
   readonly startMs: number
   readonly totalTimeMs: number
@@ -64,6 +66,7 @@ const normalizeFrame = (frame: CpuProfileFrame): NormalizedCpuProfileFrame => {
     hitCount: Math.max(0, Math.floor(toNumber(frame.hitCount))),
     location,
     name,
+    originalLocation: toString(frame.originalLocation),
     selfTimeMs: Math.max(0, toNumber(frame.selfTimeMs)),
     startMs: Math.max(0, toNumber(frame.startMs)),
     totalTimeMs: Math.max(0, toNumber(frame.totalTimeMs)),
@@ -141,7 +144,11 @@ const getLabel = (name: string, width: number): string => {
 }
 
 const getTooltip = (frame: NormalizedCpuProfileFrame): string => {
-  const locationLine = frame.location ? `\nLocation: ${frame.location}` : ''
+  const locationLine = frame.originalLocation
+    ? `\nLocation: ${frame.originalLocation}\nGenerated location: ${frame.location}`
+    : frame.location
+      ? `\nLocation: ${frame.location}`
+      : ''
   return `${frame.name}${locationLine}\nStart: ${roundMetricValue(frame.startMs)} ms\nDuration: ${roundMetricValue(frame.durationMs)} ms\nSelf: ${roundMetricValue(frame.selfTimeMs)} ms\nTotal: ${roundMetricValue(frame.totalTimeMs)} ms\nHits: ${frame.hitCount}`
 }
 

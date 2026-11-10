@@ -15,11 +15,12 @@ The static site is written to `.vscode-charts/docs`, leaving chart and report pa
 
 ## Documentation source
 
-The overview, quick start, execution flow, scenario guide, and report guide are maintained in `site`. The measure catalog is generated from the public collector registry in `packages/memory-leak-finder/src/parts/Measures/Measures.ts`; detailed notes remain in their original locations under `docs/measures` and `docs/scenarios`.
+The overview, quick start, execution flow, scenario guide, and report guide are maintained in `site`. The measure catalog is generated from the public collector registry in `packages/memory-leak-finder/src/parts/Measures/Measures.ts`. Detailed measure and scenario guides also live in `site`, where VitePress includes them in local search. CI audit records are kept in `ci-audits` and are not published as user guides.
 
 ## Existing project guides
 
 - [Large performance benchmarks](../large-benchmark/README.md)
 - [Electron end-to-end tests](../electron-e2e/README.md)
-- [Scenario notes](../../docs/scenarios)
-- [Measure notes](../../docs/measures)
+- [Scenario guides](./site/scenarios)
+- [Measure guides](./site/measures)
+- [CI audit records](./ci-audits)
