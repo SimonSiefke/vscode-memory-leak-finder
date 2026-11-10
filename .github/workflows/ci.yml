@@ -221,6 +221,8 @@ jobs:
             args: --measure detached-dom-node-count --timeout-between 10000
           - name: pending-promise-count
             args: --measure pending-promise-count
+          - name: empty-set-count
+            args: --measure empty-set-count
           - name: promise-count
             args: --measure promise-count
           - name: promises-with-stack-trace-shard-1
@@ -785,6 +787,11 @@ jobs:
       - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
+          name: vscode-memory-leak-finder-results-linux-empty-set-count
+          path: ./vscode-memory-leak-finder-results-linux-empty-set-count
+      - uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
           name: vscode-memory-leak-finder-results-linux-pending-promise-count
           path: ./vscode-memory-leak-finder-results-linux-pending-promise-count
       - name: Merge all measure results
@@ -1146,6 +1153,11 @@ jobs:
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-instruction-count-arm64
+      - name: Delete individual artifacts
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-empty-set-count
       - name: Delete individual artifacts
         uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
