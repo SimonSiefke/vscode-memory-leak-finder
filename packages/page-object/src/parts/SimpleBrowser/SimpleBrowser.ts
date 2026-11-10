@@ -16,7 +16,7 @@ interface DeferredMockServer extends MockServer {
   finishResponse: () => void
 }
 
-const workspacePath = join(Root.root, '.vscode-test-workspace')
+const defaultWorkspacePath = join(Root.root, '.vscode-test-workspace')
 const usedPorts = new Set<number>()
 
 const getProcessIdsUsingPort = async (port: number): Promise<readonly number[]> => {
@@ -180,7 +180,15 @@ const createDeferredMockServer = async ({ port }: { port: number }): Promise<Def
   }
 }
 
-const createWorkspaceFileServer = async ({ port, relativePath }: { port: number; relativePath: string }): Promise<MockServer> => {
+const createWorkspaceFileServer = async ({
+  port,
+  relativePath,
+  workspacePath,
+}: {
+  port: number
+  relativePath: string
+  workspacePath: string
+}): Promise<MockServer> => {
   const absolutePath = join(workspacePath, relativePath)
   const server = createServer(async (_req, res) => {
     try {
@@ -209,7 +217,7 @@ const createWorkspaceFileServer = async ({ port, relativePath }: { port: number;
 
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
-export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
+export const create = ({ electronApp, expect, ideVersion, page, platform, VError, workspacePath = defaultWorkspacePath }: CreateParams) => {
   const api = {
     async activateChatEditorForBrowserContext() {
       const candidates = [
@@ -710,7 +718,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async createWorkspaceFileServer({ id, port, relativePath }: { id: string; port: number; relativePath: string }) {
       try {
         await page.waitForIdle()
-        const server = await createWorkspaceFileServer({ port, relativePath })
+        const server = await createWorkspaceFileServer({ port, relativePath, workspacePath })
         this.mockServers[id] = server
         await page.waitForIdle()
       } catch (error) {

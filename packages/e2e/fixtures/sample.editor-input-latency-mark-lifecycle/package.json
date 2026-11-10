@@ -1,0 +1,26 @@
+{
+  "name": "editor-input-latency-mark-lifecycle",
+  "displayName": "Editor Input Latency Mark Lifecycle",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "editor-input-latency-mark-lifecycle.setup",
+        "title": "Editor Input Latency Mark Lifecycle: Setup"
+      },
+      {
+        "command": "editor-input-latency-mark-lifecycle.run",
+        "title": "Editor Input Latency Mark Lifecycle: Run"
+      },
+      {
+        "command": "editor-input-latency-mark-lifecycle.cleanup",
+        "title": "Editor Input Latency Mark Lifecycle: Cleanup"
+      }
+    ]
+  }
+}

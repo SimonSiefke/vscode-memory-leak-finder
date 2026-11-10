@@ -1,3 +1,4 @@
+import { get, type IncomingMessage } from 'node:http'
 import type { Dynamic } from '../Types/Types.ts'
 import waitForLocalhost from 'wait-for-localhost'
 import * as ConfigureHttpAgentMaxListeners from '../ConfigureHttpAgentMaxListeners/ConfigureHttpAgentMaxListeners.ts'
@@ -14,11 +15,16 @@ export const getJson = async (port: number): Promise<Dynamic[]> => {
       signal: AbortSignal.timeout(30000),
       useGet: true,
     })
-    const response = await fetch(`http://localhost:${port}/json/list`)
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+    const response = await new Promise<IncomingMessage>((resolve, reject) => {
+      get(`http://127.0.0.1:${port}/json/list`, { agent: false, signal: AbortSignal.timeout(5000) }, resolve).once('error', reject)
+    })
+    response.setEncoding('utf8')
+    let body = ''
+    for await (const chunk of response) body += chunk
+    if (response.statusCode !== 200) {
+      throw new Error(`HTTP ${response.statusCode}: ${response.statusMessage}`)
     }
-    const targets = await response.json()
+    const targets = JSON.parse(body)
     if (!Array.isArray(targets)) {
       throw new TypeError(`Expected array but got ${typeof targets}`)
     }

@@ -14,6 +14,7 @@ export interface PrepareTestsOptions {
   readonly downloadUserDataZipFileUrl: string
   readonly enableExtensions: boolean
   readonly enableProxy: boolean
+  readonly launchAgentWindow?: boolean | undefined
   readonly headlessMode: boolean
   readonly ide: string
   readonly ideVersion: string
@@ -54,6 +55,7 @@ export const prepareTests = async (options: PrepareTestsOptions) => {
     downloadUserDataZipFileUrl,
     enableExtensions,
     enableProxy,
+    launchAgentWindow,
     headlessMode,
     ide,
     insidersCommit,
@@ -91,6 +93,7 @@ export const prepareTests = async (options: PrepareTestsOptions) => {
       downloadUserDataZipFileUrl,
       enableExtensions,
       enableProxy,
+      launchAgentWindow,
       headlessMode,
       ide,
       insidersCommit,

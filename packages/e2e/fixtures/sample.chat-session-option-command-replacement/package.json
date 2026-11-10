@@ -1,0 +1,35 @@
+{
+  "name": "chat-session-option-command-replacement",
+  "displayName": "Chat Session Option Command Replacement",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "chatSessions": [
+      {
+        "type": "lifecycle-options",
+        "name": "Lifecycle options"
+      }
+    ],
+    "commands": [
+      {
+        "command": "chat-session-option-command-replacement.setup",
+        "title": "Chat Session Option Command Replacement: Setup"
+      },
+      {
+        "command": "chat-session-option-command-replacement.run",
+        "title": "Chat Session Option Command Replacement: Run"
+      },
+      {
+        "command": "chat-session-option-command-replacement.cleanup",
+        "title": "Chat Session Option Command Replacement: Cleanup"
+      }
+    ]
+  },
+  "enabledApiProposals": [
+    "chatSessionsProvider"
+  ]
+}

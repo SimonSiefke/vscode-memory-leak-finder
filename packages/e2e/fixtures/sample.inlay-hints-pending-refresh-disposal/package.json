@@ -1,0 +1,26 @@
+{
+  "name": "inlay-hints-pending-refresh-disposal",
+  "displayName": "Inlay Hints Pending Refresh Disposal",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "inlay-hints-pending-refresh-disposal.setup",
+        "title": "Inlay Hints Pending Refresh Disposal: Setup"
+      },
+      {
+        "command": "inlay-hints-pending-refresh-disposal.run",
+        "title": "Inlay Hints Pending Refresh Disposal: Run"
+      },
+      {
+        "command": "inlay-hints-pending-refresh-disposal.cleanup",
+        "title": "Inlay Hints Pending Refresh Disposal: Cleanup"
+      }
+    ]
+  }
+}

@@ -60,9 +60,9 @@
     ]
   },
   "dependencies": {
-    "@lvce-editor/rpc": "^6.19.3",
+    "@lvce-editor/rpc": "^6.23.0",
     "ansi-escapes": "^7.3.0",
-    "chalk": "^6.0.0"
+    "chalk": "^6.0.1"
   },
   "devDependencies": {}
 }

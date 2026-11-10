@@ -16,4 +16,6 @@ export type CreateParams = {
   readonly reconnectDevtools?: () => Promise<void>
   readonly subprocessRuntime?: 'bun' | 'node'
   readonly VError: any
+  readonly workspacePath?: string
+  readonly extensionsPath?: string
 }

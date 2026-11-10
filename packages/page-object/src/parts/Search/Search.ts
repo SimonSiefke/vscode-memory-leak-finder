@@ -2,6 +2,12 @@ import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
 export const create = ({ expect, page, VError }: CreateParams) => {
   return {
+    async submit() {
+      await page.keyboard.press('Enter')
+    },
+    async shouldHaveSummary(text: string | RegExp) {
+      await expect(page.locator('.search-view .messages')).toHaveText(text)
+    },
     async clear() {
       try {
         await page.waitForIdle()

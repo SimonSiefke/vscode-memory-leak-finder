@@ -1,0 +1,39 @@
+{
+  "name": "task-custom-execution-late-provider-disposal",
+  "displayName": "Task Custom Execution Late Provider Disposal",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "taskDefinitions": [
+      {
+        "type": "late-disposal-task",
+        "required": [
+          "task"
+        ],
+        "properties": {
+          "task": {
+            "type": "string"
+          }
+        }
+      }
+    ],
+    "commands": [
+      {
+        "command": "task-custom-execution-late-provider-disposal.setup",
+        "title": "Task Custom Execution Late Provider Disposal: Setup"
+      },
+      {
+        "command": "task-custom-execution-late-provider-disposal.run",
+        "title": "Task Custom Execution Late Provider Disposal: Run"
+      },
+      {
+        "command": "task-custom-execution-late-provider-disposal.cleanup",
+        "title": "Task Custom Execution Late Provider Disposal: Cleanup"
+      }
+    ]
+  }
+}

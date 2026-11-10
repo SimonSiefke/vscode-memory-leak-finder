@@ -13,8 +13,7 @@ export const takeHeapSnapshot = async (session: Session, outFile: Dynamic, optio
   const stream = HeapSnapshotStream.create(session, options)
   const writeStream = createWriteStream(outFile)
   const pipelinePromise = pipeline(stream, writeStream)
-  await stream.start()
-  await pipelinePromise
+  await Promise.all([stream.start(), pipelinePromise])
 }
 
 export const takeTrackingHeapSnapshot = async (session: Session, outFile: string, options: Dynamic = {}) => {
@@ -24,6 +23,5 @@ export const takeTrackingHeapSnapshot = async (session: Session, outFile: string
   const stream = HeapSnapshotStream.createTrackingSnapshot(session, options)
   const writeStream = createWriteStream(outFile)
   const pipelinePromise = pipeline(stream, writeStream)
-  await stream.start()
-  await pipelinePromise
+  await Promise.all([stream.start(), pipelinePromise])
 }

@@ -8,6 +8,11 @@ import * as StdinDataState from '../StdinDataState/StdinDataState.ts'
 import * as StdoutWorker from '../StdoutWorker/StdoutWorker.ts'
 
 export const run = async (platform: string, arch: string, argv: readonly string[], env: NodeJS.ProcessEnv): Promise<void> => {
+  if (argv[argv.lastIndexOf('--measure') + 1] === 'duplicate-code' && argv.includes('--measure')) {
+    const { measureDuplicateCode } = await import('../MeasureDuplicateCode/MeasureDuplicateCode.ts')
+    await measureDuplicateCode(argv)
+    return
+  }
   await StdoutWorker.initialize()
   Object.assign(CommandMapRef.commandMapRef, CommandMap.commandMap)
   if (argv.includes('--create-all-mock-data-zip')) {
@@ -32,6 +37,9 @@ export const run = async (platform: string, arch: string, argv: readonly string[
     continueValue: options.continueValue,
     cwd: options.cwd,
     enableExtensions: options.enableExtensions,
+    launchAgentWindow: options.launchAgentWindow,
+    enableProxy: options.enableProxy,
+    useProxyMock: options.useProxyMock,
     headless: options.headless,
     ide: options.ide,
     ideVersion: options.ideVersion,

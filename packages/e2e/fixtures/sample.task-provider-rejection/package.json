@@ -1,0 +1,33 @@
+{
+  "name": "task-provider-rejection",
+  "displayName": "Task Provider Rejection",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "taskDefinitions": [
+      {
+        "type": "rejected-provider",
+        "required": [],
+        "properties": {}
+      }
+    ],
+    "commands": [
+      {
+        "command": "task-provider-rejection.setup",
+        "title": "Task Provider Rejection: Setup"
+      },
+      {
+        "command": "task-provider-rejection.run",
+        "title": "Task Provider Rejection: Run"
+      },
+      {
+        "command": "task-provider-rejection.cleanup",
+        "title": "Task Provider Rejection: Cleanup"
+      }
+    ]
+  }
+}

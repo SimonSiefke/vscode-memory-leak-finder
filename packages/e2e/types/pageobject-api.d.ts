@@ -54,6 +54,32 @@ export interface PageObjectWindowHandle extends NewWindowHandle {
   shouldBeVisible(): Promise<void>
 }
 
+export interface AgentsWindow {
+  armCanvasObserver(): Promise<void>
+  keepCanvasObserver(title: string): Promise<void>
+  disposeCanvasObservers(): Promise<void>
+  showInboxEvidence(title: string): Promise<void>
+  presentInboxCanvas(): Promise<void>
+  hideInboxCanvas(): Promise<void>
+  closeInboxEvidence(): Promise<void>
+  selectWorkspace(path: string, readinessDirectory: string): Promise<void>
+  archiveChat(title: string): Promise<void>
+  selectNoWorkspace(): Promise<void>
+  shouldBeVisible(): Promise<void>
+  newChat(): Promise<void>
+  shouldHaveNewChat(): Promise<void>
+  typeDraft(message: string): Promise<void>
+  clearDraft(): Promise<void>
+  shouldHaveSendDisabled(): Promise<void>
+  sendNewChat(message: string): Promise<void>
+  sendMessage(message: string): Promise<void>
+  shouldHaveRequest(message: string): Promise<void>
+  shouldHaveReply(text: string, count?: number): Promise<void>
+  shouldHaveSession(title: string): Promise<void>
+  openChat(title: string): Promise<void>
+  deleteChat(title: string): Promise<void>
+}
+
 export interface ActivityBar {
   hide(): Promise<void>
   hideTooltip(): Promise<void>
@@ -189,6 +215,8 @@ export interface DropDownContextMenu {
   shouldHaveItem(option: any): Promise<void>
 }
 export interface Editor {
+  shouldContainText(text: string): Promise<void>
+  typeCharacters(text: string): Promise<void>
   warmUpTextEditor(fileName?: any): Promise<void>
   acceptInlineCompletion(): Promise<void>
   acceptRename(): Promise<void>
@@ -201,6 +229,8 @@ export interface Editor {
   closeAll(): Promise<void>
   closeOthers(): Promise<void>
   closeAllEditorGroups(): Promise<void>
+  closeActiveEditorGroup(): Promise<void>
+  shouldHaveEditorGroupCount(count: number): Promise<void>
   closeAutoFix(): Promise<void>
   closeFind(): Promise<void>
   closeInspectedTokens(): Promise<void>
@@ -214,6 +244,7 @@ export interface Editor {
   disableVersionLens(): Promise<void>
   duplicateSelection(): Promise<void>
   enable2x2GridView(): Promise<void>
+  enableSingleColumnLayout(): Promise<void>
   enableReadonly(): Promise<void>
   enableStickyScroll(): Promise<void>
   enableVersionLens(): Promise<void>
@@ -262,7 +293,7 @@ export interface Editor {
   replaceText(options: any): Promise<void>
   save(options: any): Promise<void>
   saveAll(): Promise<void>
-  scrollDown(): Promise<void>
+  scrollDown(options?: { viaKeyBoard?: boolean }): Promise<void>
   scrollUp(): Promise<void>
   select(text: any): Promise<void>
   selectAll(options?: any): Promise<void>
@@ -339,6 +370,7 @@ export interface Editor {
   waitForNewWindow(options: any, electron: any): Promise<number>
 }
 export interface EditorFind {
+  shouldHaveMatchesCount(text: string): Promise<void>
   openReplace(): Promise<void>
   replace(): Promise<void>
   setReplaceValue(value: any): Promise<void>
@@ -460,7 +492,7 @@ export interface Extensions {
   shouldHaveTitle(expectedTtitle: any): Promise<void>
   shouldHaveValue(value: any): Promise<void>
   show(): Promise<void>
-  waitForProgressToBeHidden(): Promise<void>
+  waitForProgressToBeHidden(options?: { timeout?: number }): Promise<void>
   readonly first: any
   readonly second: any
 }
@@ -555,6 +587,7 @@ export interface MultiDiffEditor {
   shouldBeVisible(): Promise<void>
 }
 export interface Notebook {
+  focusReplInput(): Promise<void>
   addMarkdownCell(): Promise<void>
   clearAllOutputs(): Promise<void>
   createVenv(): Promise<void>
@@ -563,6 +596,7 @@ export interface Notebook {
   removeMarkdownCell(): Promise<void>
   scrollDown(): Promise<void>
   scrollUp(): Promise<void>
+  shouldHaveKernel(expectedKernel: string): Promise<void>
   shouldHaveOutput(expectedOutput: string): Promise<void>
   splitCell(cellIndex?: any): Promise<void>
 }
@@ -576,8 +610,9 @@ export interface Notification {
   shouldHaveItem(expectedMessage: any): Promise<void>
 }
 export interface Output {
+  shouldHaveText(text: RegExp, timeout?: number): Promise<void>
   clearFilter(): Promise<void>
-  filter(filterValue: any): Promise<void>
+  filter(filterValue: any, options?: { timeout?: number }): Promise<void>
   hide(): Promise<void>
   moveOutputToSidebar(): Promise<void>
   openEditor(): Promise<void>
@@ -626,6 +661,7 @@ export interface Profile {
   removeOtherProfiles(): Promise<void>
 }
 export interface QuickPick {
+  shouldHaveItem(text: string): Promise<void>
   close(): Promise<void>
   executeCommand(command: any, options?: any): Promise<void>
   focusNext(): Promise<void>
@@ -674,12 +710,14 @@ export interface RunAndDebug {
 }
 export interface RunningExtensions {
   show(): Promise<void>
-  showAndWaitFor(name: any): Promise<void>
+  showAndWaitFor(name: string, ...extensionIds: string[]): Promise<void>
   startDebuggingExtensionHost(): Promise<void>
   startProfilingExtensionHost(): Promise<void>
   stopProfilingExtensionHost(): Promise<void>
 }
 export interface Search {
+  submit(): Promise<void>
+  shouldHaveSummary(text: string | RegExp): Promise<void>
   shouldBeVisible(): Promise<void>
   clear(): Promise<void>
   collapseFiles(): Promise<void>
@@ -706,6 +744,7 @@ export interface SettingsEditor {
   ensureIdle(): Promise<void>
   expand(groupName: any): Promise<void>
   focusOutline(name: any): Promise<void>
+  hasCheckBox(name: string): Promise<boolean>
   moveScrollBar(y: any, expectedScrollBarTop: any): Promise<void>
   open(): Promise<void>
   openSettingsContextMenu(name: any, options: any): Promise<void>
@@ -857,6 +896,8 @@ export interface Task {
   unpin(name: any): Promise<void>
 }
 export interface Terminal {
+  waitForShellPrompt(): Promise<void>
+  shouldHaveOutputLine(text: string): Promise<void>
   add(): Promise<void>
   clear(): Promise<void>
   clearFindInput(): Promise<void>
@@ -888,6 +929,7 @@ export interface TerminalInlineChat {
   show(): Promise<void>
 }
 export interface Testing {
+  shouldHaveSummary(text: string | RegExp, timeout?: number): Promise<void>
   clearAllResults(): Promise<void>
   focusOnTestExplorerView(): Promise<void>
   runAllTests(options: any): Promise<void>
@@ -948,9 +990,13 @@ export interface Window {
   focus(): Promise<void>
 }
 export interface Workbench {
+  collectGarbage(): Promise<void>
   connectToSsh(options: any): Promise<void>
   waitForNewWindow(options: any): Promise<void>
-  openNewWindow(): Promise<PageObjectApi & PageObjectWindowHandle>
+  openNewWindow(command?: string): Promise<PageObjectApi & PageObjectWindowHandle>
+  openChatWindow(): Promise<PageObjectApi & PageObjectWindowHandle>
+  waitForNewWindowReady(timeout?: number, url?: string): Promise<PageObjectApi & PageObjectWindowHandle>
+  connectWindow(sessionId: string): Promise<PageObjectApi & PageObjectWindowHandle>
   close(): Promise<void>
   evaluate(options: any): Promise<unknown>
   shouldBeVisible(): Promise<void>
@@ -960,6 +1006,7 @@ export interface Workbench {
   shouldHaveEditorBackground(color: any): Promise<void>
 }
 export interface Workspace {
+  getWorkspacePath(): string
   add(options: any): Promise<void>
   addExtension(name: any): Promise<void>
   initializeGitRepository(): Promise<void>
@@ -976,6 +1023,7 @@ export interface Workspace {
 }
 
 export interface PageObjectApi {
+  readonly AgentsWindow: AgentsWindow
   readonly ActivityBar: ActivityBar
   readonly AccessibilityHelp: AccessibilityHelp
   readonly CallHierarchy: CallHierarchy

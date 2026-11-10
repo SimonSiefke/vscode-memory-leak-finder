@@ -118,7 +118,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
         const checkbox = page.locator(`.monaco-custom-toggle[aria-label="${name}"]`)
         await expect(checkbox).toBeVisible()
-        const checkedValue = checkbox.getAttribute('aria-checked')
+        const checkedValue = await checkbox.getAttribute('aria-checked')
         if (checkedValue === 'false') {
           return
         }
@@ -184,6 +184,10 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       } catch (error) {
         throw new VError(error, `Failed to focus outline item`)
       }
+    },
+    async hasCheckBox(name: string): Promise<boolean> {
+      await page.waitForIdle()
+      return (await page.locator(`.monaco-custom-toggle[aria-label="${name}"]`).count()) > 0
     },
     async moveScrollBar(y: number, expectedScrollBarTop: number) {
       try {
@@ -322,7 +326,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to remove item`)
       }
     },
-    async search({ resultCount, value }: { resultCount: number | 'many'; value: string }) {
+    async search({ resultCount, value }: { resultCount: number | 'many' | 'any'; value: string }) {
       try {
         await page.waitForIdle()
         const searchInput = page.locator('.search-container [role="textbox"]')
@@ -336,9 +340,9 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const searchCount = page.locator('.settings-count-widget')
         await expect(searchCount).toBeVisible()
         await page.waitForIdle()
-        if (resultCount === 'many' || resultCount > 1) {
-          await expect(searchCount).toHaveText(new RegExp(`\\d+ Settings Found`))
-        } else {
+        if (resultCount === 'many') {
+          await expect(searchCount).toHaveText(/^[1-9]\d* Settings? Found$/)
+        } else if (resultCount !== 'any') {
           const word = resultCount === 1 ? 'Setting' : 'Settings'
           await expect(searchCount).toHaveText(`${resultCount} ${word} Found`)
         }

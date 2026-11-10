@@ -42,6 +42,7 @@ export const updateState = async (newState: any): Promise<void> => {
       downloadUserDataZipFileUrl: '',
       enableExtensions: state.enableExtensions,
       enableProxy: state.enableProxy,
+      launchAgentWindow: state.launchAgentWindow,
       filterValue: state.value,
       headlessMode: state.headless,
       ide: state.ide,

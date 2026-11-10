@@ -1,22 +1,23 @@
 import { existsSync } from 'node:fs'
 import { mkdir, readdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
+import { escapeHtml } from '../EscapeHtml/EscapeHtml.ts'
 import * as CopyAssetsToFolder from '../CopyAssetsToFolder/CopyAssetsToFolder.ts'
 import * as GeneratePromiseStackTraceHtml from '../GeneratePromiseStackTraceHtml/GeneratePromiseStackTraceHtml.ts'
 import * as Root from '../Root/Root.ts'
 
-const baseStructure = `
+const getBaseStructure = (title: string) => `
 <!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8">
-    <title>VSCode Memory Leak Finder Charts</title>
+    <title>${title}</title>
     <link rel="stylesheet" href="./styles.css">
   </head>
 
   <body>
     <header>
-      <h1>VSCode Memory Leak Finder Charts</h1>
+      <h1>${title}</h1>
     </header>
     <main class="Main">
       CONTENT
@@ -39,6 +40,20 @@ const getMiddleHtml = (dirents: string[]) => {
   return html
 }
 
+const getLabeledChartsHtml = (dirents: string[]): string => {
+  let html = '<ul class="Charts SingleColumn">\n'
+  for (const dirent of dirents) {
+    if (!dirent.endsWith('.svg')) {
+      continue
+    }
+    const chartName = escapeHtml(dirent.slice(0, -4))
+    const src = escapeHtml(encodeURIComponent(dirent))
+    html += `        <li class="Chart"><h2 class="ChartTitle">${chartName}</h2><img class="ChartImage" src="./${src}" alt="${chartName}"></li>\n`
+  }
+  html += '      </ul>'
+  return html
+}
+
 const singleColumnFolders = new Set([
   'compiled-code-size-by-file',
   'compiled-code-size-by-function',
@@ -52,6 +67,12 @@ const singleColumnFolders = new Set([
 ])
 
 export const getFolderContentHtml = (folderName: string, dirents: string[]): string => {
+  if (folderName === 'map-and-set-size') {
+    return getLabeledChartsHtml(dirents)
+  }
+  if (folderName === 'cpu-performance-counters') {
+    return getLabeledChartsHtml(dirents)
+  }
   if (singleColumnFolders.has(folderName)) {
     return getSingleColumnHtml(dirents)
   }
@@ -66,7 +87,7 @@ const generateIndexHtmlForFolder = async (folderPath: string, folderName: string
   await CopyAssetsToFolder.copyAssetsToFolder(folderPath)
 
   const middleHtml = getFolderContentHtml(folderName, dirents)
-  const html = baseStructure.replace('CONTENT', middleHtml)
+  const html = getBaseStructure('VSCode Memory Leak Finder Charts').replace('CONTENT', middleHtml)
   await writeFile(outPath, html)
 }
 
@@ -85,7 +106,7 @@ const getSingleColumnHtml = (dirents: string[]): string => {
 
   html += '          </ul>\n'
   html += '        </nav>\n'
-  html += '        <main class="ChartsContainer">\n'
+  html += '        <div class="ChartsContainer">\n'
   html += '          <ul class="Charts SingleColumn">\n'
 
   for (const svgFile of svgFiles) {
@@ -94,7 +115,7 @@ const getSingleColumnHtml = (dirents: string[]): string => {
   }
 
   html += '          </ul>\n'
-  html += '        </main>\n'
+  html += '        </div>\n'
   html += '        <svg class="ArrowOverlay" id="arrowOverlay">\n'
   html += '          <path id="arrowPath" stroke="black" stroke-width="2" fill="none" opacity="0" />\n'
   html += '          <polygon id="arrowHead" points="0,0 12,6 0,12" fill="black" opacity="0" />\n'
@@ -130,6 +151,51 @@ const generateIndexHtmlRecursively = async (basePath: string): Promise<void> => 
   }
 }
 
+export const getExtensionHostOverviewHtml = (charts: readonly { folder: string; files: readonly string[] }[]): string => {
+  const sections = charts
+    .map(({ folder, files }) => {
+      const images = files
+        .map((file) => {
+          const src = `./${encodeURIComponent(folder)}/${encodeURIComponent(file)}`
+          const alt = escapeHtml(file)
+          return `<li class="Chart"><img class="ChartImage" src="${src}" alt="${alt}"></li>`
+        })
+        .join('\n')
+      return `<section><h2><a href="./${encodeURIComponent(folder)}/index.html">${escapeHtml(folder)}</a></h2><ul class="Charts">\n${images}\n</ul></section>`
+    })
+    .join('\n')
+  return getBaseStructure('VS Code Extension Host Memory Charts').replace(
+    'CONTENT',
+    `<p><a href="../index.html">All process charts</a></p>${sections}`,
+  )
+}
+
+const generateExtensionHostOverview = async (chartsPath: string): Promise<boolean> => {
+  const extensionHostPath = join(chartsPath, 'extension-host')
+  if (!existsSync(extensionHostPath)) {
+    return false
+  }
+  const entries = await readdir(extensionHostPath, { withFileTypes: true })
+  const charts: { folder: string; files: string[] }[] = []
+  for (const entry of entries) {
+    if (!entry.isDirectory()) {
+      continue
+    }
+    const chartFolderPath = join(extensionHostPath, entry.name)
+    const chartFiles = await readdir(chartFolderPath)
+    const svgFiles = chartFiles.filter((file) => file.endsWith('.svg'))
+    if (svgFiles.length > 0) {
+      charts.push({ folder: entry.name, files: svgFiles })
+    }
+  }
+  if (charts.length === 0) {
+    return false
+  }
+  await CopyAssetsToFolder.copyAssetsToFolder(extensionHostPath)
+  await writeFile(join(extensionHostPath, 'index.html'), getExtensionHostOverviewHtml(charts))
+  return true
+}
+
 export const generateIndexHtml = async (): Promise<void> => {
   const outPath = join(Root.root, '.vscode-charts', `index.html`)
   const svgPath = join(Root.root, '.vscode-charts')
@@ -144,8 +210,11 @@ export const generateIndexHtml = async (): Promise<void> => {
   await CopyAssetsToFolder.copyAssetsToFolder(svgPath)
 
   const dirents = await readdir(svgPath)
-  const middleHtml = getMiddleHtml(dirents)
-  const html = baseStructure.replace('CONTENT', middleHtml)
+  let middleHtml = getMiddleHtml(dirents)
+  if (await generateExtensionHostOverview(svgPath)) {
+    middleHtml += '\n<p><a href="./extension-host/index.html">Extension host charts</a></p>'
+  }
+  const html = getBaseStructure('VSCode Memory Leak Finder Charts').replace('CONTENT', middleHtml)
   await writeFile(outPath, html)
 
   // Generate index.html for subfolders that contain multiple SVG files

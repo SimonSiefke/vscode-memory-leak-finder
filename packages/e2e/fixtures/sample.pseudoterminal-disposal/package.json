@@ -1,0 +1,26 @@
+{
+  "name": "pseudoterminal-disposal",
+  "displayName": "Pseudoterminal Disposal",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "pseudoterminal-disposal.setup",
+        "title": "Pseudoterminal Disposal: Setup"
+      },
+      {
+        "command": "pseudoterminal-disposal.run",
+        "title": "Pseudoterminal Disposal: Run"
+      },
+      {
+        "command": "pseudoterminal-disposal.cleanup",
+        "title": "Pseudoterminal Disposal: Cleanup"
+      }
+    ]
+  }
+}

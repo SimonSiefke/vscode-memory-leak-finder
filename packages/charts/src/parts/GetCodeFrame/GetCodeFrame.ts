@@ -1,6 +1,5 @@
 import { codeFrameColumns } from '@babel/code-frame'
 import { existsSync, readFileSync } from 'node:fs'
-import { readdir } from 'node:fs/promises'
 import { join } from 'node:path'
 import * as Root from '../Root/Root.ts'
 
@@ -12,7 +11,11 @@ interface ParseStackLineResult {
 
 const parseStackLine = (line: string): ParseStackLineResult | null => {
   // Format: "src/vs/editor/contrib/find/browser/findWidget.ts:381:69"
-  const match = line.match(/^(.+):(\d+):(\d+)$/)
+  const match = line
+    .trim()
+    .replace(/^at\s+/, '')
+    .replace(/^.*\((.*)\)$/, '$1')
+    .match(/^(.+):(\d+):(\d+)$/)
   if (!match) {
     return null
   }
@@ -38,20 +41,6 @@ const findSourceFile = async (relativePath: string, sourcesHash: string | null |
     return null
   }
 
-  try {
-    const hashDirs = await readdir(sourcesDir, { withFileTypes: true })
-    for (const hashDir of hashDirs) {
-      if (hashDir.isDirectory()) {
-        const sourceFilePath = join(sourcesDir, hashDir.name, relativePath)
-        if (existsSync(sourceFilePath)) {
-          return sourceFilePath
-        }
-      }
-    }
-  } catch {
-    // Ignore errors
-  }
-
   return null
 }
 
@@ -71,14 +60,15 @@ export const getCodeFrame = async (stackLine: string, sourcesHash?: string | nul
     const rawLines = readFileSync(sourceFilePath, 'utf8')
     const location = {
       start: {
-        column: column,
+        // Source-map columns are zero based; Babel columns are one based.
+        column: column + 1,
         line: line,
       },
     }
     const codeFrame = codeFrameColumns(rawLines, location, {
       highlightCode: false,
-      linesAbove: 5,
-      linesBelow: 5,
+      linesAbove: 2,
+      linesBelow: 2,
     })
     return codeFrame
   } catch {

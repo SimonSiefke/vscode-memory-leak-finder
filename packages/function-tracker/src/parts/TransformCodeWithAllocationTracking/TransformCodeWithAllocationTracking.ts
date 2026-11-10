@@ -25,7 +25,10 @@ const collectAllocationLocations = (ast: any): Map<any, { line: number; column: 
   return allocationLocations
 }
 
-export const transformCodeWithAllocationTracking = (code: string, options: TransformOptions = {}): string => {
+export const transformCodeWithAllocationTracking = (
+  code: string,
+  options: TransformOptions & { readonly trackBytes?: boolean } = {},
+): string => {
   if (!code) {
     return ''
   }
@@ -41,7 +44,7 @@ export const transformCodeWithAllocationTracking = (code: string, options: Trans
     })
 
     const allocationLocations = collectAllocationLocations(originalAst)
-    const plugin = createAllocationWrapperPlugin({ allocationLocations, scriptId })
+    const plugin = createAllocationWrapperPlugin({ allocationLocations, scriptId, trackBytes: options.trackBytes })
     traverse2(originalAst, plugin)
     allocationLocations.clear()
 

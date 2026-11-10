@@ -1,3 +1,4 @@
+import { allocationBytesPreamble } from '../AllocationBytesPreamble/AllocationBytesPreamble.ts'
 import type { TransformOptions } from '../Types/Types.ts'
 import { transformCodeWithAllocationTracking } from '../TransformCodeWithAllocationTracking/TransformCodeWithAllocationTracking.ts'
 import { transformCodeWithTracking } from '../TransformCodeWithTracking/TransformCodeWithTracking.ts'
@@ -186,6 +187,9 @@ const TIMEOUT_PREAMBLE_CODE = `(() => {
 
 export const transformCode = async (code: string, options: TransformOptions = {}): Promise<string> => {
   const { trackingMode = 'functions' } = options
+  if (trackingMode === 'allocation-bytes') {
+    return allocationBytesPreamble + '\n' + transformCodeWithAllocationTracking(code, { ...options, trackBytes: true })
+  }
   if (trackingMode === 'allocations') {
     const transformedCode = transformCodeWithAllocationTracking(code, { ...options })
     return ALLOCATION_PREAMBLE_CODE + '\n' + transformedCode

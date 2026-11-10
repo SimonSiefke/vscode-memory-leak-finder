@@ -5,6 +5,7 @@ import * as SanitizeFilename from '../SanitizeFilename/SanitizeFilename.ts'
 
 const getImageExtension = (contentType: string): string => {
   const contentTypeLower = contentType.toLowerCase()
+  if (contentTypeLower.includes('octet-stream')) return 'bin'
   if (contentTypeLower.includes('png')) {
     return 'png'
   }

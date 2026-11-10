@@ -1,0 +1,26 @@
+{
+  "name": "comment-thread-disposal",
+  "displayName": "Comment Thread Disposal",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "comment-thread-disposal.setup",
+        "title": "Comment Thread Disposal: Setup"
+      },
+      {
+        "command": "comment-thread-disposal.run",
+        "title": "Comment Thread Disposal: Run"
+      },
+      {
+        "command": "comment-thread-disposal.cleanup",
+        "title": "Comment Thread Disposal: Cleanup"
+      }
+    ]
+  }
+}

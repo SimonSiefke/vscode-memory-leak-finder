@@ -1,62 +1,14 @@
 import { addUtilityExecutionContext } from '../AddUtilityExecutionContext/AddUtilityExecutionContext.ts'
 import * as Assert from '../Assert/Assert.ts'
 import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/DebuggerCreateIpcConnection.ts'
-import { DevtoolsProtocolPage, DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import { DevtoolsProtocolPage } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import { createPageObjectContext, createDefaultContext, createUtilityContext } from '../CreateTestContext/CreateTestContext.ts'
 import * as DisableTimeouts from '../DisableTimeouts/DisableTimeouts.ts'
-import * as ElectronApp from '../ElectronApp/ElectronApp.ts'
-import * as Expect from '../Expect/Expect.ts'
 import * as ImportScript from '../ImportScript/ImportScript.ts'
 import * as LivePage from '../LivePage/LivePage.ts'
 import * as Page from '../Page/Page.ts'
 import * as PageObjectState from '../PageObjectState/PageObjectState.ts'
-import { VError } from '../VError/VError.ts'
 import { waitForSession } from '../WaitForSession/WaitForSession.ts'
-
-const createDefaultContext = (sessionRpc, utilityContext) => {
-  return {
-    callFunctionOn(options) {
-      return DevtoolsProtocolRuntime.evaluate(sessionRpc, {
-        ...options,
-        ...(utilityContext.uniqueId
-          ? {
-              uniqueContextId: utilityContext.uniqueId,
-            }
-          : {
-              contextId: utilityContext.id,
-            }),
-      })
-    },
-  }
-}
-
-const createUtilityContext = (sessionRpc, utilityContext) => {
-  return {
-    callFunctionOn(options) {
-      return DevtoolsProtocolRuntime.callFunctionOn(sessionRpc, {
-        ...options,
-        ...(utilityContext.uniqueId
-          ? {
-              uniqueContextId: utilityContext.uniqueId,
-            }
-          : {
-              executionContextId: utilityContext.id,
-            }),
-      })
-    },
-    evaluate(options) {
-      return DevtoolsProtocolRuntime.evaluate(sessionRpc, {
-        ...options,
-        ...(utilityContext.uniqueId
-          ? {
-              uniqueContextId: utilityContext.uniqueId,
-            }
-          : {
-              contextId: utilityContext.id,
-            }),
-      })
-    },
-  }
-}
 
 export const connectDevtools = async (
   platform: string,
@@ -104,23 +56,17 @@ export const connectDevtools = async (
     utilityContext,
   })
 
-  const pageObjectContext: any = {
+  const pageObjectContext = createPageObjectContext({
     browserRpc,
-    defaultContext: createDefaultContext(sessionRpc, utilityContext),
-    electronApp: undefined,
-    evaluateInDefaultContext(item) {
-      throw new Error(`not implemented`)
-    },
-    evaluateInUtilityContext(item) {},
-    expect: Expect.expect,
-    ideVersion: parsedIdeVersion,
-    page: undefined,
-    platform,
-    reconnectDevtools: undefined,
+    electronObjectId,
+    electronRpc,
+    idleTimeout,
+    page: firstWindow,
     sessionRpc,
-    utilityContext: createUtilityContext(sessionRpc, utilityContext),
-    VError,
-  }
+    utilityContext,
+    ideVersion: parsedIdeVersion,
+    platform,
+  })
 
   const livePage: any = LivePage.create({
     onRebind: async (nextPage) => {
@@ -133,15 +79,8 @@ export const connectDevtools = async (
   })
   pageObjectContext.page = livePage
 
-  const electronApp = ElectronApp.create({
-    browserRpc,
-    electronObjectId,
-    electronRpc,
-    firstWindow: livePage,
-    idleTimeout,
-    sessionRpc,
-  })
-  pageObjectContext.electronApp = electronApp
+  const electronApp = pageObjectContext.electronApp
+  electronApp.rebind({ firstWindow: livePage, sessionRpc })
   pageObjectContext.reconnectDevtools = async () => {
     const reconnectTimeout = Math.min(attachedToPageTimeout, 5000)
     const { sessionId, sessionRpc, targetId } = await waitForSession(browserRpc, reconnectTimeout)

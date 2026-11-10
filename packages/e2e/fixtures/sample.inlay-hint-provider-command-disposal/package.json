@@ -1,0 +1,26 @@
+{
+  "name": "inlay-hint-provider-command-disposal",
+  "displayName": "Inlay Hint Provider Command Disposal",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "inlay-hint-provider-command-disposal.setup",
+        "title": "Inlay Hint Provider Command Disposal: Setup"
+      },
+      {
+        "command": "inlay-hint-provider-command-disposal.run",
+        "title": "Inlay Hint Provider Command Disposal: Run"
+      },
+      {
+        "command": "inlay-hint-provider-command-disposal.cleanup",
+        "title": "Inlay Hint Provider Command Disposal: Cleanup"
+      }
+    ]
+  }
+}

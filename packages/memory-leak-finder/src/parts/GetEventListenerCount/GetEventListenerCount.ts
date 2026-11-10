@@ -29,10 +29,8 @@ const getAllEventListeners = (nodes) => {
   for (const node of nodes) {
     const listeners = getEventListeners(node)
     for (const [key, value] of Object.entries(listeners)) {
-      listenerMap[key] ||= 0
-      listenerMap[key] += value.length
-      listenerMap.z_total ||= 0
-      listenerMap.z_total += value.length
+      listenerMap[key] = (listenerMap[key] || 0) + value.length
+      listenerMap.z_total = (listenerMap.z_total || 0) + value.length
     }
   }
   return listenerMap.z_total
