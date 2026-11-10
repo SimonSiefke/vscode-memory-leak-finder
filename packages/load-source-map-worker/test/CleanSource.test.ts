@@ -13,6 +13,21 @@ test('cleanSource - markdown language features', () => {
   )
 })
 
+test('cleanSource - named webpack source', () => {
+  const input = 'webpack://my-extension/./src/../src/extension.ts'
+  expect(cleanSource(input)).toBe('my-extension/src/extension.ts')
+})
+
+test('cleanSource - unnamed webpack source', () => {
+  const input = 'webpack:///./src/extension.ts'
+  expect(cleanSource(input)).toBe('src/extension.ts')
+})
+
+test('cleanSource - webpack external module', () => {
+  const input = 'webpack://my-extension/external commonjs "some-package"'
+  expect(cleanSource(input)).toBe('my-extension/external/commonjs/some-package')
+})
+
 test('cleanSource - external commonjs vscode', () => {
   const input = 'webpack://markdown-language-features/external commonjs "vscode"'
   expect(cleanSource(input)).toBe('extensions/markdown-language-features/external/commonjs/vscode')

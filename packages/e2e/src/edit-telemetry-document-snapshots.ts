@@ -2,7 +2,7 @@ import * as Snapshots from '../helpers/editTelemetrySnapshots.ts'
 import type { TestContext } from '../types.ts'
 
 // Requires unbundled VS Code modules and usage telemetry (local logging in OSS
-// development builds). See docs/scenarios/edit-telemetry-document-snapshots.md.
+// development builds). See packages/docs/site/scenarios/edit-telemetry-document-snapshots.md.
 export const skip = 1
 
 let iteration = 0
