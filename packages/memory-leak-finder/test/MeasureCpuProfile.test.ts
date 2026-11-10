@@ -22,6 +22,8 @@ test('cpu profile measure lifecycle starts and stops the profiler', async () => 
   }
   const session = {
     dispose() {},
+    on() {},
+    off() {},
     invoke(method: string, params: unknown) {
       calls.push([method, params])
       if (method === 'Profiler.stop') {
@@ -31,14 +33,15 @@ test('cpu profile measure lifecycle starts and stops the profiler', async () => 
     },
   } as any
 
-  const args = MeasureCpuProfile.create(session) as [any]
+  const args = MeasureCpuProfile.create(session) as [any, any]
   const before = await MeasureCpuProfile.start(...args)
   const after = await MeasureCpuProfile.stop(...args)
   const result = MeasureCpuProfile.compare(before, after)
-  await MeasureCpuProfile.releaseResources(...args)
+  await MeasureCpuProfile.releaseResources(session)
 
   expect(before.metrics.sampleCount).toBe(0)
-  expect(after).toBe(profile)
+  expect(after.profile).toBe(profile)
+  expect(after.scriptMap).toEqual({})
   expect(result.isLeak).toBe(false)
   expect(result.metrics.totalTimeMs).toBe(3)
   expect(result.topSelfTime[0]).toMatchObject({
@@ -47,9 +50,11 @@ test('cpu profile measure lifecycle starts and stops the profiler', async () => 
     selfTimeMs: 3,
   })
   expect(calls).toEqual([
+    ['Debugger.enable', undefined],
     ['Profiler.enable', {}],
     ['Profiler.start', {}],
     ['Profiler.stop', {}],
+    ['Debugger.disable', undefined],
     ['Profiler.disable', {}],
   ])
 })

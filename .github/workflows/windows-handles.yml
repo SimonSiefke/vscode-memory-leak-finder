@@ -9,10 +9,6 @@ on:
     branches:
       - main
 
-concurrency:
-  group: windows-handles-${{ github.ref }}
-  cancel-in-progress: true
-
 permissions:
   contents: read
 
