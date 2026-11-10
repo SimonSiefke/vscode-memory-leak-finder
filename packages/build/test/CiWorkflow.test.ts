@@ -9,12 +9,10 @@ const getWorkflowPath = (workflowName = 'ci.yml'): string => {
   return join(testDir, '..', '..', '..', '.github', 'workflows', workflowName)
 }
 
-test('ci cancels superseded runs before starting the measure matrix', async () => {
+test('ci retains every run before starting the measure matrix', async () => {
   const workflow = await readFile(getWorkflowPath(), 'utf8')
 
-  expect(workflow).toContain(`concurrency:
-  group: ci-\${{ github.ref }}
-  cancel-in-progress: true`)
+  expect(workflow).not.toContain('\nconcurrency:')
 })
 
 test('ci measure failures do not block the Pages deployment', async () => {
@@ -26,6 +24,14 @@ test('ci measure failures do not block the Pages deployment', async () => {
         uses: coactions/setup-xvfb@v1`)
   expect(workflow).toContain(`  deploy:
     if: \${{ always() && needs.ci.result == 'success' && needs.ci-linux-charts.result == 'success' }}`)
+  expect(workflow).toContain(`    concurrency:
+      group: github-pages-deploy
+      cancel-in-progress: false`)
+  expect(workflow).toContain(`      - name: Check whether this run is for the latest main commit
+        id: latest-main`)
+  expect(workflow).toContain('git ls-remote "https://github.com/${GITHUB_REPOSITORY}.git" refs/heads/main')
+  expect(workflow).toContain('if [ -z "$latest_sha" ]; then')
+  expect(workflow).toContain("        if: steps.latest-main.outputs.is-latest == 'true'\n        id: deployment")
 })
 
 test('pr bounds the Memory City smoke test without the setup-xvfb action wrapper', async () => {
@@ -122,7 +128,7 @@ test('Windows handles runs separately from ci and pr so cancellation cannot affe
   }
 })
 
-test('the optional Windows handles workflow runs on pushes and pull requests and uploads charts', async () => {
+test('the optional Windows handles workflow retains push and pull request runs and uploads charts', async () => {
   const workflow = await readFile(getWorkflowPath('windows-handles.yml'), 'utf8')
 
   expect(workflow).toContain(`on:
@@ -132,9 +138,7 @@ test('the optional Windows handles workflow runs on pushes and pull requests and
   pull_request:
     branches:
       - main`)
-  expect(workflow).toContain(`concurrency:
-  group: windows-handles-\${{ github.ref }}
-  cancel-in-progress: true`)
+  expect(workflow).not.toContain('\nconcurrency:')
   expect(workflow).toContain(`  windows-handles:
     runs-on: windows-2022
     continue-on-error: true`)

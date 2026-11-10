@@ -128,7 +128,16 @@ export const generatePromiseStackTraceHtmlForFolder = async (
     const svg = await rpc.invoke(
       'Chart.create',
       items.map((item) => ({ count: item.count || 0, delta: item.delta || 0, name: getPromiseTitle(getPromiseStack(item)) })),
-      { type: 'dual-bar-chart', fontSize: 12, marginLeft: 400, marginRight: 100, width: 1400, compress: config.compress },
+      {
+        type: 'dual-bar-chart',
+        fontSize: 12,
+        marginLeft: 400,
+        marginRight: 100,
+        width: 1400,
+        labelAlign: 'left',
+        labelLineWidth: 400,
+        compress: config.compress,
+      },
     )
     await writeFile(join(targetFolderPath, chartFile), svg)
     content += `<section class="PromiseScenario">\n<h2>${EscapeHtml.escapeHtml(scenario)}</h2>\n`
