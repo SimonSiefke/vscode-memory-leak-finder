@@ -32,9 +32,16 @@ test('snapshot byte measures use the ordinary streamed measure lifecycle and rel
   const measure = wrapMeasure(MeasureHeapSnapshotBytes).create(session)
   try {
     const before = await measure.start()
+    await measure.runCompletion()
     const after = await measure.stop()
     expect(before.map((metric: any) => metric.value)).toEqual([150, 50])
-    expect(measure.compare(before, after, {})).toMatchObject({ isLeak: false })
+    expect(measure.compare(before, after, {})).toMatchObject({
+      isLeak: false,
+      samples: [
+        { runIndex: 0, metrics: { heapBytes: 150, compiledCodeBytes: 50 } },
+        { runIndex: 1, metrics: { heapBytes: 150, compiledCodeBytes: 50 } },
+      ],
+    })
     expect(calls).toEqual(['HeapProfiler.takeHeapSnapshot', 'HeapProfiler.takeHeapSnapshot'])
     expect(listeners.size).toBe(0)
   } finally {

@@ -54,6 +54,12 @@ test('renders Babel context and a caret at the zero-based source-map column, usi
   })
 })
 
+test('does not guess a source revision when a stack trace has no source hash', async () => {
+  await withSource(async (_hash, location) => {
+    expect(await getCodeFrame(location)).toBeNull()
+  })
+})
+
 test('discovers promise folders under the renderer and other process results', async () => {
   const root = await mkdtemp(join(tmpdir(), 'promise-folders-'))
   try {
@@ -140,6 +146,9 @@ test('writes black/red charts and source frames above complete stacks, retaining
       expect(cards[3].querySelector('img')).toBeNull()
       const svg = await readFile(join(target, 'scenario & growth.svg'), 'utf8')
       const chart = new JSDOM(svg, { contentType: 'image/svg+xml' }).window.document
+      const chartLabels = [...chart.querySelectorAll('[aria-label="y-axis tick label"] text')]
+      expect(chartLabels).toHaveLength(4)
+      expect(chartLabels.map((label) => Number(label.getAttribute('x')))).toEqual([0, 0, 0, 0])
       expect(chart.querySelector('[aria-label="rect"] [fill="#000"], [aria-label="rect"] [fill="#000000"]')).not.toBeNull()
       expect(chart.querySelector('[fill="#b22222"], [fill="#B22222"]')).not.toBeNull()
       expect([...chart.querySelectorAll('text')].filter((node) => node.textContent === 'promise.ts:4:2')).toHaveLength(2)
