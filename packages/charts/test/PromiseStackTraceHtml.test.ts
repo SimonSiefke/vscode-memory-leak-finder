@@ -106,7 +106,13 @@ test('writes black/red charts and source frames above complete stacks, retaining
         join(source, 'scenario & growth.json'),
         JSON.stringify({
           promisesWithStackTrace: [
-            { count: 10, delta: 7, originalStack: [location, 'src/caller.ts:20:0'], sourcesHash: hash },
+            {
+              count: 10,
+              delta: 7,
+              properties: { first: 1, second: 2 },
+              originalStack: [location, 'src/caller.ts:20:0'],
+              sourcesHash: hash,
+            },
             { count: 8, delta: 5, originalStack: `${location}\nsrc/other.ts:30:0`, sourcesHash: hash },
             {
               count: 6,
@@ -126,6 +132,9 @@ test('writes black/red charts and source frames above complete stacks, retaining
       expect(html).not.toContain('Increase (red)')
       expect(document.querySelector('.PromiseChartLegend, .InitialSwatch, .GrowthSwatch')).toBeNull()
       expect(cards).toHaveLength(4)
+      expect(html).not.toContain('Properties:')
+      expect(cards[0].querySelector('.PromiseItemMeta')?.textContent).toContain('Count: 10')
+      expect(cards[0].querySelector('.PromiseItemMeta')?.textContent).toContain('Delta: 7')
       expect(document.querySelector('h2')?.textContent).toBe('scenario & growth')
       expect(document.querySelector('.PromiseChart')?.getAttribute('src')).toBe('./scenario%20%26%20growth.svg')
       expect(cards[0].querySelector('.CodeFrame code')?.textContent).toContain('> 4 |   return new Promise(() => "<pending>")')
