@@ -176,8 +176,6 @@ export const generatePromiseStackTraceHtmlForFolder = async (
       const stackTrace = getPromiseStack(item)
       const count = item.count || 0
       const delta = item.delta || 0
-      const properties = item.properties || {}
-
       const promiseTitle = getPromiseTitle(stackTrace)
 
       content += '<div class="PromiseItem">\n'
@@ -186,9 +184,6 @@ export const generatePromiseStackTraceHtmlForFolder = async (
       content += '    <div class="PromiseItemMeta">\n'
       content += `      <span>Count: ${count}</span>\n`
       content += `      <span>Delta: ${delta}</span>\n`
-      if (Object.keys(properties).length > 0) {
-        content += `      <span>Properties: ${Object.keys(properties).length}</span>\n`
-      }
       content += '    </div>\n'
       content += '  </div>\n'
 
