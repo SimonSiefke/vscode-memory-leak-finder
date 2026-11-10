@@ -72,6 +72,33 @@ const getPromiseTitle = (stackTrace: string | string[]): string => {
   return 'Promise'
 }
 
+const codeFrameAnsiColors: Record<string, string> = {
+  '31': 'CodeFrameToken-marker',
+  '32': 'CodeFrameToken-string',
+  '33': 'CodeFrameToken-punctuation',
+  '35': 'CodeFrameToken-number',
+  '36': 'CodeFrameToken-keyword',
+  '90': 'CodeFrameToken-comment',
+}
+
+const codeFrameToHtml = (codeFrame: string): string => {
+  let html = ''
+  let activeClass = ''
+  const parts = codeFrame.split(/\u001b\[([\d;]+)m/)
+  for (let i = 0; i < parts.length; i++) {
+    if (i % 2 === 1) {
+      const color = parts[i].split(';').find((code) => code in codeFrameAnsiColors)
+      activeClass = color ? codeFrameAnsiColors[color] : ''
+      continue
+    }
+    if (!parts[i]) continue
+    const escaped = EscapeHtml.escapeHtml(parts[i])
+    const className = activeClass === 'CodeFrameToken-comment' && /^\s*[\d|]+\s*\|$/.test(parts[i]) ? 'CodeFrameToken-gutter' : activeClass
+    html += className ? `<span class="${className}">${escaped}</span>` : escaped
+  }
+  return html
+}
+
 export const generatePromiseStackTraceHtmlForFolder = async (
   sourceFolderPath: string,
   targetFolderPath: string,
@@ -165,10 +192,10 @@ export const generatePromiseStackTraceHtmlForFolder = async (
       content += '    </div>\n'
       content += '  </div>\n'
 
-      const codeFrame = stackTrace[0] ? await GetCodeFrame.getCodeFrame(stackTrace[0], item.sourcesHash) : null
+      const codeFrame = stackTrace[0] ? await GetCodeFrame.getCodeFrame(stackTrace[0], item.sourcesHash, true) : null
       if (codeFrame) {
         content += '  <div class="CodeFrame"><h4>Source</h4>\n'
-        content += `    <pre><code>${EscapeHtml.escapeHtml(codeFrame)}</code></pre>\n`
+        content += `    <pre><code>${codeFrameToHtml(codeFrame)}</code></pre>\n`
         content += '  </div>\n'
       } else {
         content += '  <p class="CodeFrameUnavailable">Source code unavailable for this location.</p>\n'
