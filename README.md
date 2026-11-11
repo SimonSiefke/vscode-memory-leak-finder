@@ -644,6 +644,15 @@ Measures the total number of ResizeObservers.
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure resize-observer-count --only base
 ```
 
+### Script compilation evaluation
+
+See [the script-compilation-evaluation measure](docs/measures/script-compilation-evaluation.md) for coverage, result fields, and limitations.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure script-compilation-evaluation --only base
+npm run build-charts
+```
+
 ### SetSize
 
 Measures the total number of elements in all Sets.
@@ -1039,3 +1048,13 @@ selector tracing adds overhead. Empty traces are shown explicitly.
 
 Run locally with `node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure css-selector-stats --runs 1 --restart-between --run-skipped-tests-anyway`,
 then `npm run build-charts`. The page is written to `.vscode-charts/css-selector-stats/index.html`.
+
+### Empty Set Count
+
+Counts live `Set` instances with no entries in the inspected JavaScript realm. The native size accessor avoids invoking application-defined `size` getters. Temporary inspector references are released after each reading.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure empty-set-count
+```
+
+Linux CI collects this measure and publishes `empty-set-count.svg` on the main GitHub Pages charts page.

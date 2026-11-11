@@ -47,6 +47,27 @@
   font-size: 13px;
   line-height: 1.5;
 }
+.CodeFrameToken-keyword {
+  color: #0000ff;
+}
+.CodeFrameToken-string {
+  color: #a31515;
+}
+.CodeFrameToken-comment {
+  color: #008000;
+}
+.CodeFrameToken-gutter {
+  color: #6a737d;
+}
+.CodeFrameToken-number {
+  color: #098658;
+}
+.CodeFrameToken-punctuation {
+  color: #795e26;
+}
+.CodeFrameToken-marker {
+  color: #cd3131;
+}
 
 .PromiseScenario {
   margin-bottom: 48px;

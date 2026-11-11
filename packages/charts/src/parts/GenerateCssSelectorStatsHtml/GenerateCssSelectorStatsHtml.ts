@@ -47,7 +47,19 @@ export const getCssSelectorStatsData = async (basePath: string): Promise<Scenari
     }
     scenarios.push({ name: file.slice(0, -5).replaceAll('\\', '/'), rows: [...selectors.values()] })
   }
-  return scenarios
+  const totals = new Map<string, SelectorRow>()
+  for (const scenario of scenarios) {
+    for (const row of scenario.rows) {
+      const previous = totals.get(row.selector)
+      totals.set(row.selector, {
+        selector: row.selector,
+        elapsedMs: (previous?.elapsedMs || 0) + row.elapsedMs,
+        matchAttempts: (previous?.matchAttempts || 0) + row.matchAttempts,
+        matchCount: (previous?.matchCount || 0) + row.matchCount,
+      })
+    }
+  }
+  return [{ name: 'all', rows: [...totals.values()] }, ...scenarios]
 }
 
 export const renderCssSelectorStatsHtml = (scenarios: readonly Scenario[]): string => {
@@ -102,7 +114,7 @@ table{border-collapse:collapse;width:100%;table-layout:fixed;font-variant-numeri
 th{position:sticky;top:0;background:#edf1fa}th:first-child,td:first-child{text-align:left;width:60%}td:first-child{font:13px ui-monospace,monospace}
 th button{font:inherit;font-weight:600;border:0;background:transparent;color:inherit;cursor:pointer}th[aria-sort=descending] button::after{content:' ▼'}th[aria-sort=ascending] button::after{content:' ▲'}tbody tr:nth-child(even){background:#f7f9fd}
 </style></head><body><h1>Slowest CSS selectors</h1>
-<p>CSS selector matching during each measured VS Code scenario, excluding application startup. Each scenario runs once in a fresh instance. Time is total matching time in milliseconds; identical selector text is combined across stylesheets. Instrumentation adds overhead, and scenario duration and background activity affect the totals.</p>
+<p>CSS selector matching during each measured VS Code scenario, excluding application startup. Each scenario runs once in a fresh instance. Time is total matching time in milliseconds; identical selector text is combined across stylesheets. The “all” scenario sums recorded rows across all tests; older truncated results may not include every selector. Instrumentation adds overhead, and scenario duration and background activity affect the totals.</p>
 <div class="controls"><label>Scenario <select id="scenario">${options}</select></label><label>Filter selectors <input id="filter" type="search" placeholder="Selector text"></label></div>
 <p id="status" role="status">${status}</p><p>Click a column heading to sort; click again to reverse. The top 1,000 rows are selected after filtering and sorting all selectors.</p>
 <table><thead><tr><th scope="col" aria-sort="none"><button data-key="selector">Selector name</button></th><th scope="col" aria-sort="descending"><button data-key="elapsedMs">Time (ms)</button></th><th scope="col" aria-sort="none"><button data-key="matchAttempts">matchAttempts</button></th><th scope="col" aria-sort="none"><button data-key="matchCount">matchCount</button></th></tr></thead><tbody>${tableRows}</tbody></table>

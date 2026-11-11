@@ -221,6 +221,8 @@ jobs:
             args: --measure detached-dom-node-count --timeout-between 10000
           - name: pending-promise-count
             args: --measure pending-promise-count
+          - name: empty-set-count
+            args: --measure empty-set-count
           - name: promise-count
             args: --measure promise-count
           - name: promises-with-stack-trace-shard-1
@@ -467,7 +469,7 @@ jobs:
   ci-linux-charts:
     runs-on: ubuntu-24.04
     needs: [ci-linux-measures, ci-linux-instruction-count]
-    if: ${{ always() && needs.ci-linux-measures.result != 'cancelled' }}
+    if: ${{ always() && needs.ci-linux-measures.result == 'success' && needs.ci-linux-instruction-count.result == 'success' }}
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v7
@@ -521,6 +523,7 @@ jobs:
         with:
           pattern: vscode-memory-leak-finder-results-linux-*-extensions
           path: ./vscode-memory-leak-finder-results-linux-extensions
+          merge-multiple: true
       - name: Download all measure results
         uses: actions/download-artifact@v8
         continue-on-error: true
@@ -782,6 +785,11 @@ jobs:
         with:
           name: vscode-memory-leak-finder-results-linux-file-watcher-count
           path: ./vscode-memory-leak-finder-results-linux-file-watcher-count
+      - uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-empty-set-count
+          path: ./vscode-memory-leak-finder-results-linux-empty-set-count
       - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
@@ -1150,14 +1158,19 @@ jobs:
         uses: geekyeggo/delete-artifact@v6
         continue-on-error: true
         with:
+          name: vscode-memory-leak-finder-results-linux-empty-set-count
+      - name: Delete individual artifacts
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
           name: vscode-memory-leak-finder-results-linux-pending-promise-count
       - name: Generate charts
         run: node packages/charts/src/main.ts
       - name: Verify extension-host overview charts
         run: |
           test -s .vscode-charts/extension-host/index.html
-          grep -q './array-count/index.html' .vscode-charts/extension-host/index.html
-          grep -q './function-count/index.html' .vscode-charts/extension-host/index.html
+          grep -q 'src="./array-count.svg"' .vscode-charts/extension-host/index.html
+          grep -q 'src="./function-count.svg"' .vscode-charts/extension-host/index.html
           grep -q './extension-host/index.html' .vscode-charts/index.html
       - name: Verify startup performance report
         run: |

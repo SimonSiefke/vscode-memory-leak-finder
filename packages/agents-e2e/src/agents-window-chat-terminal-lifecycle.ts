@@ -116,7 +116,9 @@ const cycle = async (context: TestContext, end: 'delete' | 'archive' | 'reload')
             label: 'Chat terminal lifecycle task',
             type: 'shell',
             inAgents: true,
-            command: String.raw`printf '%s\t%s\n' "$$" "$PWD" >> .chat-window-task-pids`,
+            // A newly launched task shell can drop the first input character before its prompt is ready.
+            // Start with harmless whitespace so the marker command remains intact if that byte is lost.
+            command: String.raw` printf '%s\t%s\n' "$$" "$PWD" >> .chat-window-task-pids`,
             presentation: { panel: 'dedicated', clear: false },
             problemMatcher: [],
           },
@@ -168,8 +170,9 @@ const cycle = async (context: TestContext, end: 'delete' | 'archive' | 'reload')
     const taskReadiness = await connectTaskReadiness(userData as string)
     const firstExecution = await taskReadiness.checkpoint()
     await child.QuickPick.executeCommand('Agents: Run Primary Task')
-    const taskOwner = await taskReadiness.waitAfter(firstExecution)
+    // Let the renderer finish the task action before requiring its asynchronously captured AHP completion event.
     await child.waitForIdle()
+    const taskOwner = await taskReadiness.waitAfter(firstExecution)
     const readPids = async (): Promise<number[]> => {
       try {
         const text = (await readFile(taskPids, 'utf8')).trim()
@@ -202,8 +205,8 @@ const cycle = async (context: TestContext, end: 'delete' | 'archive' | 'reload')
     await requireAlive(shells, 'hiding task terminals')
     const secondExecution = await taskReadiness.checkpoint()
     await child.QuickPick.executeCommand('Agents: Run Primary Task')
-    await taskReadiness.waitAfter(secondExecution, taskOwner)
     await child.waitForIdle()
+    await taskReadiness.waitAfter(secondExecution, taskOwner)
     assert.deepEqual(await readPids(), [taskPid, taskPid], 'Hidden task must reuse its existing shell')
     await requireAlive(shells, 'hidden task reuse')
 
