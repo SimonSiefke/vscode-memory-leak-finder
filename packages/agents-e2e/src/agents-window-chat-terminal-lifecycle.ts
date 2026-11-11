@@ -170,8 +170,9 @@ const cycle = async (context: TestContext, end: 'delete' | 'archive' | 'reload')
     const taskReadiness = await connectTaskReadiness(userData as string)
     const firstExecution = await taskReadiness.checkpoint()
     await child.QuickPick.executeCommand('Agents: Run Primary Task')
-    const taskOwner = await taskReadiness.waitAfter(firstExecution)
+    // Let the renderer finish the task action before requiring its asynchronously captured AHP completion event.
     await child.waitForIdle()
+    const taskOwner = await taskReadiness.waitAfter(firstExecution)
     const readPids = async (): Promise<number[]> => {
       try {
         const text = (await readFile(taskPids, 'utf8')).trim()
@@ -204,8 +205,8 @@ const cycle = async (context: TestContext, end: 'delete' | 'archive' | 'reload')
     await requireAlive(shells, 'hiding task terminals')
     const secondExecution = await taskReadiness.checkpoint()
     await child.QuickPick.executeCommand('Agents: Run Primary Task')
-    await taskReadiness.waitAfter(secondExecution, taskOwner)
     await child.waitForIdle()
+    await taskReadiness.waitAfter(secondExecution, taskOwner)
     assert.deepEqual(await readPids(), [taskPid, taskPid], 'Hidden task must reuse its existing shell')
     await requireAlive(shells, 'hidden task reuse')
 
