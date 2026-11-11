@@ -59,11 +59,32 @@ export const connect = async (userData: string) => {
       return new Set((await read()).map((execution) => execution.key))
     },
     async waitAfter(before: Set<string>, owner?: Execution): Promise<Execution> {
-      const executions = await waitFor(
-        'the renderer to receive task command completion',
-        async () => (await read()).filter((execution) => !before.has(execution.key)),
-        (executions) => executions.some((execution) => execution.finished),
-      )
+      let executions: Execution[]
+      try {
+        executions = await waitFor(
+          'the renderer to receive task command completion',
+          async () => (await read()).filter((execution) => !before.has(execution.key)),
+          (executions) => executions.some((execution) => execution.finished),
+        )
+      } catch (error) {
+        const messages = await readLogMessages()
+        const terminalEvents = messages
+          .filter(
+            (message) =>
+              message._ahpLog?.dir === 's2c' &&
+              message._ahpLog.transport === 'local' &&
+              message.params?.action?.type?.startsWith('terminal/'),
+          )
+          .slice(-40)
+          .map((message) => ({
+            connectionId: message._ahpLog?.connectionId,
+            channel: message.params?.channel,
+            ...message.params?.action,
+          }))
+        throw new Error(
+          `${String(error)}; checkpoint=${JSON.stringify([...before])}; observed=${JSON.stringify(await read())}; terminalEvents=${JSON.stringify(terminalEvents)}`,
+        )
+      }
       assert.equal(executions.length, 1, 'One task invocation must execute exactly one fixture shell command')
       const execution = executions[0]
       assert.ok(execution.finished)
