@@ -82,7 +82,9 @@ test('ci measures total array length and downloads the results for Pages charts'
 test('ci collects Node-compatible measures for the extension host and verifies its Pages overview', async () => {
   const workflow = await readFile(getWorkflowPath(), 'utf8')
 
-  expect(workflow).toContain("if: ${{ always() && needs.ci-linux-measures.result == 'success' && needs.ci-linux-instruction-count.result == 'success' }}")
+  expect(workflow).toContain(
+    "if: ${{ always() && needs.ci-linux-measures.result == 'success' && needs.ci-linux-instruction-count.result == 'success' }}",
+  )
   for (const measure of ['array-count', 'function-count', 'pending-promise-count', 'object-count']) {
     expect(workflow).toContain(`          - name: ${measure}-extensions\n            args: --measure ${measure} --inspect-extensions`)
   }
