@@ -91,6 +91,7 @@ test('ci collects Node-compatible measures for the extension host and verifies i
   expect(workflow).not.toContain('name: detached-dom-node-count-extensions')
   expect(workflow).toContain('pattern: vscode-memory-leak-finder-results-linux-*-extensions')
   expect(workflow).toContain('path: ./vscode-memory-leak-finder-results-linux-extensions')
+  expect(workflow).toContain('merge-multiple: true')
   expect(workflow).toContain('name: Delete extension-host artifact (array-count-extensions)')
   expect(workflow).toContain('name: Delete extension-host artifact (function-count-extensions)')
   expect(workflow).toContain("grep -q './array-count/index.html' .vscode-charts/extension-host/index.html")

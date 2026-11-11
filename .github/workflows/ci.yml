@@ -523,6 +523,7 @@ jobs:
         with:
           pattern: vscode-memory-leak-finder-results-linux-*-extensions
           path: ./vscode-memory-leak-finder-results-linux-extensions
+          merge-multiple: true
       - name: Download all measure results
         uses: actions/download-artifact@v8
         continue-on-error: true
