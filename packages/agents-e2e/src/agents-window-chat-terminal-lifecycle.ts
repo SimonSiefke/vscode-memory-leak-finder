@@ -117,8 +117,8 @@ const cycle = async (context: TestContext, end: 'delete' | 'archive' | 'reload')
             type: 'shell',
             inAgents: true,
             // A newly launched task shell can drop the first input character before its prompt is ready.
-            // The OR fallback still writes the marker if the leading 'f' in "false" is dropped.
-            command: String.raw`false || printf '%s\t%s\n' "$$" "$PWD" >> .chat-window-task-pids`,
+            // Start with harmless whitespace so the marker command remains intact if that byte is lost.
+            command: String.raw` printf '%s\t%s\n' "$$" "$PWD" >> .chat-window-task-pids`,
             presentation: { panel: 'dedicated', clear: false },
             problemMatcher: [],
           },
