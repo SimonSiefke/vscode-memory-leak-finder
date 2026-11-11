@@ -97,8 +97,8 @@ test('ci collects Node-compatible measures for the extension host and verifies i
   expect(workflow).toContain('merge-multiple: true')
   expect(workflow).toContain('name: Delete extension-host artifact (array-count-extensions)')
   expect(workflow).toContain('name: Delete extension-host artifact (function-count-extensions)')
-  expect(workflow).toContain("grep -q './array-count/index.html' .vscode-charts/extension-host/index.html")
-  expect(workflow).toContain("grep -q './function-count/index.html' .vscode-charts/extension-host/index.html")
+  expect(workflow).toContain('grep -q \'src="./array-count.svg"\' .vscode-charts/extension-host/index.html')
+  expect(workflow).toContain('grep -q \'src="./function-count.svg"\' .vscode-charts/extension-host/index.html')
 })
 
 test.each(['string-object-count', 'string-object-bytes'])(

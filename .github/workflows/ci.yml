@@ -1169,8 +1169,8 @@ jobs:
       - name: Verify extension-host overview charts
         run: |
           test -s .vscode-charts/extension-host/index.html
-          grep -q './array-count/index.html' .vscode-charts/extension-host/index.html
-          grep -q './function-count/index.html' .vscode-charts/extension-host/index.html
+          grep -q 'src="./array-count.svg"' .vscode-charts/extension-host/index.html
+          grep -q 'src="./function-count.svg"' .vscode-charts/extension-host/index.html
           grep -q './extension-host/index.html' .vscode-charts/index.html
       - name: Verify startup performance report
         run: |
