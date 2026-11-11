@@ -593,7 +593,9 @@ export const runTestsWithCallback = async ({
     }
 
     let restartAfterFailure = false
+    let stopAfterCrash = false
     for (let i = 0; i < formattedPaths.length; i++) {
+      if (stopAfterCrash) break
       const formattedPath = formattedPaths[i]
       const { absolutePath, dirent, relativeDirname, relativePath } = formattedPath
       const proxyTestFolderName = GetProxyTestFolderName.getProxyTestFolderName(absolutePath)
@@ -904,7 +906,14 @@ export const runTestsWithCallback = async ({
       } catch (error) {
         // A failed setup or teardown can leave a debugger running, a dialog open,
         // or a dead renderer. Keep its failure, but isolate the next scenario.
-        restartAfterFailure = true
+        const message =
+          error instanceof Error
+            ? error.message
+            : typeof error === 'object' && error !== null && 'message' in error && typeof error.message === 'string'
+              ? error.message
+              : String(error)
+        stopAfterCrash = message.includes('Application crashed: target crashed')
+        restartAfterFailure = !stopAfterCrash
         if (wasOriginallySkipped) {
           skippedFailed++
         } else {
