@@ -117,8 +117,8 @@ const cycle = async (context: TestContext, end: 'delete' | 'archive' | 'reload')
             type: 'shell',
             inAgents: true,
             // A newly launched task shell can drop the first input character before its prompt is ready.
-            // A redirection-only command remains valid if the leading ':' is dropped, then the marker runs.
-            command: String.raw`: 2>/dev/null; printf '%s\t%s\n' "$$" "$PWD" >> .chat-window-task-pids`,
+            // The OR fallback still writes the marker if the leading 'f' in "false" is dropped.
+            command: String.raw`false || printf '%s\t%s\n' "$$" "$PWD" >> .chat-window-task-pids`,
             presentation: { panel: 'dedicated', clear: false },
             problemMatcher: [],
           },
