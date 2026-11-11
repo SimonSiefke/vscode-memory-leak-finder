@@ -36,10 +36,24 @@ type Execution = ReturnType<typeof taskExecutions>[number]
 
 export const connect = async (userData: string) => {
   const logRoot = join(userData, 'logs')
-  const logs = (await readdir(logRoot)).sort()
-  assert.ok(logs.length, 'The real agent-host transport must have a log directory')
-  const directory = join(logRoot, logs.at(-1)!, 'ahp')
-  const read = async () => taskExecutions(await readMessages(directory))
+  const readLogMessages = async () => {
+    const logs = (await readdir(logRoot)).sort()
+    assert.ok(logs.length, 'The real agent-host transport must have a log directory')
+    return (
+      await Promise.all(
+        logs.map(async (log) => {
+          const directory = join(logRoot, log, 'ahp')
+          try {
+            return await readMessages(directory)
+          } catch (error) {
+            if ((error as NodeJS.ErrnoException).code === 'ENOENT') return []
+            throw error
+          }
+        }),
+      )
+    ).flat()
+  }
+  const read = async () => taskExecutions(await readLogMessages())
   return {
     async checkpoint(): Promise<Set<string>> {
       return new Set((await read()).map((execution) => execution.key))
@@ -54,7 +68,7 @@ export const connect = async (userData: string) => {
       const execution = executions[0]
       assert.ok(execution.finished)
       if (execution.exitCode !== 0) {
-        const messages = await readMessages(directory)
+        const messages = await readLogMessages()
         const output = messages
           .filter(
             (message) =>
