@@ -116,7 +116,9 @@ const cycle = async (context: TestContext, end: 'delete' | 'archive' | 'reload')
             label: 'Chat terminal lifecycle task',
             type: 'shell',
             inAgents: true,
-            command: String.raw`printf '%s\t%s\n' "$$" "$PWD" >> .chat-window-task-pids`,
+            // A newly launched task shell can drop the first input character before its prompt is ready.
+            // A redirection-only command remains valid if the leading ':' is dropped, then the marker runs.
+            command: String.raw`: 2>/dev/null; printf '%s\t%s\n' "$$" "$PWD" >> .chat-window-task-pids`,
             presentation: { panel: 'dedicated', clear: false },
             problemMatcher: [],
           },
