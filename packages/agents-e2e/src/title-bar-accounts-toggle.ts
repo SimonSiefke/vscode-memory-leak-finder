@@ -1,4 +1,4 @@
-import type { TestContext } from '../types.js'
+import type { TestContext } from '../../e2e/types.ts'
 
 export const skip = process.platform === 'darwin'
 

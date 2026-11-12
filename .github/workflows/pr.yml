@@ -64,6 +64,12 @@ jobs:
         uses: coactions/setup-xvfb@v1
         with:
           run: node packages/cli/bin/test.js --cwd packages/agents-e2e --launch-agent-window --enable-extensions --use-proxy-mock --only agents-window-inbox-canvas-subscriptions.ts --vscode-version 1.145.0 --runs 1
+      - name: Run Agents window title bar accounts regression
+        if: matrix.os != 'macos-26'
+        timeout-minutes: 10
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: node packages/cli/bin/test.js --cwd packages/agents-e2e --launch-agent-window --enable-extensions --use-proxy-mock --only title-bar-accounts-toggle.ts --vscode-version 1.145.0 --runs 1
       - name: Run chat-window terminal lifecycle regression
         if: matrix.os == 'ubuntu-24.04'
         timeout-minutes: 10
