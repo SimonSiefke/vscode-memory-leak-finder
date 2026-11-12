@@ -2,18 +2,18 @@ import type { TestContext } from '../../e2e/types.ts'
 
 export const skip = process.platform === 'darwin'
 
-let agentsWindow: any
+let titleBar: any
 
-export const setup = async ({ AgentsWindow, Workbench }: TestContext): Promise<void> => {
+export const setup = async ({ AgentsWindow, TitleBar }: TestContext): Promise<void> => {
   await AgentsWindow.newChat()
-  agentsWindow = await Workbench.openChatWindow()
+  titleBar = TitleBar
   // @ts-ignore
-  await agentsWindow.TitleBar.ensureAccountsWidgetVisible()
+  await titleBar.ensureAccountsWidgetVisible()
 }
 
 export const run = async (): Promise<void> => {
   // @ts-ignore
-  await agentsWindow.TitleBar.hideAccountsWidget()
+  await titleBar.hideAccountsWidget()
   // @ts-ignore
-  await agentsWindow.TitleBar.showAccountsWidget()
+  await titleBar.showAccountsWidget()
 }
