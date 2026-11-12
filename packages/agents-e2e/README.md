@@ -53,6 +53,8 @@ their loopback servers.
 
 The UI selectors and canvas protocol target VS Code 1.145.0. Other versions must
 pass the readiness assertions rather than silently skipping unsupported paths.
+CI keeps this scenario pinned to 1.145.0 because VS Code 1.146 changes the Inbox
+UI and no longer exposes the notification list this scenario exercises.
 
 ## Sensitivity validation
 

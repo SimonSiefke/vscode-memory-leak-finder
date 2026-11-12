@@ -105,7 +105,7 @@ jobs:
       - name: Collect startup CPU profiles (smoke)
         if: matrix.os == 'ubuntu-24.04'
         timeout-minutes: 5
-        run: xvfb-run --auto-servernum node packages/build/src/measureStartupProfiles.ts --executable .vscode-test/vscode-linux-x64-1.145.0/code --output .vscode-memory-leak-finder-results/startup-performance --samples 1
+        run: xvfb-run --auto-servernum node packages/build/src/measureStartupProfiles.ts --executable .vscode-test/vscode-linux-x64-1.146.0/code --output .vscode-memory-leak-finder-results/startup-performance --samples 1
       - name: Generate charts
         run: node packages/charts/src/main.ts
       - name: Validate Memory City artifact
