@@ -74,9 +74,7 @@ export const cleanMapAndSetSizeCharts = async (chartsRoot: string): Promise<void
     (entry) =>
       entry.isFile() &&
       entry.name.endsWith('.svg') &&
-      processTypes.some((processType) =>
-        chartNames.some((chartName) => entry.name.startsWith(`${processType}-${chartName}-`)),
-      ),
+      processTypes.some((processType) => chartNames.some((chartName) => entry.name.startsWith(`${processType}-${chartName}-`))),
   )
   await Promise.all(staleFiles.map((entry) => rm(join(chartsRoot, entry.name), { force: true })))
 }
