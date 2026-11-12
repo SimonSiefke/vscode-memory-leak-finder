@@ -1,6 +1,8 @@
 import { copyFile, mkdir, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import { aggregate, median, profileCosts, sampleDurations, stackLabel, type Profile } from './Aggregate.ts'
+import { SourceMapConsumer, type RawSourceMap } from 'source-map'
+import { fileURLToPath } from 'node:url'
+import { aggregate, median, profileCosts, sampleDurations, type Profile } from './Aggregate.ts'
 import { escapeHtml } from '../EscapeHtml/EscapeHtml.ts'
 import { getCpuProfileFrames } from '../GetCpuProfileData/GetCpuProfileData.ts'
 import { launchChartWorker } from '../LaunchChartWorker/LaunchChartWorker.ts'
@@ -16,7 +18,7 @@ interface Manifest {
   cachePolicy: string
   boundary: string
   overhead: string
-  runs: { run: number; error?: string; profiles: Record<string, { file?: string; error?: string; attachedMs?: number }> }[]
+  runs: { run: number; error?: string; profiles: Record<string, { file?: string; scriptMap?: string; error?: string; attachedMs?: number }> }[]
 }
 const labels = {
   renderer: 'Renderer process',
@@ -28,6 +30,70 @@ const leafLabel = (key: string): string => {
   const frames = JSON.parse(key) as string[]
   const [name, url, line, column] = JSON.parse(frames.at(-1)!)
   return `${name || '(anonymous)'}${url ? ` (${url.split('/').at(-1)}:${line + 1}:${column + 1})` : ''}`
+}
+const formatFrame = (frame: string): string => {
+  const [name, url, line, column] = JSON.parse(frame)
+  const path = url
+    ? url.startsWith('vscode-file://vscode-app')
+      ? url.replace(/^vscode-file:\/\/vscode-app/, '').split('/resources/app/').at(-1) || url
+      : url.startsWith('file://')
+        ? url.split('/').at(-1) || url
+        : url
+    : ''
+  return `${name || '(anonymous)'}${path ? ` (${path}:${line + 1}:${column + 1})` : ''}`
+}
+const formatStack = (key: string): string => (JSON.parse(key) as string[]).map(formatFrame).join('\n')
+const loadSourceMap = async (url: string): Promise<RawSourceMap> => {
+  if (url.startsWith('file://')) return JSON.parse(await readFile(fileURLToPath(url), 'utf8'))
+  if (url.startsWith('data:')) {
+    const [, metadata, data] = url.match(/^data:([^,]*),(.*)$/s) || []
+    if (!metadata || !data) throw new Error('Invalid source map data URL')
+    return JSON.parse(metadata.includes(';base64') ? Buffer.from(data, 'base64').toString('utf8') : decodeURIComponent(data))
+  }
+  const response = await fetch(url)
+  if (!response.ok) throw new Error(`Source map request failed: ${response.status} ${url}`)
+  return response.json() as Promise<RawSourceMap>
+}
+const withOriginalLocations = async (profile: Profile, scriptMap: Record<string, { url?: string; sourceMapUrl?: string }>): Promise<Profile> => {
+  const consumers = new Map<string, SourceMapConsumer>()
+  const consumersByScriptUrl = new Map<string, SourceMapConsumer>()
+  for (const script of Object.values(scriptMap)) {
+    if (!script.url || !script.sourceMapUrl) continue
+    try {
+      const url = new URL(script.sourceMapUrl, script.url).toString()
+      if (!consumers.has(url)) consumers.set(url, await new SourceMapConsumer(await loadSourceMap(url)))
+      consumersByScriptUrl.set(script.url, consumers.get(url)!)
+    } catch (error) {
+      console.warn(`Failed to load startup source map for ${script.url}`, error)
+    }
+  }
+  const originalPositions = new Map<string, { source: string; line: number; column: number }>()
+  for (const node of profile.nodes) {
+    const { url, lineNumber, columnNumber } = node.callFrame
+    if (!url) continue
+    const consumer = consumersByScriptUrl.get(url)
+    if (!consumer) continue
+    const original = consumer.originalPositionFor({ line: lineNumber + 1, column: columnNumber + 1 })
+    if (original.source && original.line !== null && original.column !== null)
+      originalPositions.set(`${url}:${lineNumber}:${columnNumber}`, { source: original.source, line: original.line, column: original.column })
+  }
+  return {
+    ...profile,
+    nodes: profile.nodes.map((node) => {
+      const { url, lineNumber, columnNumber } = node.callFrame
+      const original = originalPositions.get(`${url}:${lineNumber}:${columnNumber}`)
+      if (!original) return node
+      return {
+        ...node,
+        callFrame: {
+          ...node.callFrame,
+          url: original.source,
+          lineNumber: original.line - 1,
+          columnNumber: original.column,
+        },
+      }
+    }),
+  }
 }
 const number = (value: number) => value.toLocaleString('en-US', { maximumFractionDigits: 3 })
 
@@ -60,7 +126,19 @@ export const generateStartupPerformance = async (
         const expected = `run-${run.run}/${name}.cpuprofile`
         if (capture.file !== expected) throw new Error(`Unexpected startup profile path: ${capture.file}`)
         try {
-          const profile = JSON.parse(await readFile(join(results, expected), 'utf8')) as Profile
+          let profile = JSON.parse(await readFile(join(results, expected), 'utf8')) as Profile
+          if (capture.scriptMap) {
+            try {
+              const expectedScriptMap = `run-${run.run}/${name}-script-map.json`
+              if (capture.scriptMap !== expectedScriptMap) throw new Error(`Unexpected startup script map path: ${capture.scriptMap}`)
+              const scriptMap = JSON.parse(await readFile(join(results, capture.scriptMap), 'utf8'))
+              profile = await withOriginalLocations(profile, scriptMap)
+              await mkdir(join(output, `run-${run.run}`), { recursive: true })
+              await copyFile(join(results, capture.scriptMap), join(output, capture.scriptMap))
+            } catch (error) {
+              console.warn(`Could not read startup script map ${capture.scriptMap}`, error)
+            }
+          }
           profileCosts(profile)
           captures.push({
             run: run.run,
@@ -78,7 +156,7 @@ export const generateStartupPerformance = async (
       const rows = aggregate(captures.map((capture) => capture.profile))
       const csv =
         'stack,mean self ms,median self ms\n' +
-        rows.map((row) => `"${stackLabel(row.stack).replaceAll('"', '""')}",${row.meanMs},${row.medianMs}`).join('\n')
+        rows.map((row) => `"${formatStack(row.stack).replaceAll('"', '""')}",${row.meanMs},${row.medianMs}`).join('\n')
       await writeFile(join(output, `${name}-stacks.csv`), csv)
       let chart = '<p>No valid CPU profile captures are available for this process.</p>'
       if (captures.length) {
@@ -105,7 +183,7 @@ export const generateStartupPerformance = async (
         .slice(0, 30)
         .map(
           (row) =>
-            `<tr><td><details><summary>${escapeHtml(leafLabel(row.stack))}</summary>${escapeHtml(stackLabel(row.stack))}</details></td><td>${number(row.meanMs)}</td><td>${number(row.medianMs)}</td></tr>`,
+            `<tr><td><details><summary>${escapeHtml(leafLabel(row.stack))}</summary><pre>${escapeHtml(formatStack(row.stack))}</pre></details></td><td>${number(row.meanMs)}</td><td>${number(row.medianMs)}</td></tr>`,
         )
         .join('')
       sections.push(`<section id="${name}"><h2>${labels[name]}</h2>

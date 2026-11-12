@@ -42,7 +42,7 @@ export const collectStartupProfiles = async (executable: string, output: string,
       'Main, shared process and extension host: profiler enabled before releasing inspect-brk. Renderer: earliest discoverable workbench target (initial renderer execution can be missed). Stop: VS Code startup-profiler marker deletion after LifecyclePhase.Eventually and installed-extension registration.',
     overhead:
       'Inspector pauses and CPU sampling perturb startup. Profile durations are sampling windows, not uninstrumented startup latency.',
-    runs: [] as { run: number; profiles: Record<string, { file?: string; error?: string; attachedMs?: number }>; error?: string }[],
+    runs: [] as { run: number; profiles: Record<string, { file?: string; scriptMap?: string; error?: string; attachedMs?: number }>; error?: string }[],
   }
   for (let run = 1; run <= samples; run++) {
     const folder = join(output, `run-${run}`)
@@ -81,6 +81,7 @@ export const collectStartupProfiles = async (executable: string, output: string,
     const started = Date.now()
     const deadline = started + 90000
     const sessions = new Map<string, Inspector>()
+    const scriptMaps = new Map<string, Record<string, { url?: string; sourceMapUrl?: string }>>()
     const result: (typeof manifest.runs)[number] = { run, profiles: {} }
     let log = ''
     let launchError: Error | undefined
@@ -123,6 +124,12 @@ export const collectStartupProfiles = async (executable: string, output: string,
             })
             const session = await Inspector.connect(url)
             sessions.set(name, session)
+            const scriptMap: Record<string, { url?: string; sourceMapUrl?: string }> = {}
+            scriptMaps.set(name, scriptMap)
+            session.on('Debugger.scriptParsed', ({ scriptId, url: scriptUrl, sourceMapURL }) => {
+              scriptMap[scriptId] = { url: scriptUrl, ...(sourceMapURL ? { sourceMapUrl: sourceMapURL } : {}) }
+            })
+            await session.invoke('Debugger.enable')
             await session.invoke('Profiler.enable')
             await session.invoke('Profiler.start')
             result.profiles[name] = { attachedMs: Date.now() - started }
@@ -149,7 +156,9 @@ export const collectStartupProfiles = async (executable: string, output: string,
           if (!profile?.samples?.length) throw new Error('No CPU samples captured')
           const file = `run-${run}/${name}.cpuprofile`
           await writeJson(join(output, file), profile)
-          result.profiles[name] = { ...result.profiles[name], file }
+          const scriptMapFile = `run-${run}/${name}-script-map.json`
+          await writeJson(join(output, scriptMapFile), scriptMaps.get(name) || {})
+          result.profiles[name] = { ...result.profiles[name], file, scriptMap: scriptMapFile }
         } catch (error) {
           result.profiles[name] = { error: String(error) }
         }
