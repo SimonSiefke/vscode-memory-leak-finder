@@ -4,7 +4,8 @@ export const skip = process.platform === 'darwin'
 
 let agentsWindow: any
 
-export const setup = async ({ Workbench }: TestContext): Promise<void> => {
+export const setup = async ({ AgentsWindow, Workbench }: TestContext): Promise<void> => {
+  await AgentsWindow.newChat()
   agentsWindow = await Workbench.openChatWindow()
   // @ts-ignore
   await agentsWindow.TitleBar.ensureAccountsWidgetVisible()
