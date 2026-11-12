@@ -29,6 +29,7 @@ export * as ForcedLayoutCount from '../CreateForcedLayoutCountChart/CreateForced
 export * as ForcedLayoutCountOverview from '../CreateForcedLayoutCountOverviewChart/CreateForcedLayoutCountOverviewChart.ts'
 export * as FrontendStartupPerformance from '../CreateFrontendStartupPerformanceChart/CreateFrontendStartupPerformanceChart.ts'
 export * as HeapSnapshotMemory from '../CreateHeapSnapshotMemoryChart/CreateHeapSnapshotMemoryChart.ts'
+export * as HeapSnapshotMemoryOverview from '../CreateHeapSnapshotMemoryOverviewChart/CreateHeapSnapshotMemoryOverviewChart.ts'
 export * as FunctionCount from '../CreateFunctionCountChart/CreateFunctionCountChart.ts'
 export * as GpuCanvasContextCount from '../CreateGpuCanvasContextCountChart/CreateGpuCanvasContextCountChart.ts'
 export * as IframeCount from '../CreateIframeCountChart/CreateIframeCountChart.ts'
