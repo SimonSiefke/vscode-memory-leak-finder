@@ -20,34 +20,39 @@ const withSource = async (fn: (hash: string, location: string) => Promise<void>)
       [
         '// first',
         '// second',
-        'function createPromise() {',
-        '  return new Promise(() => "<pending>")',
-        '}',
+        '// third',
+        '// fourth',
+        '// fifth',
         '// sixth',
         '// seventh',
         '// eighth',
+        'function createPromise() {',
+        '  return new Promise(() => "<pending>")',
+        '}',
+        '// twelfth',
+        '// thirteenth',
       ].join('\n'),
     )
-    await fn(basename(source), 'src/promise.ts:4:2')
+    await fn(basename(source), 'src/promise.ts:10:2')
   } finally {
     await rm(source, { recursive: true, force: true })
   }
 }
 
-test('renders Babel context and a caret at the zero-based source-map column, using the matching source revision', async () => {
+test('renders seven lines of Babel context and a caret at the zero-based source-map column, using the matching source revision', async () => {
   await withSource(async (hash, location) => {
     const frame = await getCodeFrame(location, hash)
-    expect(frame).toBe(
-      [
-        '  2 | // second',
-        '  3 | function createPromise() {',
-        '> 4 |   return new Promise(() => "<pending>")',
-        '    |   ^',
-        '  5 | }',
-        '  6 | // sixth',
-      ].join('\n'),
+    expect(frame).toContain('// third')
+    expect(frame).toContain('// eighth')
+    expect(frame).toContain('function createPromise()')
+    expect(frame).toContain('> 10 |   return new Promise(() => "<pending>")')
+    expect(frame).toContain('|   ^')
+    expect(frame).toContain('// twelfth')
+    expect(frame).not.toContain('// second')
+    expect(await getCodeFrame('src/promise.ts:10:0', hash)).toContain('    | ^')
+    expect(await getCodeFrame('src/promise.ts:2:0', hash)).toBe(
+      ['  1 | // first', '> 2 | // second', '    | ^', '  3 | // third', '  4 | // fourth'].join('\n'),
     )
-    expect(await getCodeFrame('src/promise.ts:4:0', hash)).toContain('    | ^')
     expect(await getCodeFrame(`at createPromise (${location})`, hash)).toBe(frame)
     expect(await getCodeFrame(location, `${hash}-missing`)).toBeNull()
     expect(await getCodeFrame('not a source location', hash)).toBeNull()
@@ -137,10 +142,10 @@ test('writes black/red charts and source frames above complete stacks, retaining
       expect(cards[0].querySelector('.PromiseItemMeta')?.textContent).toContain('Delta: 7')
       expect(document.querySelector('h2')?.textContent).toBe('scenario & growth')
       expect(document.querySelector('.PromiseChart')?.getAttribute('src')).toBe('./scenario%20%26%20growth.svg')
-      expect(cards[0].querySelector('.CodeFrame code')?.textContent).toContain('> 4 |   return new Promise(() => "<pending>")')
+      expect(cards[0].querySelector('.CodeFrame code')?.textContent).toContain('> 10 |   return new Promise(() => "<pending>")')
       expect(cards[0].querySelector('.CodeFrameToken-keyword')?.textContent).toBe('function')
       expect(cards[0].querySelector('.CodeFrameToken-string')?.textContent).toBe('"<pending>"')
-      expect([...cards[0].querySelectorAll('.CodeFrameToken-comment')].map((node) => node.textContent)).toContain('// second')
+      expect([...cards[0].querySelectorAll('.CodeFrameToken-comment')].map((node) => node.textContent)).toContain('// third')
       expect(cards[0].querySelector('.CodeFrameToken-keyword')?.getAttribute('style')).toBeNull()
       const promiseCss = await readFile(join(target, 'promise-stack-traces.css'), 'utf8')
       expect(promiseCss).toContain('.CodeFrameToken-keyword')
@@ -160,7 +165,7 @@ test('writes black/red charts and source frames above complete stacks, retaining
       expect(chartLabels.map((label) => Number(label.getAttribute('x')))).toEqual([0, 0, 0, 0])
       expect(chart.querySelector('[aria-label="rect"] [fill="#000"], [aria-label="rect"] [fill="#000000"]')).not.toBeNull()
       expect(chart.querySelector('[fill="#b22222"], [fill="#B22222"]')).not.toBeNull()
-      expect([...chart.querySelectorAll('text')].filter((node) => node.textContent === 'promise.ts:4:2')).toHaveLength(2)
+      expect([...chart.querySelectorAll('text')].filter((node) => node.textContent === 'promise.ts:10:2')).toHaveLength(2)
       expect([...chart.querySelectorAll('text')].map((node) => node.textContent)).toEqual(expect.arrayContaining(['10', '8', '6', '2']))
     } finally {
       await rm(root, { recursive: true, force: true })
