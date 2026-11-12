@@ -1058,3 +1058,13 @@ node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure empty-s
 ```
 
 Linux CI collects this measure and publishes `empty-set-count.svg` on the main GitHub Pages charts page.
+
+### Active Timeout Count
+
+Counts outstanding renderer timeouts from the start of workbench instrumentation. Both timer clear APIs remove either kind of handle; fired timeouts are removed while intervals remain active until cleared. The measure automatically prepares an instrumented VS Code copy and does not modify the installed build. Timers created before the workbench starts and timers in other realms are outside this measure.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure active-timeout-count
+```
+
+Linux CI collects this measure and publishes `active-timeout-count.svg` on the main GitHub Pages charts page.

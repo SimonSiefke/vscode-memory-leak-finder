@@ -1,6 +1,7 @@
 export * as MeasureAbortControllerCount from '../MeasureAbortControllerCount/MeasureAbortControllerCount.ts'
 export * as MeasureAbortSignalCount from '../MeasureAbortSignalCount/MeasureAbortSignalCount.ts'
 export * as MeasureActiveAsyncResourcesWithStackTraces from '../MeasureActiveAsyncResourcesWithStackTraces/MeasureActiveAsyncResourcesWithStackTraces.ts'
+export * as MeasureActiveTimeoutCount from '../MeasureActiveTimeoutCount/MeasureActiveTimeoutCount.ts'
 export * as MeasureArrayBufferBytes from '../MeasureArrayBufferBytes/MeasureArrayBufferBytes.ts'
 export * as MeasureArrayCount from '../MeasureArrayCount/MeasureArrayCount.ts'
 export * as MeasureArrayElementCount from '../MeasureArrayElementCount/MeasureArrayElementCount.ts'

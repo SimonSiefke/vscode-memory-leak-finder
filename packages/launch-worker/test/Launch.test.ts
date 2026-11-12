@@ -29,3 +29,8 @@ test('byte measure selects its dedicated tracking mode for both public spellings
   expect(getTrackingMode('trackedAllocationBytes')).toBe('allocation-bytes')
   expect(getTrackingMode('tracked-allocation-bytes')).toBe('allocation-bytes')
 })
+
+test('active-timeout-count selects startup timer tracking', () => {
+  expect(getTrackingMode('active-timeout-count')).toBe('active-timers')
+  expect(getTrackingMode('activeTimeoutCount')).toBe('active-timers')
+})
