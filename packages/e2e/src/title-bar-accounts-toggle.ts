@@ -2,14 +2,17 @@ import type { TestContext } from '../types.js'
 
 export const skip = process.platform === 'darwin'
 
-export const setup = async ({ TitleBar }: TestContext): Promise<void> => {
+let agentsWindow: any
+
+export const setup = async ({ Workbench }: TestContext): Promise<void> => {
+  agentsWindow = await Workbench.openChatWindow()
   // @ts-ignore
-  await TitleBar.ensureAccountsWidgetVisible()
+  await agentsWindow.TitleBar.ensureAccountsWidgetVisible()
 }
 
-export const run = async ({ TitleBar }: TestContext): Promise<void> => {
+export const run = async (): Promise<void> => {
   // @ts-ignore
-  await TitleBar.hideAccountsWidget()
+  await agentsWindow.TitleBar.hideAccountsWidget()
   // @ts-ignore
-  await TitleBar.showAccountsWidget()
+  await agentsWindow.TitleBar.showAccountsWidget()
 }
