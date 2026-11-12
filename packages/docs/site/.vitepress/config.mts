@@ -32,7 +32,34 @@ export default defineConfig({
           ],
         },
       ],
-      '/measures/': [{ text: 'Measure catalog', items: [{ text: 'All measures', link: '/measures/' }] }],
+      '/measures/': [
+        {
+          text: 'Measure catalog',
+          items: [
+            { text: 'All measures', link: '/measures/' },
+            { text: 'Event loop delay', link: '/measures/event-loop-delay' },
+            { text: 'Forced layout count', link: '/measures/forced-layout-count' },
+            { text: 'Long renderer tasks', link: '/measures/long-renderer-tasks' },
+            { text: 'Module resolution', link: '/measures/module-resolution' },
+            { text: 'Module resolution lookups', link: '/measures/module-resolution-lookups' },
+            { text: 'Synchronous DOM read count', link: '/measures/synchronous-dom-read-count' },
+            { text: 'Synchronous DOM read count with stack traces', link: '/measures/synchronous-dom-read-count-with-stack-traces' },
+            { text: 'Synchronous file system', link: '/measures/synchronous-file-system' },
+            { text: 'Tracked allocation bytes', link: '/measures/tracked-allocation-bytes' },
+          ],
+        },
+      ],
+      '/scenarios/': [
+        {
+          text: 'Scenarios',
+          items: [
+            { text: 'Accessibility marker signals', link: '/scenarios/accessibility-marker-signals' },
+            { text: 'Edit telemetry document snapshots', link: '/scenarios/edit-telemetry-document-snapshots' },
+            { text: 'Markdown editing', link: '/scenarios/markdown-editing' },
+            { text: 'Python development', link: '/scenarios/python-development' },
+          ],
+        },
+      ],
     },
     search: { provider: 'local' },
     socialLinks: [{ icon: 'github', link: 'https://github.com/SimonSiefke/vscode-memory-leak-finder' }],

@@ -36,25 +36,60 @@ type Execution = ReturnType<typeof taskExecutions>[number]
 
 export const connect = async (userData: string) => {
   const logRoot = join(userData, 'logs')
-  const logs = (await readdir(logRoot)).sort()
-  assert.ok(logs.length, 'The real agent-host transport must have a log directory')
-  const directory = join(logRoot, logs.at(-1)!, 'ahp')
-  const read = async () => taskExecutions(await readMessages(directory))
+  const readLogMessages = async () => {
+    const logs = (await readdir(logRoot)).sort()
+    assert.ok(logs.length, 'The real agent-host transport must have a log directory')
+    return (
+      await Promise.all(
+        logs.map(async (log) => {
+          const directory = join(logRoot, log, 'ahp')
+          try {
+            return await readMessages(directory)
+          } catch (error) {
+            if ((error as NodeJS.ErrnoException).code === 'ENOENT') return []
+            throw error
+          }
+        }),
+      )
+    ).flat()
+  }
+  const read = async () => taskExecutions(await readLogMessages())
   return {
     async checkpoint(): Promise<Set<string>> {
       return new Set((await read()).map((execution) => execution.key))
     },
     async waitAfter(before: Set<string>, owner?: Execution): Promise<Execution> {
-      const executions = await waitFor(
-        'the renderer to receive task command completion',
-        async () => (await read()).filter((execution) => !before.has(execution.key)),
-        (executions) => executions.some((execution) => execution.finished),
-      )
+      let executions: Execution[]
+      try {
+        executions = await waitFor(
+          'the renderer to receive task command completion',
+          async () => (await read()).filter((execution) => !before.has(execution.key)),
+          (executions) => executions.some((execution) => execution.finished),
+        )
+      } catch (error) {
+        const messages = await readLogMessages()
+        const terminalEvents = messages
+          .filter(
+            (message) =>
+              message._ahpLog?.dir === 's2c' &&
+              message._ahpLog.transport === 'local' &&
+              message.params?.action?.type?.startsWith('terminal/'),
+          )
+          .slice(-40)
+          .map((message) => ({
+            connectionId: message._ahpLog?.connectionId,
+            channel: message.params?.channel,
+            ...message.params?.action,
+          }))
+        throw new Error(
+          `${String(error)}; checkpoint=${JSON.stringify([...before])}; observed=${JSON.stringify(await read())}; terminalEvents=${JSON.stringify(terminalEvents)}`,
+        )
+      }
       assert.equal(executions.length, 1, 'One task invocation must execute exactly one fixture shell command')
       const execution = executions[0]
       assert.ok(execution.finished)
       if (execution.exitCode !== 0) {
-        const messages = await readMessages(directory)
+        const messages = await readLogMessages()
         const output = messages
           .filter(
             (message) =>

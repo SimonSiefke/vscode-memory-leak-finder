@@ -6,14 +6,16 @@ These entries identify what a collector measures, not a promise that every metri
 
 ## Detailed guides
 
-- [Event loop delay](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/docs/measures/event-loop-delay.md)
-- [Forced layout count](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/docs/measures/forced-layout-count.md)
-- [Long renderer tasks](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/docs/measures/long-renderer-tasks.md)
-- [Module resolution](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/docs/measures/module-resolution.md)
-- [Module resolution lookups](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/docs/measures/module-resolution-lookups.md)
-- [Synchronous DOM read count](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/docs/measures/synchronous-dom-read-count.md)
-- [Synchronous file system](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/docs/measures/synchronous-file-system.md)
-- [Tracked allocation bytes](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/docs/measures/tracked-allocation-bytes.md)
+- [Event loop delay](./event-loop-delay)
+- [Forced layout count](./forced-layout-count)
+- [Long renderer tasks](./long-renderer-tasks)
+- [Module resolution](./module-resolution)
+- [Module resolution lookups](./module-resolution-lookups)
+- [Script compilation and evaluation](./script-compilation-evaluation)
+- [Synchronous DOM read count](./synchronous-dom-read-count)
+- [Synchronous DOM read count with stack traces](./synchronous-dom-read-count-with-stack-traces)
+- [Synchronous file system](./synchronous-file-system)
+- [Tracked allocation bytes](./tracked-allocation-bytes)
 
 ## Registry
 
@@ -169,6 +171,7 @@ These entries identify what a collector measures, not a promise that every metri
 | `scope-count`                                           | [ScopeCount](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureScopeCount/MeasureScopeCount.ts)                                                                                                             |
 | `scope-count2`                                          | [ScopeCount2](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureScopeCount2/MeasureScopeCount2.ts)                                                                                                          |
 | `scopes`                                                | [Scopes](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureScopes/MeasureScopes.ts)                                                                                                                         |
+| `script-compilation-evaluation`                         | [ScriptCompilationEvaluation](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureScriptCompilationEvaluation/MeasureScriptCompilationEvaluation.ts)                                                          |
 | `set-count`                                             | [SetCount](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureSetCount/MeasureSetCount.ts)                                                                                                                   |
 | `set-size`                                              | [SetSize](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureSetSize/MeasureSetSize.ts)                                                                                                                      |
 | `set-timeout`                                           | [SetTimeout](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureSetTimeout/MeasureSetTimeout.ts)                                                                                                             |
@@ -184,6 +187,7 @@ These entries identify what a collector measures, not a promise that every metri
 | `symbols`                                               | [Symbols](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureSymbols/MeasureSymbols.ts)                                                                                                                      |
 | `symbols-with-stack-traces`                             | [SymbolsWithStackTraces](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureSymbolsWithStackTraces/MeasureSymbolsWithStackTraces.ts)                                                                         |
 | `synchronous-dom-read-count`                            | [SynchronousDomReadCount](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureSynchronousDomReadCount/MeasureSynchronousDomReadCount.ts)                                                                      |
+| `synchronous-dom-read-count-with-stack-traces`          | [SynchronousDomReadCountWithStackTraces](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureSynchronousDomReadCountWithStackTraces/MeasureSynchronousDomReadCountWithStackTraces.ts)                         |
 | `synchronous-file-system`                               | [SynchronousFileSystem](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureSynchronousFileSystem/MeasureSynchronousFileSystem.ts)                                                                            |
 | `text-decoder-count`                                    | [TextDecoderCount](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureTextDecoderCount/MeasureTextDecoderCount.ts)                                                                                           |
 | `text-encoder-count`                                    | [TextEncoderCount](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureTextEncoderCount/MeasureTextEncoderCount.ts)                                                                                           |

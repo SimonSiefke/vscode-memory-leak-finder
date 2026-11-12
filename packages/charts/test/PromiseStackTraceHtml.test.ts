@@ -54,6 +54,12 @@ test('renders Babel context and a caret at the zero-based source-map column, usi
   })
 })
 
+test('does not guess a source revision when a stack trace has no source hash', async () => {
+  await withSource(async (_hash, location) => {
+    expect(await getCodeFrame(location)).toBeNull()
+  })
+})
+
 test('discovers promise folders under the renderer and other process results', async () => {
   const root = await mkdtemp(join(tmpdir(), 'promise-folders-'))
   try {
@@ -100,7 +106,13 @@ test('writes black/red charts and source frames above complete stacks, retaining
         join(source, 'scenario & growth.json'),
         JSON.stringify({
           promisesWithStackTrace: [
-            { count: 10, delta: 7, originalStack: [location, 'src/caller.ts:20:0'], sourcesHash: hash },
+            {
+              count: 10,
+              delta: 7,
+              properties: { first: 1, second: 2 },
+              originalStack: [location, 'src/caller.ts:20:0'],
+              sourcesHash: hash,
+            },
             { count: 8, delta: 5, originalStack: `${location}\nsrc/other.ts:30:0`, sourcesHash: hash },
             {
               count: 6,
@@ -120,9 +132,20 @@ test('writes black/red charts and source frames above complete stacks, retaining
       expect(html).not.toContain('Increase (red)')
       expect(document.querySelector('.PromiseChartLegend, .InitialSwatch, .GrowthSwatch')).toBeNull()
       expect(cards).toHaveLength(4)
+      expect(html).not.toContain('Properties:')
+      expect(cards[0].querySelector('.PromiseItemMeta')?.textContent).toContain('Count: 10')
+      expect(cards[0].querySelector('.PromiseItemMeta')?.textContent).toContain('Delta: 7')
       expect(document.querySelector('h2')?.textContent).toBe('scenario & growth')
       expect(document.querySelector('.PromiseChart')?.getAttribute('src')).toBe('./scenario%20%26%20growth.svg')
       expect(cards[0].querySelector('.CodeFrame code')?.textContent).toContain('> 4 |   return new Promise(() => "<pending>")')
+      expect(cards[0].querySelector('.CodeFrameToken-keyword')?.textContent).toBe('function')
+      expect(cards[0].querySelector('.CodeFrameToken-string')?.textContent).toBe('"<pending>"')
+      expect([...cards[0].querySelectorAll('.CodeFrameToken-comment')].map((node) => node.textContent)).toContain('// second')
+      expect(cards[0].querySelector('.CodeFrameToken-keyword')?.getAttribute('style')).toBeNull()
+      const promiseCss = await readFile(join(target, 'promise-stack-traces.css'), 'utf8')
+      expect(promiseCss).toContain('.CodeFrameToken-keyword')
+      expect(html).not.toContain('<pending>')
+      expect(cards[0].querySelector('.CodeFrame code')?.textContent).toContain('    |   ^')
       expect(cards[0].querySelector('.CodeBlock code')?.textContent).toBe(`at ${location}\nat src/caller.ts:20:0`)
       expect(cards[0].innerHTML.indexOf('class="CodeFrame"')).toBeLessThan(cards[0].innerHTML.indexOf('class="CodeBlock"'))
       expect(cards[1].querySelector('.CodeFrame')).not.toBeNull()

@@ -1,6 +1,5 @@
 import { codeFrameColumns } from '@babel/code-frame'
 import { existsSync, readFileSync } from 'node:fs'
-import { readdir } from 'node:fs/promises'
 import { join } from 'node:path'
 import * as Root from '../Root/Root.ts'
 
@@ -42,24 +41,10 @@ const findSourceFile = async (relativePath: string, sourcesHash: string | null |
     return null
   }
 
-  try {
-    const hashDirs = await readdir(sourcesDir, { withFileTypes: true })
-    for (const hashDir of hashDirs) {
-      if (hashDir.isDirectory()) {
-        const sourceFilePath = join(sourcesDir, hashDir.name, relativePath)
-        if (existsSync(sourceFilePath)) {
-          return sourceFilePath
-        }
-      }
-    }
-  } catch {
-    // Ignore errors
-  }
-
   return null
 }
 
-export const getCodeFrame = async (stackLine: string, sourcesHash?: string | null): Promise<string | null> => {
+export const getCodeFrame = async (stackLine: string, sourcesHash?: string | null, highlight = false): Promise<string | null> => {
   const parsed = parseStackLine(stackLine)
   if (!parsed) {
     return null
@@ -81,7 +66,10 @@ export const getCodeFrame = async (stackLine: string, sourcesHash?: string | nul
       },
     }
     const codeFrame = codeFrameColumns(rawLines, location, {
-      highlightCode: false,
+      // Force color so report generation can turn Babel's token colors into
+      // HTML classes even when the report is generated without a TTY.
+      forceColor: highlight,
+      highlightCode: highlight,
       linesAbove: 2,
       linesBelow: 2,
     })
