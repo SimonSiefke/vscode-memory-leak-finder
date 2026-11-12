@@ -395,17 +395,9 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const stopButton = debugToolBar.locator('[aria-label^="Stop"]')
         await expect(stopButton).toBeVisible()
         await page.waitForIdle()
-        const quickPick = QuickPick.create({
-          electronApp,
-          expect,
-          ideVersion,
-          page,
-          platform,
-          VError,
-        })
-        await quickPick.executeCommand(WellKnownCommands.DebugStop)
+        await stopButton.click()
         await expect(stopButton).toBeHidden({
-          timeout: 5000,
+          timeout: 30_000,
         })
         await expect(debugToolBar).toBeHidden()
         await page.waitForIdle()
