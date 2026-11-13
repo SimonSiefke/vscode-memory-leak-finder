@@ -116,6 +116,16 @@ test.each(['setup', 'run', 'teardown'])('restarts the app after a %s failure whi
   expect(workers[0].initializationWorkerRpc.dispose).toHaveBeenCalledTimes(1)
 })
 
+test('stops after an application crash instead of starting another scenario', async () => {
+  run.mockRejectedValueOnce(new Error('Application crashed: target crashed'))
+  const result = await runTestsWithCallback(options())
+  expect(result).toMatchObject({ failed: 1, passed: 0, total: 3 })
+  expect(prepare).toHaveBeenCalledTimes(1)
+  expect(setup).toHaveBeenCalledTimes(1)
+  expect(run).toHaveBeenCalledTimes(1)
+  expect(workers[0].initializationWorkerRpc.dispose).toHaveBeenCalledTimes(1)
+})
+
 test('also recovers from an intentionally skipped scenario forced to run', async () => {
   setup.mockResolvedValueOnce({ skipped: false, wasOriginallySkipped: true, error: new Error('skipped scenario setup failed') })
   const result = await runTestsWithCallback(options())

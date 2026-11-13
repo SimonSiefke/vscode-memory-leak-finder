@@ -32,6 +32,22 @@ test('does not match completion from another channel or connection with the same
   ])
 })
 
+test('reads agent-host events from every log session', async () => {
+  const userData = await mkdtemp(join(tmpdir(), 'terminal-task-readiness-'))
+  try {
+    const directory = join(userData, 'logs', 'older-session', 'ahp')
+    const newerDirectory = join(userData, 'logs', 'newer-session', 'ahp')
+    await mkdir(directory, { recursive: true })
+    await mkdir(newerDirectory, { recursive: true })
+    const messages = [executed(), event('terminal/commandFinished', 'cwd', { exitCode: 0 })]
+    await writeFile(join(directory, 'terminal.jsonl'), messages.map((message) => JSON.stringify(message)).join('\n') + '\n')
+    const readiness = await connect(userData)
+    await expect(readiness.waitAfter(new Set())).resolves.toMatchObject({ finished: true, exitCode: 0 })
+  } finally {
+    await rm(userData, { recursive: true, force: true })
+  }
+})
+
 test('failed task completion reports the command and bounded output from its own connection and channel', async () => {
   const userData = await mkdtemp(join(tmpdir(), 'terminal-task-readiness-'))
   try {

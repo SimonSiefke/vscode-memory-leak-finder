@@ -1,5 +1,5 @@
 import { execFile } from 'node:child_process'
-import { access, mkdir, rm, writeFile } from 'node:fs/promises'
+import { access, mkdir, readdir, rm, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { promisify } from 'node:util'
 import escapeHtml from 'escape-html'
@@ -53,7 +53,34 @@ const getComparisonDataByFilename = (comparisonData: readonly any[]): Map<string
   return comparisonDataByFilename
 }
 
+export const getMapAndSetSizeChartPath = (processType: string, chartName: string, filename: string): string => {
+  return join(Root.root, '.vscode-charts', `${processType}-${chartName}-${filename}.svg`)
+}
+
+export const cleanMapAndSetSizeCharts = async (chartsRoot: string): Promise<void> => {
+  await rm(join(chartsRoot, 'map-and-set-size'), { recursive: true, force: true })
+  let entries
+  try {
+    entries = await readdir(chartsRoot, { withFileTypes: true })
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+      return
+    }
+    throw error
+  }
+  const processTypes = ['main', 'node', 'shared-process', 'extension-host', 'pty-host', 'integrated-browser']
+  const chartNames = ['map-size', 'set-size']
+  const staleFiles = entries.filter(
+    (entry) =>
+      entry.isFile() &&
+      entry.name.endsWith('.svg') &&
+      processTypes.some((processType) => chartNames.some((chartName) => entry.name.startsWith(`${processType}-${chartName}-`))),
+  )
+  await Promise.all(staleFiles.map((entry) => rm(join(chartsRoot, entry.name), { force: true })))
+}
+
 export const generateCharts = async () => {
+  await cleanMapAndSetSizeCharts(join(Root.root, '.vscode-charts'))
   await Promise.all([
     rm(join(Root.root, '.vscode-charts', 'map-size'), { recursive: true, force: true }),
     rm(join(Root.root, '.vscode-charts', 'set-size'), { recursive: true, force: true }),
@@ -113,7 +140,7 @@ export const generateCharts = async () => {
                   })
             let outPath
             if (visitor.name === 'map-size' || visitor.name === 'set-size') {
-              outPath = join(Root.root, '.vscode-charts', 'map-and-set-size', `${basePathInfo.processType}-${visitor.name}-${filename}.svg`)
+              outPath = getMapAndSetSizeChartPath(basePathInfo.processType, visitor.name, filename)
             } else if (basePathInfo.isNode) {
               if (visitor.name === 'named-function-count-3') {
                 outPath = join(Root.root, '.vscode-charts', 'node', 'named-function-count-3', `${filename}.svg`)

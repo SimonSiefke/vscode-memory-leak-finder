@@ -70,6 +70,12 @@ jobs:
         uses: coactions/setup-xvfb@v1
         with:
           run: node packages/cli/bin/test.js --cwd packages/agents-e2e --launch-agent-window --enable-extensions --use-proxy-mock --only agents-window-chat-terminal-lifecycle.ts --vscode-version insiders:d9cccddf6b34357c58b5bbfb60ea03d4c4d1df65 --runs 2
+      - name: Run tree view refresh lifecycle regression
+        if: matrix.os == 'ubuntu-24.04'
+        timeout-minutes: 10
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: node packages/cli/bin/test.js --only tree-view-refresh-lifecycle-churn --enable-extensions --run-skipped-tests-anyway --runs 2 --vscode-version 1.145.0
       - name: Run headless test (with videos)
         if: matrix.os != 'macos-26'
         uses: coactions/setup-xvfb@v1
@@ -110,7 +116,7 @@ jobs:
       - name: Collect startup CPU profiles (smoke)
         if: matrix.os == 'ubuntu-24.04'
         timeout-minutes: 5
-        run: xvfb-run --auto-servernum node packages/build/src/measureStartupProfiles.ts --executable .vscode-test/vscode-linux-x64-1.145.0/code --output .vscode-memory-leak-finder-results/startup-performance --samples 1
+        run: xvfb-run --auto-servernum node packages/build/src/measureStartupProfiles.ts --executable .vscode-test/vscode-linux-x64-1.146.0/code --output .vscode-memory-leak-finder-results/startup-performance --samples 1
       - name: Generate charts
         run: node packages/charts/src/main.ts
       - name: Validate Memory City artifact

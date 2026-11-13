@@ -11,6 +11,7 @@ These entries identify what a collector measures, not a promise that every metri
 - [Long renderer tasks](./long-renderer-tasks)
 - [Module resolution](./module-resolution)
 - [Module resolution lookups](./module-resolution-lookups)
+- [Script compilation and evaluation](./script-compilation-evaluation)
 - [Synchronous DOM read count](./synchronous-dom-read-count)
 - [Synchronous DOM read count with stack traces](./synchronous-dom-read-count-with-stack-traces)
 - [Synchronous file system](./synchronous-file-system)
@@ -170,6 +171,7 @@ These entries identify what a collector measures, not a promise that every metri
 | `scope-count`                                           | [ScopeCount](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureScopeCount/MeasureScopeCount.ts)                                                                                                             |
 | `scope-count2`                                          | [ScopeCount2](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureScopeCount2/MeasureScopeCount2.ts)                                                                                                          |
 | `scopes`                                                | [Scopes](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureScopes/MeasureScopes.ts)                                                                                                                         |
+| `script-compilation-evaluation`                         | [ScriptCompilationEvaluation](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureScriptCompilationEvaluation/MeasureScriptCompilationEvaluation.ts)                                                          |
 | `set-count`                                             | [SetCount](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureSetCount/MeasureSetCount.ts)                                                                                                                   |
 | `set-size`                                              | [SetSize](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureSetSize/MeasureSetSize.ts)                                                                                                                      |
 | `set-timeout`                                           | [SetTimeout](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureSetTimeout/MeasureSetTimeout.ts)                                                                                                             |
