@@ -453,6 +453,8 @@ const parseTrackFunctions = (argv: readonly string[]): boolean => {
     measure === 'trackedAllocationTimeline' ||
     measure === 'active-interval-count' ||
     measure === 'activeIntervalCount' ||
+    measure === 'active-timeout-count' ||
+    measure === 'activeTimeoutCount' ||
     measure === 'tracked-timeouts' ||
     measure === 'trackedTimeouts'
   )

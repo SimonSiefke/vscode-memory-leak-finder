@@ -777,6 +777,10 @@ test('parseArgv - rejects the Agents window with Cursor', () => {
   )
 })
 
+test.each(['active-timeout-count', 'activeTimeoutCount'])('%s automatically enables startup instrumentation', (measure) => {
+  expect(ParseArgv.parseArgv('linux', 'x64', ['--measure', measure]).trackFunctions).toBe(true)
+})
+
 test.each(['active-interval-count', 'activeIntervalCount'])('%s automatically enables startup instrumentation', (measure) => {
   expect(ParseArgv.parseArgv('linux', 'x64', ['--measure', measure]).trackFunctions).toBe(true)
 })
