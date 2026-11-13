@@ -18,7 +18,11 @@ interface Manifest {
   cachePolicy: string
   boundary: string
   overhead: string
-  runs: { run: number; error?: string; profiles: Record<string, { file?: string; scriptMap?: string; error?: string; attachedMs?: number }> }[]
+  runs: {
+    run: number
+    error?: string
+    profiles: Record<string, { file?: string; scriptMap?: string; error?: string; attachedMs?: number }>
+  }[]
 }
 const labels = {
   renderer: 'Renderer process',
@@ -35,7 +39,10 @@ const formatFrame = (frame: string): string => {
   const [name, url, line, column] = JSON.parse(frame)
   const path = url
     ? url.startsWith('vscode-file://vscode-app')
-      ? url.replace(/^vscode-file:\/\/vscode-app/, '').split('/resources/app/').at(-1) || url
+      ? url
+          .replace(/^vscode-file:\/\/vscode-app/, '')
+          .split('/resources/app/')
+          .at(-1) || url
       : url.startsWith('file://')
         ? url.split('/').at(-1) || url
         : url
@@ -54,7 +61,10 @@ const loadSourceMap = async (url: string): Promise<RawSourceMap> => {
   if (!response.ok) throw new Error(`Source map request failed: ${response.status} ${url}`)
   return response.json() as Promise<RawSourceMap>
 }
-const withOriginalLocations = async (profile: Profile, scriptMap: Record<string, { url?: string; sourceMapUrl?: string }>): Promise<Profile> => {
+const withOriginalLocations = async (
+  profile: Profile,
+  scriptMap: Record<string, { url?: string; sourceMapUrl?: string }>,
+): Promise<Profile> => {
   const consumers = new Map<string, SourceMapConsumer>()
   const consumersByScriptUrl = new Map<string, SourceMapConsumer>()
   for (const script of Object.values(scriptMap)) {
@@ -75,7 +85,11 @@ const withOriginalLocations = async (profile: Profile, scriptMap: Record<string,
     if (!consumer) continue
     const original = consumer.originalPositionFor({ line: lineNumber + 1, column: columnNumber + 1 })
     if (original.source && original.line !== null && original.column !== null)
-      originalPositions.set(`${url}:${lineNumber}:${columnNumber}`, { source: original.source, line: original.line, column: original.column })
+      originalPositions.set(`${url}:${lineNumber}:${columnNumber}`, {
+        source: original.source,
+        line: original.line,
+        column: original.column,
+      })
   }
   return {
     ...profile,

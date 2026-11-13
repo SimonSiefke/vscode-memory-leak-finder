@@ -129,12 +129,30 @@ test('startup report uses source-mapped stack frame locations and keeps raw prof
       samples: [2],
       timeDeltas: [1000],
     }
-    const profiles = Object.fromEntries(['renderer', 'main', 'shared-process', 'extension-host'].map((name) => [name, { file: `run-1/${name}.cpuprofile`, scriptMap: `run-1/${name}-script-map.json` }]))
+    const profiles = Object.fromEntries(
+      ['renderer', 'main', 'shared-process', 'extension-host'].map((name) => [
+        name,
+        { file: `run-1/${name}.cpuprofile`, scriptMap: `run-1/${name}-script-map.json` },
+      ]),
+    )
     for (const name of Object.keys(profiles)) {
       await writeFile(join(results, profiles[name].file), JSON.stringify(mappedProfile))
       await writeFile(join(results, profiles[name].scriptMap), JSON.stringify(scriptMap))
     }
-    await writeFile(join(results, 'manifest.json'), JSON.stringify({ samples: 1, generatedAt: 'test', environment: {}, version: 'test', workload: 'test', cachePolicy: 'test', boundary: 'test', overhead: 'test', runs: [{ run: 1, profiles }] }))
+    await writeFile(
+      join(results, 'manifest.json'),
+      JSON.stringify({
+        samples: 1,
+        generatedAt: 'test',
+        environment: {},
+        version: 'test',
+        workload: 'test',
+        cachePolicy: 'test',
+        boundary: 'test',
+        overhead: 'test',
+        runs: [{ run: 1, profiles }],
+      }),
+    )
 
     await generateStartupPerformance(results, output)
 

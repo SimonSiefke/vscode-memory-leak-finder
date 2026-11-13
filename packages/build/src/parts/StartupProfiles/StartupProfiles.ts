@@ -42,7 +42,11 @@ export const collectStartupProfiles = async (executable: string, output: string,
       'Main, shared process and extension host: profiler enabled before releasing inspect-brk. Renderer: earliest discoverable workbench target (initial renderer execution can be missed). Stop: VS Code startup-profiler marker deletion after LifecyclePhase.Eventually and installed-extension registration.',
     overhead:
       'Inspector pauses and CPU sampling perturb startup. Profile durations are sampling windows, not uninstrumented startup latency.',
-    runs: [] as { run: number; profiles: Record<string, { file?: string; scriptMap?: string; error?: string; attachedMs?: number }>; error?: string }[],
+    runs: [] as {
+      run: number
+      profiles: Record<string, { file?: string; scriptMap?: string; error?: string; attachedMs?: number }>
+      error?: string
+    }[],
   }
   for (let run = 1; run <= samples; run++) {
     const folder = join(output, `run-${run}`)
