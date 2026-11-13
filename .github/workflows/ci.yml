@@ -223,6 +223,8 @@ jobs:
             args: --measure pending-promise-count
           - name: active-timeout-count
             args: --measure active-timeout-count
+          - name: empty-map-count
+            args: --measure empty-map-count
           - name: empty-set-count
             args: --measure empty-set-count
           - name: promise-count
@@ -790,6 +792,11 @@ jobs:
       - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
+          name: vscode-memory-leak-finder-results-linux-empty-map-count
+          path: ./vscode-memory-leak-finder-results-linux-empty-map-count
+      - uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
           name: vscode-memory-leak-finder-results-linux-empty-set-count
           path: ./vscode-memory-leak-finder-results-linux-empty-set-count
       - uses: actions/download-artifact@v8
@@ -1161,6 +1168,11 @@ jobs:
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-instruction-count-arm64
+      - name: Delete individual artifacts
+        uses: geekyeggo/delete-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-empty-map-count
       - name: Delete individual artifacts
         uses: geekyeggo/delete-artifact@v6
         continue-on-error: true

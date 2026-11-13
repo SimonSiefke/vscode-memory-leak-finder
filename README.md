@@ -1068,3 +1068,13 @@ node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure active-
 ```
 
 Linux CI collects this measure and publishes `active-timeout-count.svg` on the main GitHub Pages charts page.
+
+### Empty Map Count
+
+Counts live `Map` instances with no entries in the inspected JavaScript realm. The native size accessor avoids invoking application-defined `size` getters. Temporary inspector references are released after each reading.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure empty-map-count
+```
+
+Linux CI collects this measure and publishes `empty-map-count.svg` on the main GitHub Pages charts page.
