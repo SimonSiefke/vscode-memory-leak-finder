@@ -81,9 +81,7 @@ export const create = ({ expect, platform, page, VError, electronApp, ideVersion
       try {
         const accountsWidget = page.locator('.part.titlebar .sessions-account-titlebar-widget')
         await expect(accountsWidget).toBeVisible()
-        const contextMenu = ContextMenu.create({ electronApp, expect, ideVersion, page, platform, VError })
-        await contextMenu.open(accountsWidget)
-        await contextMenu.select('Hide Accounts')
+        await toggleTitleBarItem('Accounts')
         await page.waitForIdle()
         await expect(accountsWidget).toBeHidden()
       } catch (error) {

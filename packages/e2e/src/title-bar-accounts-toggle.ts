@@ -1,11 +1,10 @@
-import type { TestContext } from '../../e2e/types.ts'
+import type { TestContext } from '../types.js'
 
 export const skip = process.platform === 'darwin'
 
 let titleBar: any
 
-export const setup = async ({ AgentsWindow, TitleBar }: TestContext): Promise<void> => {
-  await AgentsWindow.newChat()
+export const setup = async ({ TitleBar }: TestContext): Promise<void> => {
   titleBar = TitleBar
   // @ts-ignore
   await titleBar.ensureAccountsWidgetVisible()
