@@ -24,6 +24,7 @@ test('loads nested results, combines stylesheets and generates the Pages route',
     await writeFile(join(folder, 'empty.json'), JSON.stringify({ cssSelectorStats: { topSelectors: [] } }))
     const scenarios = await getCssSelectorStatsData(root)
     expect(scenarios).toEqual([
+      { name: 'all', rows: [{ ...row('.a', 3, 2), matchCount: 2 }, row('.b', 0)] },
       { name: 'nested/empty', rows: [] },
       { name: 'nested/test', rows: [{ ...row('.a', 3, 2), matchCount: 2 }, row('.b', 0)] },
     ])
@@ -33,6 +34,30 @@ test('loads nested results, combines stylesheets and generates the Pages route',
     for (const [index, scenario] of scenarios.entries()) {
       expect(JSON.parse(await readFile(join(output, 'data', `${index}.json`), 'utf8'))).toEqual(scenario.rows)
     }
+  } finally {
+    await rm(root, { recursive: true, force: true })
+  }
+})
+
+test('adds a synthetic all scenario with totals from every recorded scenario', async () => {
+  const root = await mkdtemp(join(tmpdir(), 'css-selector-stats-'))
+  try {
+    const folder = join(root, 'css-selector-stats')
+    await mkdir(folder, { recursive: true })
+    await writeFile(join(folder, 'all.json'), JSON.stringify({ cssSelectorStats: { topSelectors: [row('.shared', 2, 3)] } }))
+    await writeFile(
+      join(folder, 'test.json'),
+      JSON.stringify({ cssSelectorStats: { topSelectors: [row('.shared', 5, 7), row('.other', 9, 2)] } }),
+    )
+    const scenarios = await getCssSelectorStatsData(root)
+    expect(scenarios).toEqual([
+      { name: 'all', rows: [{ ...row('.shared', 7, 10), matchCount: 2 }, row('.other', 9, 2)] },
+      { name: 'all', rows: [row('.shared', 2, 3)] },
+      { name: 'test', rows: [row('.shared', 5, 7), row('.other', 9, 2)] },
+    ])
+    const html = renderCssSelectorStatsHtml(scenarios)
+    expect(html.match(/<option value="\d+"(?: selected)?>all<\/option>/g)).toHaveLength(2)
+    expect(html).toContain('The “all” scenario sums recorded rows across all tests')
   } finally {
     await rm(root, { recursive: true, force: true })
   }

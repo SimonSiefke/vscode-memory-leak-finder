@@ -1,18 +1,20 @@
 /** @jest-environment jsdom */
-import { expect, test } from '@jest/globals'
+import { expect, jest, test } from '@jest/globals'
 import * as RunAndDebug from '../src/parts/RunAndDebug/RunAndDebug.ts'
 
 const document = (globalThis as any).document
+const stopButtonClick = jest.fn()
 
 const locator = (selector: string): any => ({
   selector,
   locator: (child: string) => locator(`${selector} ${child}`),
   first: () => locator(selector),
+  click: stopButtonClick,
 })
 
 const createDebugger = (label: string) => {
   document.body.innerHTML = `
-    <div class="debug-toolbar"><button class="codicon-debug-continue"></button></div>
+    <div class="debug-toolbar"><button aria-label="Stop"></button><button class="codicon-debug-continue"></button></div>
     <div class="debug-top-stack-frame-column"></div>
     <div class="debug-call-stack">
       <div class="monaco-list-row selected" aria-label="Session index.js [8644] « Launch Program Paused on breakpoint">
@@ -31,6 +33,11 @@ const createDebugger = (label: string) => {
     electronApp: {},
     expect: (element: any) => ({
       toBeVisible: async () => expect(document.querySelector(element.selector)).not.toBeNull(),
+      toBeHidden: async ({ timeout }: { timeout?: number } = {}) => {
+        if (element.selector.includes('[aria-label^="Stop"]')) {
+          expect(timeout).toBe(30_000)
+        }
+      },
       toHaveText: async (pattern: RegExp) => expect(document.querySelector(element.selector).textContent).toMatch(pattern),
       toHaveAttribute: async (name: string, value: string | RegExp) => {
         const actual = document.querySelector(element.selector).getAttribute(name)
@@ -79,4 +86,11 @@ test('waitForPaused rejects a paused session without any stack frames', async ()
     frame.remove()
   }
   await expect(debuggerView.waitForPaused({ file: 'index.js', line: 4 })).rejects.toThrow()
+})
+
+test('stop clicks the toolbar stop action and waits for the debugger to stop', async () => {
+  stopButtonClick.mockClear()
+  const debuggerView = createDebugger('Stack Frame <anonymous>, line 4, index.js')
+  await debuggerView.stop()
+  expect(stopButtonClick).toHaveBeenCalledTimes(1)
 })

@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@lvce-editor/rpc": "^6.23.0",
-    "@observablehq/plot": "0.6.17",
+    "@observablehq/plot": "0.6.19",
     "escape-html": "^1.0.3",
     "jsdom": "^26.1.0",
     "pretty-bytes": "^7.2.0",

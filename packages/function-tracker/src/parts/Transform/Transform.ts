@@ -1,3 +1,4 @@
+import { activeTimerPreamble } from '../ActiveTimerPreamble/ActiveTimerPreamble.ts'
 import { allocationBytesPreamble } from '../AllocationBytesPreamble/AllocationBytesPreamble.ts'
 import type { TransformOptions } from '../Types/Types.ts'
 import { transformCodeWithAllocationTracking } from '../TransformCodeWithAllocationTracking/TransformCodeWithAllocationTracking.ts'
@@ -193,6 +194,9 @@ export const transformCode = async (code: string, options: TransformOptions = {}
   if (trackingMode === 'allocations') {
     const transformedCode = transformCodeWithAllocationTracking(code, { ...options })
     return ALLOCATION_PREAMBLE_CODE + '\n' + transformedCode
+  }
+  if (trackingMode === 'active-timers') {
+    return activeTimerPreamble + '\n' + code
   }
   if (trackingMode === 'timeouts') {
     return TIMEOUT_PREAMBLE_CODE + '\n' + code
