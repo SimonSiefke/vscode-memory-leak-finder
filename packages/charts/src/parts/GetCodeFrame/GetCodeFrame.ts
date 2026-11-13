@@ -70,7 +70,7 @@ export const getCodeFrame = async (stackLine: string, sourcesHash?: string | nul
       // HTML classes even when the report is generated without a TTY.
       forceColor: highlight,
       highlightCode: highlight,
-      linesAbove: 2,
+      linesAbove: 7,
       linesBelow: 2,
     })
     return codeFrame

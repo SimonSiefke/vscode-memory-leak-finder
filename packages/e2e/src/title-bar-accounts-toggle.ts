@@ -2,24 +2,21 @@ import type { TestContext } from '../types.js'
 
 export const skip = process.platform === 'darwin'
 
-let titleBar: any
-let initialSettings: Record<string, unknown>
-
-export const setup = async ({ TitleBar, Workspace }: TestContext): Promise<void> => {
-  initialSettings = await Workspace.readWorkspaceSettings()
-  await Workspace.updateWorkspaceSettings({ 'workbench.activityBar.location': 'top' })
-  titleBar = TitleBar
+export const setup = async ({ QuickPick, TitleBar }: TestContext): Promise<void> => {
+  // The harness excludes the fixture workspace from file watching, so use the
+  // layout command instead of writing a workspace setting after launch.
+  await QuickPick.executeCommand('View: Move Activity Bar to Top')
   // @ts-ignore
-  await titleBar.ensureAccountsWidgetVisible()
+  await TitleBar.ensureAccountsWidgetVisible()
 }
 
-export const run = async (): Promise<void> => {
+export const run = async ({ TitleBar }: TestContext): Promise<void> => {
   // @ts-ignore
-  await titleBar.hideAccountsWidget()
+  await TitleBar.hideAccountsWidget()
   // @ts-ignore
-  await titleBar.showAccountsWidget()
+  await TitleBar.showAccountsWidget()
 }
 
-export const teardown = async ({ Workspace }: TestContext): Promise<void> => {
-  await Workspace.writeWorkspaceSettings(initialSettings)
+export const teardown = async ({ QuickPick }: TestContext): Promise<void> => {
+  await QuickPick.executeCommand('View: Move Activity Bar to Side')
 }
