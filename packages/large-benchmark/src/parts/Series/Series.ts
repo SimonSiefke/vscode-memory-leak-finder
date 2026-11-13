@@ -24,7 +24,9 @@ export const validateCommits = (value: unknown): string[] => {
   if (!value.every((reference) => typeof reference === 'string')) throw new Error('commits must contain only commit references')
   const parsed = value.map((reference: string) => parseCommitReference(reference))
   const commits = parsed.map((commit) => commit.reference)
-  if (new Set(parsed.map((commit) => commit.artifact)).size !== commits.length) throw new Error('commits must be unique')
+  const sameCommitPair = commits.length === 2 && commits[0] === commits[1]
+  if (!sameCommitPair && new Set(parsed.map((commit) => commit.artifact)).size !== commits.length)
+    throw new Error('commits must be unique except for a two-label same-commit control')
   return commits
 }
 

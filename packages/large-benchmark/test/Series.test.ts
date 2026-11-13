@@ -45,7 +45,7 @@ const result = (pairIndex: number, before: number, after: number): Result => ({
   ).flat(),
 })
 
-test('commit arrays preserve order, normalize case, and reject malformed, repeated, or oversized input', () => {
+test('commit arrays preserve order, normalize case, and reject malformed, repeated series, or oversized input', () => {
   expect(parseCommits(JSON.stringify([commits[2], commits[0]!.toUpperCase()]))).toEqual([commits[2], commits[0]])
   for (const input of [
     'bad-json',
@@ -55,7 +55,7 @@ test('commit arrays preserve order, normalize case, and reject malformed, repeat
     '[123,456]',
     JSON.stringify([commits[0]]),
     JSON.stringify([commits[0], 'abc']),
-    JSON.stringify([commits[0], commits[0]!.toUpperCase()]),
+    JSON.stringify([commits[0], commits[0]!.toUpperCase(), commits[1]]),
     JSON.stringify(Array(257).fill(commits[0])),
   ])
     expect(() => parseCommits(input)).toThrow()
@@ -394,4 +394,30 @@ test.each(['pair', 'series'])('qualified fork references survive the %s workflow
   expect(html).toContain(before)
   expect(html).toContain(after)
   expect(html).toContain('startupTime')
+})
+
+test('same-commit controls preserve both labels and generate a paired measurement manifest', async () => {
+  const directory = await temporary()
+  expect(parseCommits(JSON.stringify([commits[0], commits[0]!.toUpperCase()]))).toEqual([commits[0], commits[0]])
+  expect(seriesMatrix([commits[0]!, commits[0]!], [benchmark]).include).toEqual([
+    { id: 'pair-1', before: commits[0], after: commits[0], group: 1, benchmarks: benchmark.id },
+  ])
+  await largePerformance([
+    'matrix',
+    '--before-commit',
+    commits[0]!,
+    '--after-commit',
+    commits[0]!,
+    '--measures',
+    'instructions',
+    '--samples',
+    '37',
+    '--output-dir',
+    directory,
+  ])
+  expect(JSON.parse(await readFile(join(directory, 'manifest.json'), 'utf8'))).toMatchObject({
+    schemaVersion: 1,
+    commits: { before: commits[0], after: commits[0] },
+    samples: 37,
+  })
 })

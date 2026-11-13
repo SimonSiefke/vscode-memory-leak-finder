@@ -20,7 +20,7 @@ export const executionPlan = (commits: string[], benchmarks: Benchmark[]) => {
   }
   const buildsFor = (arch: Architecture) => ({
     include: benchmarks.some((b) => collectorArchitecture(b) === arch)
-      ? commits.map((commit) => ({ commit, artifact: buildArtifact(commit, arch) }))
+      ? [...new Set(commits)].map((commit) => ({ commit, artifact: buildArtifact(commit, arch) }))
       : [],
   })
   const matrix = matrixFor('x64')

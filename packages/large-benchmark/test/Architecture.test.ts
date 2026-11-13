@@ -124,3 +124,15 @@ test('matrix CLI freezes architecture and emits ARM-only outputs for an instruct
     await rm(directory, { recursive: true, force: true })
   }
 })
+
+test('same-commit instruction controls build once and reuse the same artifact for both labels', () => {
+  const selected = benchmarks.filter((b) => b.collector === 'instructions')
+  const plan = executionPlan([commits[0]!, commits[0]!], selected)
+  expect(plan.arm_build_matrix.include).toEqual([{ commit: commits[0], artifact: `${commits[0]}-arm64` }])
+  expect(plan.arm_matrix.include).toHaveLength(selected.length)
+  for (const job of plan.arm_matrix.include) {
+    expect(job.before).toBe(job.after)
+    expect(job.beforeArtifact).toBe(job.afterArtifact)
+  }
+  expect(plan.build_matrix.include).toEqual([])
+})
