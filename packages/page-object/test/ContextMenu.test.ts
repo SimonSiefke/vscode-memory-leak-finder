@@ -7,26 +7,51 @@ class TestError extends Error {
   }
 }
 
-test.each([true, false])('selectAndClose activates a toggle once when the menu remains open: %s', async (staysOpen) => {
+test.each([
+  [true, false],
+  [false, false],
+  [true, true],
+  [false, true],
+])('selectAndClose activates a toggle once (persistent: %s, deferred mouse action: %s)', async (staysOpen, deferredMouseAction) => {
   let menuVisible = true
   let checked = false
+  const pending: Promise<void>[] = []
+  const activate = jest.fn(() => {
+    checked = !checked
+    menuVisible = staysOpen
+  })
   const item = {
     click: jest.fn(async () => {
-      checked = !checked
-      menuVisible = staysOpen
+      if (deferredMouseAction) {
+        pending.push(
+          new Promise((resolve) =>
+            setTimeout(() => {
+              if (menuVisible) activate()
+              resolve()
+            }, 0),
+          ),
+        )
+      } else {
+        activate()
+      }
     }),
   }
   const menu = {
     isVisible: jest.fn(async () => menuVisible),
     locator: jest.fn(() => item),
   }
-  const press = jest.fn(async (_key: string) => {
-    menuVisible = false
+  const press = jest.fn(async (key: string) => {
+    if (key === 'Escape') {
+      menuVisible = false
+    }
   })
   const page = {
     keyboard: { press },
     locator: jest.fn(() => menu),
     waitForIdle: jest.fn(async () => {}),
+    evaluate: jest.fn(async () => {
+      await Promise.all(pending)
+    }),
   }
   const expectElement = (element: unknown) => ({
     toBeFocused: async () => {},
@@ -47,8 +72,9 @@ test.each([true, false])('selectAndClose activates a toggle once when the menu r
   })
 
   await contextMenu.selectAndClose('Accounts')
+  await Promise.all(pending)
 
-  expect(item.click).toHaveBeenCalledTimes(1)
+  expect(activate).toHaveBeenCalledTimes(1)
   expect(checked).toBe(true)
-  expect(press.mock.calls).toEqual(staysOpen ? [['Escape']] : [])
+  expect(menuVisible).toBe(false)
 })
