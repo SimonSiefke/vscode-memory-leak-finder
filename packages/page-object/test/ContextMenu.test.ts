@@ -15,6 +15,7 @@ test.each([
 ])('selectAndClose activates a toggle once (persistent: %s, deferred mouse action: %s)', async (staysOpen, deferredMouseAction) => {
   let menuVisible = true
   let checked = false
+  let rendererMouseHandlerReady = false
   const pending: Promise<void>[] = []
   const activate = jest.fn(() => {
     checked = !checked
@@ -22,6 +23,7 @@ test.each([
   })
   const item = {
     click: jest.fn(async () => {
+      if (!rendererMouseHandlerReady) return
       if (deferredMouseAction) {
         pending.push(
           new Promise((resolve) =>
@@ -50,6 +52,7 @@ test.each([
     locator: jest.fn(() => menu),
     waitForIdle: jest.fn(async () => {}),
     evaluate: jest.fn(async () => {
+      rendererMouseHandlerReady = true
       await Promise.all(pending)
     }),
   }

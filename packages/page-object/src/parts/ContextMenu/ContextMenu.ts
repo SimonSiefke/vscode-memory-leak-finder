@@ -120,8 +120,8 @@ export const create = ({ expect, page, VError }: CreateParams) => {
         hasText: option,
       })
       await expect(contextMenuItem).toBeVisible()
-      // VS Code enables menu mouse handlers 100ms after rendering.
-      await new Promise((resolve) => setTimeout(resolve, 150))
+      // Wait on the renderer's clock so its delayed menu mouse handler is installed first.
+      await page.evaluate({ expression: 'new Promise(resolve => setTimeout(resolve, 150))', awaitPromise: true })
       await contextMenuItem.click()
       // Menu mouse-up handlers queue the action in the renderer's next timer turn.
       await page.evaluate({ expression: 'new Promise(resolve => setTimeout(resolve, 0))', awaitPromise: true })
