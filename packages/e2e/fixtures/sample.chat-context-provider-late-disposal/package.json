@@ -1,0 +1,29 @@
+{
+  "name": "chat-context-provider-late-disposal",
+  "displayName": "Chat Context Provider Late Disposal",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "chat-context-provider-late-disposal.setup",
+        "title": "Chat Context Provider Late Disposal: Setup"
+      },
+      {
+        "command": "chat-context-provider-late-disposal.run",
+        "title": "Chat Context Provider Late Disposal: Run"
+      },
+      {
+        "command": "chat-context-provider-late-disposal.cleanup",
+        "title": "Chat Context Provider Late Disposal: Cleanup"
+      }
+    ]
+  },
+  "enabledApiProposals": [
+    "chatContextProvider"
+  ]
+}
