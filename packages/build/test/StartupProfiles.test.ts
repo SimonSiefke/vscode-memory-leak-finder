@@ -1,8 +1,47 @@
 import { expect, test } from '@jest/globals'
 import { createServer } from 'node:http'
+import { spawn } from 'node:child_process'
+import { once } from 'node:events'
+import { setTimeout as delay } from 'node:timers/promises'
 import { WebSocketServer } from 'ws'
 import { Inspector } from '../src/parts/StartupProfiles/Inspector.ts'
 import { collectStartupProfiles } from '../src/parts/StartupProfiles/StartupProfiles.ts'
+
+test('startup profiling collects script metadata without pausing an inspect-brk process', async () => {
+  const child = spawn(process.execPath, [
+    '--inspect-brk=127.0.0.1:0',
+    '-e',
+    'process.stdout.write("started"); setInterval(() => {}, 1000)\n//# sourceURL=startup-profiling-test.js',
+  ])
+  let session: Inspector | undefined
+  let output = ''
+  child.stdout.on('data', (data) => (output += data.toString()))
+  try {
+    const url = await new Promise<string>((resolve, reject) => {
+      child.once('error', reject)
+      child.stderr.on('data', (data) => {
+        const match = data.toString().match(/ws:\/\/\S+/)
+        if (match) resolve(match[0])
+      })
+    })
+    session = await Inspector.connect(url)
+    const scripts: string[] = []
+    session.on('Debugger.scriptParsed', ({ url }) => scripts.push(url))
+    await session.startProfiling()
+    await session.invoke('Runtime.runIfWaitingForDebugger')
+    for (let attempt = 0; attempt < 100 && (output !== 'started' || !scripts.includes('startup-profiling-test.js')); attempt++)
+      await delay(10)
+    expect(output).toBe('started')
+    expect(scripts).toContain('startup-profiling-test.js')
+    const { profile } = await session.invoke('Profiler.stop')
+    expect(profile.samples.length).toBeGreaterThan(0)
+  } finally {
+    session?.dispose()
+    const exited = once(child, 'exit')
+    child.kill()
+    await exited
+  }
+})
 
 test('inspector correlates out-of-order replies, surfaces protocol errors and releases pending requests', async () => {
   const server = createServer()

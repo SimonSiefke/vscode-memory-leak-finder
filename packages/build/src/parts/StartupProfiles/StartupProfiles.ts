@@ -133,9 +133,7 @@ export const collectStartupProfiles = async (executable: string, output: string,
             session.on('Debugger.scriptParsed', ({ scriptId, url: scriptUrl, sourceMapURL }) => {
               scriptMap[scriptId] = { url: scriptUrl, ...(sourceMapURL ? { sourceMapUrl: sourceMapURL } : {}) }
             })
-            await session.invoke('Debugger.enable')
-            await session.invoke('Profiler.enable')
-            await session.invoke('Profiler.start')
+            await session.startProfiling()
             result.profiles[name] = { attachedMs: Date.now() - started }
             if (name !== 'renderer') await session.invoke('Runtime.runIfWaitingForDebugger')
           } catch (error) {

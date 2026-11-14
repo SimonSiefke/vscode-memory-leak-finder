@@ -55,6 +55,13 @@ export class Inspector {
     listeners.add(listener)
     this.eventListeners.set(method, listeners)
   }
+  async startProfiling(): Promise<void> {
+    await this.invoke('Debugger.enable')
+    // Collect scriptParsed events without stopping inspect-brk processes at their first statement.
+    await this.invoke('Debugger.setSkipAllPauses', { skip: true })
+    await this.invoke('Profiler.enable')
+    await this.invoke('Profiler.start')
+  }
   dispose(): void {
     this.rejectPending(new Error('Inspector disposed'))
     this.socket.terminate()
