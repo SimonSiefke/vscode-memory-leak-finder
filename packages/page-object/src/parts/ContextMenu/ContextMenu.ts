@@ -116,17 +116,15 @@ export const create = ({ expect, page, VError }: CreateParams) => {
       const contextMenu = page.locator('.context-view.monaco-menu-container .actions-container')
       await expect(contextMenu).toBeVisible()
       await expect(contextMenu).toBeFocused()
-      const contextMenuItem = contextMenu.locator('.action-item', {
+      const contextMenuItem = contextMenu.locator('.action-menu-item', {
         hasText: option,
       })
-      try {
-        await contextMenuItem.clickExponential({
-          waitForHidden: contextMenu,
-        })
-      } catch (error) {
-        if (!(await contextMenu.isVisible())) {
-          throw error
-        }
+      await expect(contextMenuItem).toBeVisible()
+      // VS Code enables menu mouse handlers 100ms after rendering.
+      await new Promise((resolve) => setTimeout(resolve, 150))
+      await contextMenuItem.click()
+      await page.waitForIdle()
+      if (await contextMenu.isVisible()) {
         await page.keyboard.press('Escape')
       }
       await expect(contextMenu).toBeHidden()
