@@ -1,6 +1,7 @@
 export const AbortControllerCount = 'abortControllerCount'
 export const AbortSignalCount = 'abortSignalCount'
 export const ActiveAsyncResourcesWithStackTraces = 'activeAsyncResourcesWithStackTraces'
+export const ActiveIntervalCount = 'activeIntervalCount'
 export const ActiveTimeoutCount = 'activeTimeoutCount'
 export const ArrayBufferBytes = 'arrayBufferBytes'
 export const ArrayCount = 'arrayCount'

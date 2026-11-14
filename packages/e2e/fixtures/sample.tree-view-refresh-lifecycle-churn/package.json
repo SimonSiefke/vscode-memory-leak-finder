@@ -1,0 +1,34 @@
+{
+  "name": "tree-view-refresh-lifecycle-churn",
+  "displayName": "Tree View Refresh Lifecycle Churn",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "views": {
+      "explorer": [
+        {
+          "id": "treeViewRefreshLifecycleChurn",
+          "name": "Refresh lifecycle"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "tree-view-refresh-lifecycle-churn.setup",
+        "title": "Tree View Refresh Lifecycle Churn: Setup"
+      },
+      {
+        "command": "tree-view-refresh-lifecycle-churn.run",
+        "title": "Tree View Refresh Lifecycle Churn: Run"
+      },
+      {
+        "command": "tree-view-refresh-lifecycle-churn.cleanup",
+        "title": "Tree View Refresh Lifecycle Churn: Cleanup"
+      }
+    ]
+  }
+}
