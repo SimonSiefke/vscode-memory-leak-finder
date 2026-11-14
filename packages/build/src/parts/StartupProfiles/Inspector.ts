@@ -4,10 +4,15 @@ export class Inspector {
   private nextId = 0
   private pending = new Map<number, { resolve: (value: any) => void; reject: (error: Error) => void; timer: NodeJS.Timeout }>()
   private socket: WebSocket
+  private readonly eventListeners = new Map<string, Set<(params: any) => void>>()
   private constructor(socket: WebSocket) {
     this.socket = socket
     socket.on('message', (data) => {
       const message = JSON.parse(data.toString())
+      if (message.method) {
+        for (const listener of this.eventListeners.get(message.method) || []) listener(message.params)
+        return
+      }
       const request = this.pending.get(message.id)
       if (!request) return
       clearTimeout(request.timer)
@@ -44,6 +49,11 @@ export class Inspector {
       this.pending.set(id, { resolve, reject, timer })
       this.socket.send(JSON.stringify({ id, method, params }))
     })
+  }
+  on(method: string, listener: (params: any) => void): void {
+    const listeners = this.eventListeners.get(method) || new Set()
+    listeners.add(listener)
+    this.eventListeners.set(method, listeners)
   }
   dispose(): void {
     this.rejectPending(new Error('Inspector disposed'))
