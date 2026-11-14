@@ -6,6 +6,7 @@ import * as IsWindows from '../IsWindows/IsWindows.ts'
 import * as ParseArgv from '../ParseArgv/ParseArgv.ts'
 import * as StdinDataState from '../StdinDataState/StdinDataState.ts'
 import * as StdoutWorker from '../StdoutWorker/StdoutWorker.ts'
+import * as Stdout from '../Stdout/Stdout.ts'
 
 export const run = async (platform: string, arch: string, argv: readonly string[], env: NodeJS.ProcessEnv): Promise<void> => {
   if (argv[argv.lastIndexOf('--measure') + 1] === 'duplicate-code' && argv.includes('--measure')) {
@@ -20,6 +21,7 @@ export const run = async (platform: string, arch: string, argv: readonly string[
     return
   }
   const options = ParseArgv.parseArgv(platform, arch, argv, env)
+  Stdout.setColorEnabled(options.color)
 
   // Parse isGithubActions once at startup
   const isGithubActions = Boolean(env.GITHUB_ACTIONS)

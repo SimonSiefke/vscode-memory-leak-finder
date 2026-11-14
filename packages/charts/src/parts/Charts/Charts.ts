@@ -1,5 +1,6 @@
 export * as AbortControllerCount from '../CreateAbortControllerCountChart/CreateAbortControllerCountChart.ts'
 export * as AbortSignalCount from '../CreateAbortSignalCountChart/CreateAbortSignalCountChart.ts'
+export * as ActiveIntervalCount from '../CreateActiveIntervalCountChart/CreateActiveIntervalCountChart.ts'
 export * as ActiveTimeoutCount from '../CreateActiveTimeoutCountChart/CreateActiveTimeoutCountChart.ts'
 export * as ArrayBufferBytes from '../CreateArrayBufferBytesChart/CreateArrayBufferBytesChart.ts'
 export * as ArrayCount from '../CreateArrayCountChart/CreateArrayCountChart.ts'
