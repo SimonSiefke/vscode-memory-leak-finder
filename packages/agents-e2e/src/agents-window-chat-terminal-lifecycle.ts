@@ -71,6 +71,11 @@ const cycle = async (context: TestContext, end: 'delete' | 'archive' | 'reload')
       'native window focus',
     )
   }
+  const focusChild = async (): Promise<void> => {
+    const childId = (await Electron.getWindowIds()).find((id) => id !== mainWindowId)
+    if (childId === undefined) throw new Error('Chat window did not open')
+    await focusWindow(childId)
+  }
   const closeChild = async (): Promise<void> => {
     const auxiliaryId = (await Electron.getWindowIds()).find((id) => id !== mainWindowId)
     if (child && auxiliaryId !== undefined) {
@@ -133,6 +138,7 @@ const cycle = async (context: TestContext, end: 'delete' | 'archive' | 'reload')
     await AgentsWindow.shouldHaveSession(title)
     child = await Workbench.openChatWindow()
     await child.shouldBeVisible()
+    await focusChild()
     await child.QuickPick.executeCommand('Chat Window Terminal Probe: Create')
     await waitFor(async () => Boolean(await readJson(journal)), 'two real editor terminal shells')
     const records = await readJson(journal)
@@ -154,6 +160,7 @@ const cycle = async (context: TestContext, end: 'delete' | 'archive' | 'reload')
     await AgentsWindow.openChat(title)
     child = await Workbench.openChatWindow()
     await child.shouldBeVisible()
+    await focusChild()
     await child.QuickPick.executeCommand('Chat Window Terminal Probe: Snapshot')
     const snapshot = join(root, '.chat-window-terminal-snapshot.json')
     await waitFor(async () => Boolean(await readJson(snapshot)), 'terminal API snapshot after reopening')

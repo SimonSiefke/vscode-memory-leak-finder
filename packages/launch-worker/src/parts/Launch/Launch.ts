@@ -49,7 +49,12 @@ export interface LaunchOptions {
 let proxyWorkerRpc: any = null
 
 export const getTrackingMode = (measureId: string): string => {
-  if (measureId === 'active-timeout-count' || measureId === 'activeTimeoutCount') {
+  if (
+    measureId === 'active-interval-count' ||
+    measureId === 'activeIntervalCount' ||
+    measureId === 'active-timeout-count' ||
+    measureId === 'activeTimeoutCount'
+  ) {
     return 'active-timers'
   }
   if (measureId === 'trackedAllocationBytes' || measureId === 'tracked-allocation-bytes') {

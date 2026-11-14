@@ -1069,6 +1069,16 @@ node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure active-
 
 Linux CI collects this measure and publishes `active-timeout-count.svg` on the main GitHub Pages charts page.
 
+### Active Interval Count
+
+Counts outstanding renderer intervals from the start of workbench instrumentation. Both timer clear APIs remove either kind of handle; fired timeouts are removed while intervals remain active until cleared. The measure automatically prepares an instrumented VS Code copy and does not modify the installed build. Timers created before the workbench starts and timers in other realms are outside this measure.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure active-interval-count
+```
+
+Linux CI collects this measure and publishes `active-interval-count.svg` on the main GitHub Pages charts page.
+
 ### Empty Map Count
 
 Counts live `Map` instances with no entries in the inspected JavaScript realm. The native size accessor avoids invoking application-defined `size` getters. Temporary inspector references are released after each reading.
