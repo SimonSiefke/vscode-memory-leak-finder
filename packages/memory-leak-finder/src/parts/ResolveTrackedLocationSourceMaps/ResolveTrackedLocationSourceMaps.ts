@@ -139,6 +139,7 @@ const findScript = (scriptMap: ScriptMap, urlOrScriptId: string): ScriptMapEntry
 export const resolveTrackedLocationSourceMaps = async (
   locations: readonly string[],
   scriptMap: ScriptMap | undefined,
+  constructorNames = true,
 ): Promise<Record<string, ResolvedTrackedLocation>> => {
   const result: Record<string, ResolvedTrackedLocation> = Object.create(null)
   for (const location of locations) {
@@ -174,7 +175,7 @@ export const resolveTrackedLocationSourceMaps = async (
     return result
   }
 
-  const cleanPositionMap = await GetCleanPositionsMap.getCleanPositionsMap(sourceMapUrlToPositions, false, true)
+  const cleanPositionMap = await GetCleanPositionsMap.getCleanPositionsMap(sourceMapUrlToPositions, false, constructorNames)
   const offsetMap: Record<string, number> = Object.create(null)
   for (const pointer of pointers) {
     const positions = cleanPositionMap[pointer.sourceMapUrl] || []

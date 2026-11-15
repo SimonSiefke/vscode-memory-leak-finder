@@ -49,8 +49,7 @@ export const runInstall = async ({ platform = process.platform, runCommand = run
   let lastExitCode = 1
 
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-    const ciExitCode = runCommand(['ci', '--ignore-scripts'])
-    lastExitCode = ciExitCode === 0 ? runCommand(['run', 'postinstall']) : ciExitCode
+    lastExitCode = runCommand(['ci'])
 
     if (lastExitCode === 0) {
       return 0

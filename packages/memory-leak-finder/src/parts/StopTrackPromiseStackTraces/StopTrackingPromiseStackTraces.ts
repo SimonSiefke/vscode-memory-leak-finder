@@ -10,7 +10,11 @@ export const stopTrackingPromiseStackTraces = async (session: Session, objectGro
   await DevtoolsProtocolRuntime.evaluate(session, {
     expression: `(()=>{
 delete globalThis.___promiseStackTraces
+if (!globalThis.___originalPromise) {
+  return
+}
 globalThis.Promise = globalThis.___originalPromise
+delete globalThis.___originalPromise
 
 })()`,
     objectGroup,

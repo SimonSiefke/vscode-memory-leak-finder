@@ -1,0 +1,431 @@
+{
+  "name": "debug-visualization-provider-disposal",
+  "displayName": "Debug Visualization Provider Disposal",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "debugVisualizers": [
+      {
+        "id": "lifecycle-visualizer-1",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-2",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-3",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-4",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-5",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-6",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-7",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-8",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-9",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-10",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-11",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-12",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-13",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-14",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-15",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-16",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-17",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-18",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-19",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-20",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-21",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-22",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-23",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-24",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-25",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-26",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-27",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-28",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-29",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-30",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-31",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-32",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-33",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-34",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-35",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-36",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-37",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-38",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-39",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-40",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-41",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-42",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-43",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-44",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-45",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-46",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-47",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-48",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-49",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-50",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-51",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-52",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-53",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-54",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-55",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-56",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-57",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-58",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-59",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-60",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-61",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-62",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-63",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-64",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-65",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-66",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-67",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-68",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-69",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-70",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-71",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-72",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-73",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-74",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-75",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-76",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-77",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-78",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-79",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-80",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-81",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-82",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-83",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-84",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-85",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-86",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-87",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-88",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-89",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-90",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-91",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-92",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-93",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-94",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-95",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-96",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-97",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-98",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-99",
+        "when": "true"
+      },
+      {
+        "id": "lifecycle-visualizer-100",
+        "when": "true"
+      }
+    ],
+    "commands": [
+      {
+        "command": "debug-visualization-provider-disposal.setup",
+        "title": "Debug Visualization Provider Disposal: Setup"
+      },
+      {
+        "command": "debug-visualization-provider-disposal.run",
+        "title": "Debug Visualization Provider Disposal: Run"
+      },
+      {
+        "command": "debug-visualization-provider-disposal.cleanup",
+        "title": "Debug Visualization Provider Disposal: Cleanup"
+      }
+    ]
+  },
+  "enabledApiProposals": [
+    "debugVisualization"
+  ]
+}

@@ -1,3 +1,5 @@
+import { existsSync } from 'node:fs'
+import { rename } from 'node:fs/promises'
 import { join } from 'node:path'
 import * as Assert from '../Assert/Assert.ts'
 import * as VideoRecordingWorker from '../LaunchVideoRecordingWorker/LaunchVideoRecordingWorker.ts'
@@ -24,6 +26,14 @@ export const addChapter = (rpc, name, time) => {
   return rpc.invoke('VideoRecording.addChapter', name, time)
 }
 
-export const finalize = (rpc) => {
-  return rpc.invoke('VideoRecording.finalize')
+export const finalize = async (rpc, archiveName?: string) => {
+  await rpc.invoke('VideoRecording.finalize')
+  if (archiveName) {
+    const directory = join(Root.root, '.vscode-videos')
+    await rename(join(directory, 'video.webm'), join(directory, `video-${archiveName}.webm`))
+    const chapterVideo = join(directory, 'out.webm')
+    if (existsSync(chapterVideo)) {
+      await rename(chapterVideo, join(directory, `out-${archiveName}.webm`))
+    }
+  }
 }

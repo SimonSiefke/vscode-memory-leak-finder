@@ -56,6 +56,7 @@ export const initialStart = async (options: ReturnType<typeof ParseArgv.parseArg
     downloadUserDataZipFileUrl: options.downloadUserDataZipFileUrl,
     enableExtensions: options.enableExtensions,
     enableProxy: options.enableProxy,
+    launchAgentWindow: options.launchAgentWindow,
     filterValue: options.filter,
     headlessMode: options.headless,
     ide: options.ide,

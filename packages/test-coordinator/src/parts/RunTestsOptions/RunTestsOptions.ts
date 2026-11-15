@@ -14,6 +14,7 @@ export interface RunTestsOptions {
   readonly downloadUserDataZipFileUrl: string
   readonly enableExtensions: boolean
   readonly enableProxy: boolean
+  readonly launchAgentWindow?: boolean | undefined
   readonly filterValue: string
   readonly headlessMode: boolean
   readonly ide: any

@@ -5,6 +5,7 @@ import { deriveMeasureRequest } from '../DeriveMeasureRequest/DeriveMeasureReque
 import { dispatchMeasureWorkflow, type WorkflowDispatchOctokit } from '../DispatchMeasureWorkflow/DispatchMeasureWorkflow.ts'
 import { renderStartedComment } from '../RenderStartedComment/RenderStartedComment.ts'
 import { userDataSnapshotUnavailableMessage } from '../UserDataSnapshot/UserDataSnapshot.ts'
+import { toNumericGitHubId } from '../ToNumericGitHubId/ToNumericGitHubId.ts'
 
 export type StartMeasureRunPullRequest = {
   readonly baseRef: string
@@ -22,7 +23,7 @@ export type StartMeasureRunOctokit = WorkflowDispatchOctokit & {
         repo: string
         issue_number: number
         body: string
-      }) => Promise<{ data: { id: number } }>
+      }) => Promise<{ data: { id: number | bigint } }>
       readonly updateComment: (options: { owner: string; repo: string; comment_id: number; body: string }) => Promise<unknown>
     }
   }
@@ -90,22 +91,23 @@ export const startMeasureRun = async ({
     owner,
     repo,
   })
+  const statusCommentId = toNumericGitHubId(placeholderComment.data.id)
 
   const marker = createCommentMarker({
     requestId: request.requestId,
     sourceRepository: `${owner}/${repo}`,
-    statusCommentId: placeholderComment.data.id,
+    statusCommentId,
   })
 
   let workflowRunUrl = ''
 
   try {
-    workflowRunUrl = await dispatchMeasureWorkflow(octokit, env, request, placeholderComment.data.id)
+    workflowRunUrl = await dispatchMeasureWorkflow(octokit, env, request, statusCommentId)
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)
     await octokit.rest.issues.updateComment({
       body: renderWorkflowStartFailureComment(marker, errorMessage),
-      comment_id: placeholderComment.data.id,
+      comment_id: statusCommentId,
       owner,
       repo,
     })
@@ -114,7 +116,7 @@ export const startMeasureRun = async ({
 
   await octokit.rest.issues.updateComment({
     body: renderStartedComment(marker, request, workflowRunUrl, startedCommentIntro),
-    comment_id: placeholderComment.data.id,
+    comment_id: statusCommentId,
     owner,
     repo,
   })

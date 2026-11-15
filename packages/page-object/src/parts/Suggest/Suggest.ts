@@ -10,25 +10,11 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const suggestWidget = page.locator('.suggest-widget')
         await expect(suggestWidget).toBeVisible()
         await page.waitForIdle()
-        const quickPick = QuickPick.create({
-          electronApp,
-          expect,
-          ideVersion,
-          page,
-          platform,
-          VError,
-        })
-        await quickPick.executeCommand(WellKnownCommands.TriggerSuggest, {
-          pressKeyOnce: true,
-        })
-        await expect(suggestWidget).toBeVisible()
-        await page.waitForIdle()
-        const element = suggestWidget.locator(`.monaco-list-row[aria-label="${item}"]`)
+        const element = suggestWidget.locator(`.monaco-list-row[aria-label=${JSON.stringify(item)}]`)
         await expect(element).toBeVisible()
         await page.waitForIdle()
         await element.click()
         await page.waitForIdle()
-        // await expect(suggestWidget).toBeHidden()
       } catch (error) {
         throw new VError(error, `Failed to select completion`)
       }
@@ -65,7 +51,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await expect(suggestWidget).toBeVisible()
         await page.waitForIdle()
         if (expectedItem) {
-          const element = suggestWidget.locator(`.monaco-list-row[aria-label="${expectedItem}"]`)
+          const element = suggestWidget.locator(`.monaco-list-row[aria-label=${JSON.stringify(expectedItem)}]`)
           await expect(element).toBeVisible()
         }
         await page.waitForIdle()

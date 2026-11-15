@@ -10,6 +10,7 @@ export const setupOnly = async ({
   downloadUserDataZipFileUrl,
   enableExtensions,
   enableProxy,
+  launchAgentWindow,
   ide,
   insidersCommit,
   inspectExtensions,
@@ -33,6 +34,7 @@ export const setupOnly = async ({
   downloadUserDataZipFileUrl: string
   enableExtensions: boolean
   enableProxy: boolean
+  launchAgentWindow?: boolean | undefined
   ide: string
   insidersCommit: string
   inspectExtensions: boolean
@@ -59,6 +61,7 @@ export const setupOnly = async ({
       downloadUserDataZipFileUrl,
       enableExtensions,
       enableProxy,
+      launchAgentWindow,
       ide,
       insidersCommit,
       inspectExtensions,

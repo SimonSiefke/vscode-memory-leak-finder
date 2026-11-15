@@ -69,7 +69,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         if (count > 0) {
           return
         }
-        const installButton = extensionEditor.locator('.action-label[aria-label^="Install"], .action-label[aria-label*="Install"]')
+        const installButton = extensionEditor.locator('.action-label.install:not(.disabled):not(.hide):not(.installing):not(.dropdown)')
         await expect(installButton).toBeVisible()
         await page.waitForIdle()
         await installButton.click()

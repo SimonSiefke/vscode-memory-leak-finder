@@ -1,0 +1,26 @@
+{
+  "name": "comment-thread-comment-replacement",
+  "displayName": "Comment Thread Comment Replacement",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "comment-thread-comment-replacement.setup",
+        "title": "Comment Thread Comment Replacement: Setup"
+      },
+      {
+        "command": "comment-thread-comment-replacement.run",
+        "title": "Comment Thread Comment Replacement: Run"
+      },
+      {
+        "command": "comment-thread-comment-replacement.cleanup",
+        "title": "Comment Thread Comment Replacement: Cleanup"
+      }
+    ]
+  }
+}

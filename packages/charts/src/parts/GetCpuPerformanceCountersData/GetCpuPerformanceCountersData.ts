@@ -9,31 +9,39 @@ interface CpuPerformanceCounterRow {
   readonly value?: number | null
 }
 
+export interface CpuPerformanceCountersChart {
+  readonly data: { name: string; value: number }[]
+  readonly filename: string
+  readonly status?: string
+}
+
 const toChartRow = (row: CpuPerformanceCounterRow) => {
   return {
     name: row.name || '',
-    value: row.value || 0,
+    value: row.value as number,
   }
 }
 
-export const getCpuPerformanceCountersData = async (basePath: string): Promise<any[]> => {
+export const getCpuPerformanceCountersData = async (basePath: string): Promise<CpuPerformanceCountersChart[]> => {
   const resultsPath = join(basePath, 'cpu-performance-counters')
   if (!existsSync(resultsPath)) {
     return []
   }
-  const dirents = await readdir(resultsPath)
-  const allData: any[] = []
-  for (const dirent of dirents.toSorted()) {
+  const dirents = await readdir(resultsPath, { recursive: true })
+  const allData: CpuPerformanceCountersChart[] = []
+  for (const dirent of dirents.filter((file) => file.endsWith('.json')).toSorted()) {
     const absolutePath = join(resultsPath, dirent)
     const rawData = await readJson(absolutePath)
-    const metrics = rawData.cpuPerformanceCounters?.metrics || []
+    if (!rawData.cpuPerformanceCounters) continue
+    const metrics: CpuPerformanceCounterRow[] = rawData.cpuPerformanceCounters.metrics || []
     const data = metrics
-      .filter((row: CpuPerformanceCounterRow) => row.available && typeof row.value === 'number')
+      .filter((row) => row.available && typeof row.value === 'number' && Number.isFinite(row.value) && row.value >= 0)
       .map(toChartRow)
       .sort((a: { value: number }, b: { value: number }) => b.value - a.value)
     allData.push({
       data,
-      filename: dirent.replace('.json', ''),
+      filename: dirent.slice(0, -5).replaceAll('\\', '/'),
+      ...(data.length ? {} : { status: 'CPU performance counters unavailable' }),
     })
   }
   return allData

@@ -39,7 +39,12 @@ export const startWorker = async (
   Assert.string(devtoolsWebsocketUrl)
   const externalRuntimeInfo =
     inspectProcess && testWorkerRpc
-      ? ((await testWorkerRpc.invoke(TestWorkerCommandType.GetExternalRuntimeInfo, connectionId)) as ExternalRuntimeInfo)
+      ? ((await testWorkerRpc.invoke(
+          TestWorkerCommandType.GetExternalRuntimeInfo,
+          connectionId,
+          inspectProcess,
+          pid,
+        )) as ExternalRuntimeInfo)
       : undefined
   if (externalRuntimeInfo && !matchesProcess(externalRuntimeInfo, inspectProcess)) {
     throw new Error(

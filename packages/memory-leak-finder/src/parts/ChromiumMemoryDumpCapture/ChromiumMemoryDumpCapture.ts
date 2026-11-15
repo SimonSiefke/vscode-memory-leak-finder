@@ -1,4 +1,4 @@
-import { mkdir, writeFile } from 'node:fs/promises'
+import { mkdir, open } from 'node:fs/promises'
 import { dirname } from 'node:path'
 import type { Session } from '../Session/Session.ts'
 import type { Dynamic } from '../Types/Types.ts'
@@ -10,8 +10,12 @@ interface TraceState {
   readonly complete: Promise<void>
   dataLossOccurred: boolean
   readonly dispose: () => void
-  readonly events: Dynamic[]
+  stream: string
 }
+
+const TraceTimeout = 10000
+const StreamChunkBytes = 256 * 1024
+const MaxTraceBytes = 256 * 1024 * 1024
 
 export interface ChromiumMemoryDumpCaptureState {
   active: boolean
@@ -41,38 +45,30 @@ function removeListener(session: Dynamic, event: string, listener: Dynamic): voi
 }
 
 function createTraceState(session: Session): TraceState {
-  const events: Dynamic[] = []
   const { promise, resolve } = Promise.withResolvers<void>()
   let disposed = false
   const state: TraceState = {
     complete: promise,
     dataLossOccurred: false,
     dispose: cleanup,
-    events,
+    stream: '',
   }
   function cleanup(): void {
     if (disposed) {
       return
     }
     disposed = true
-    removeListener(session, DevtoolsEventType.TracingDataCollected, handleDataCollected)
     removeListener(session, DevtoolsEventType.TracingTracingComplete, handleTracingComplete)
-  }
-  function handleDataCollected(message: Dynamic): void {
-    const values = message?.params?.value
-    if (Array.isArray(values)) {
-      events.push(...values)
-    }
   }
   function handleTracingComplete(message: Dynamic): void {
     state.dataLossOccurred = message?.params?.dataLossOccurred === true
+    state.stream = typeof message?.params?.stream === 'string' ? message.params.stream : ''
     cleanup()
     resolve()
   }
   if (typeof session.on !== 'function') {
     throw new Error('Chromium memory dumps require a session with event listener support')
   }
-  session.on(DevtoolsEventType.TracingDataCollected, handleDataCollected)
   session.on(DevtoolsEventType.TracingTracingComplete, handleTracingComplete)
   return state
 }
@@ -96,7 +92,7 @@ function getTraceOptions() {
       includedCategories: ['disabled-by-default-memory-infra'],
       recordMode: 'recordAsMuchAsPossible',
     },
-    transferMode: 'ReportEvents',
+    transferMode: 'ReturnAsStream',
   }
 }
 
@@ -137,10 +133,86 @@ async function stopActiveTrace(state: ChromiumMemoryDumpCaptureState): Promise<v
     return
   }
   try {
-    await DevtoolsProtocolTracing.end(state.browserSession, {})
-    await state.trace.complete
+    await withTraceTimeout(
+      (async () => {
+        await DevtoolsProtocolTracing.end(state.browserSession, {})
+        await state.trace.complete
+      })(),
+      'completion',
+    )
   } finally {
     state.active = false
+  }
+}
+
+async function withTraceTimeout<T>(operation: Promise<T>, phase: string): Promise<T> {
+  let timeout: ReturnType<typeof setTimeout> | undefined
+  try {
+    return await Promise.race([
+      operation,
+      new Promise<never>((_, reject) => {
+        timeout = setTimeout(() => reject(new Error(`Chromium trace ${phase} timed out after ${TraceTimeout}ms`)), TraceTimeout)
+      }),
+    ])
+  } finally {
+    clearTimeout(timeout)
+  }
+}
+
+async function invokeStream<T>(
+  state: ChromiumMemoryDumpCaptureState,
+  method: 'IO.read' | 'IO.close',
+  params: { handle: string; size?: number },
+): Promise<T> {
+  if (!state.browserSession) throw new Error('Chromium trace stream requires the browser connection')
+  const response = await withTraceTimeout(state.browserSession.invoke<{ result: T; error?: { message: string } }>(method, params), method)
+  if (response.error) throw new Error(`Chromium trace ${method} failed: ${response.error.message.slice(0, 160)}`)
+  return response.result
+}
+
+async function closeTraceStream(state: ChromiumMemoryDumpCaptureState): Promise<void> {
+  const handle = state.trace.stream
+  state.trace.stream = ''
+  if (handle) await invokeStream(state, 'IO.close', { handle })
+}
+
+async function writeStreamCapture(state: ChromiumMemoryDumpCaptureState): Promise<void> {
+  const handle = state.trace.stream
+  if (!handle) throw new Error('Chromium completed tracing without a stream handle')
+  let completed = false
+  try {
+    await mkdir(dirname(state.capturePath), { recursive: true })
+    const output = await open(state.capturePath, 'w')
+    try {
+      const metadata = JSON.stringify({ dataLossOccurred: state.trace.dataLossOccurred, inspectedPid: state.inspectedPid })
+      await output.writeFile(`${metadata.slice(0, -1)},"trace":`)
+      let bytes = 0
+      while (true) {
+        const result = await invokeStream<{ data: string; eof: boolean; base64Encoded?: boolean }>(state, 'IO.read', {
+          handle,
+          size: StreamChunkBytes,
+        })
+        if (typeof result?.data !== 'string' || typeof result.eof !== 'boolean')
+          throw new Error('Chromium trace stream returned an invalid chunk')
+        const chunk = Buffer.from(result.data, result.base64Encoded ? 'base64' : 'utf8')
+        if (chunk.length > StreamChunkBytes) throw new Error('Chromium trace stream exceeded its requested chunk size')
+        bytes += chunk.length
+        if (bytes > MaxTraceBytes) throw new Error(`Chromium trace exceeds the ${MaxTraceBytes} byte capture budget`)
+        if (!chunk.length && !result.eof) throw new Error('Chromium trace stream made no progress')
+        await output.writeFile(chunk)
+        if (result.eof) break
+      }
+      await output.writeFile('}')
+      completed = true
+    } finally {
+      await output.close()
+    }
+  } finally {
+    try {
+      await closeTraceStream(state)
+    } catch (error) {
+      if (completed) throw error
+    }
   }
 }
 
@@ -189,12 +261,14 @@ export async function start(state: ChromiumMemoryDumpCaptureState): Promise<stri
       if (state.active) {
         await stopActiveTrace(state)
       }
+      await closeTraceStream(state)
       throw error
     }
     setUnsupported(state, getErrorMessage(error))
   }
   if (!state.supported && state.active) {
     await stopActiveTrace(state)
+    await closeTraceStream(state)
   }
   return state.unsupportedReason
 }
@@ -204,6 +278,7 @@ export async function stop(state: ChromiumMemoryDumpCaptureState): Promise<Chrom
     if (state.active) {
       await stopActiveTrace(state)
     }
+    await closeTraceStream(state)
     return { path: '', unsupportedReason: state.unsupportedReason }
   }
   try {
@@ -219,18 +294,10 @@ export async function stop(state: ChromiumMemoryDumpCaptureState): Promise<Chrom
     }
   }
   if (!state.supported) {
+    await closeTraceStream(state)
     return { path: '', unsupportedReason: state.unsupportedReason }
   }
-  await mkdir(dirname(state.capturePath), { recursive: true })
-  await writeFile(
-    state.capturePath,
-    JSON.stringify({
-      dataLossOccurred: state.trace.dataLossOccurred,
-      inspectedPid: state.inspectedPid,
-      traceEvents: state.trace.events,
-    }),
-  )
-  state.trace.events.length = 0
+  await writeStreamCapture(state)
   state.captured = true
   return { path: state.capturePath, unsupportedReason: '' }
 }
@@ -242,6 +309,10 @@ export async function release(state: ChromiumMemoryDumpCaptureState): Promise<vo
     // The browser may already be gone while the coordinator is cleaning up.
   } finally {
     state.trace.dispose()
-    state.trace.events.length = 0
+    try {
+      await closeTraceStream(state)
+    } catch {
+      // The browser may also be gone while releasing its owned stream.
+    }
   }
 }

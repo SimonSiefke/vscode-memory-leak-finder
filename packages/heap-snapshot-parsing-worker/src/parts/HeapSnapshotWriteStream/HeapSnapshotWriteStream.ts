@@ -28,6 +28,9 @@ class HeapSnapshotWriteStream extends Writable {
   traceFunctionInfos: Uint32Array<ArrayBufferLike>
   traceTree: Uint32Array<ArrayBufferLike>
   traceTreeParents: Uint32Array<ArrayBufferLike>
+  traceTreeChunks: Uint8Array[]
+  traceTreeDepth: number
+  traceTreeSize: number
   validate: any
 
   constructor(options: { parseStrings?: boolean; validate?: boolean } = {}) {
@@ -47,6 +50,9 @@ class HeapSnapshotWriteStream extends Writable {
     this.traceFunctionInfos = new Uint32Array(0)
     this.traceTree = new Uint32Array(0)
     this.traceTreeParents = new Uint32Array(0)
+    this.traceTreeChunks = []
+    this.traceTreeDepth = 1
+    this.traceTreeSize = 0
     this.validate = options.validate ?? true
   }
 
@@ -172,34 +178,41 @@ class HeapSnapshotWriteStream extends Writable {
   }
 
   writeParsingTraceTree(chunk: Uint8Array): void {
-    this.data = concatArray(this.data, chunk)
-    const content = `[${decodeArray(this.data)}`
-    let depth = 0
     let endIndex = -1
-    for (let i = 0; i < content.length; i++) {
-      if (content[i] === '[') {
-        depth++
-      } else if (content[i] === ']') {
-        depth--
-        if (depth === 0) {
+    for (let i = 0; i < chunk.length; i++) {
+      if (chunk[i] === 91) {
+        this.traceTreeDepth++
+      } else if (chunk[i] === 93) {
+        this.traceTreeDepth--
+        if (this.traceTreeDepth === 0) {
           endIndex = i + 1
           break
         }
       }
     }
+    const fragment = endIndex === -1 ? chunk : chunk.subarray(0, endIndex)
+    this.traceTreeChunks.push(new Uint8Array(fragment))
+    this.traceTreeSize += fragment.length
     if (endIndex === -1) {
       return
     }
-    const parsed = JSON.parse(content.slice(0, endIndex))
+    const data = new Uint8Array(this.traceTreeSize + 1)
+    data[0] = 91 // The opening bracket was consumed by the section header.
+    let offset = 1
+    for (const part of this.traceTreeChunks) {
+      data.set(part, offset)
+      offset += part.length
+    }
+    this.traceTreeChunks = []
+    this.traceTreeSize = 0
+    this.traceTreeDepth = 1
+    const parsed = JSON.parse(decodeArray(data))
     const fields = this.metaData.data.meta.trace_node_fields || []
     const result = parseTraceTreeWithParents(parsed, fields)
     this.traceTree = result.tree
     this.traceTreeParents = result.parents
-    const consumedDataLength = endIndex - 1
-    const rest = this.data.slice(consumedDataLength)
-    this.data = new Uint8Array(0)
     this.state = HeapSnapshotParsingState.ParsingLocationsMetaData
-    this.handleChunk(rest)
+    this.handleChunk(chunk.subarray(endIndex))
   }
 
   writeParsingLocationsMetaData(chunk: Uint8Array): void {

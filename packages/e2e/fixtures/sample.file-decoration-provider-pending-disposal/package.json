@@ -1,0 +1,26 @@
+{
+  "name": "file-decoration-provider-pending-disposal",
+  "displayName": "File Decoration Provider Pending Disposal",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "file-decoration-provider-pending-disposal.setup",
+        "title": "File Decoration Provider Pending Disposal: Setup"
+      },
+      {
+        "command": "file-decoration-provider-pending-disposal.run",
+        "title": "File Decoration Provider Pending Disposal: Run"
+      },
+      {
+        "command": "file-decoration-provider-pending-disposal.cleanup",
+        "title": "File Decoration Provider Pending Disposal: Cleanup"
+      }
+    ]
+  }
+}

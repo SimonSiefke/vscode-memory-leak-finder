@@ -138,14 +138,44 @@ export const mergeArtifacts = async ({
     }
 
     try {
-      const result = await mergeDirectoryContents({
-        sourceDir,
-        targetDir,
-        logger,
-      })
-      logger.log(`   ✓ Copied ${result.copied} of ${result.total} entries to target directory`)
-      if (result.skipped > 0) {
-        logger.log(`   ⚠️  Skipped ${result.skipped} entries while copying`)
+      const sourceEntries = await readdir(sourceDir)
+      const artifactDirs = dir.endsWith('-extensions')
+        ? await Promise.all(
+            sourceEntries.map(async (entry) => {
+              const entryPath = join(sourceDir, entry)
+              return entry.endsWith('-extensions') && (await stat(entryPath)).isDirectory() ? entryPath : undefined
+            }),
+          ).then((entries) => entries.filter((entry): entry is string => Boolean(entry)))
+        : []
+      if (artifactDirs.length > 0) {
+        for (const entry of sourceEntries) {
+          if (artifactDirs.some((artifactDir) => artifactDir === join(sourceDir, entry))) {
+            continue
+          }
+          const sourcePath = join(sourceDir, entry)
+          const targetPath = join(targetDir, entry)
+          try {
+            await copySourceEntry(sourcePath, targetPath)
+          } catch (error) {
+            logger.error(`   ✗ Error copying ${entry}:`, error)
+          }
+        }
+      }
+      const mergeDirs = artifactDirs.length > 0 ? artifactDirs : [sourceDir]
+
+      for (const mergeDir of mergeDirs) {
+        const artifactResultsPath = join(mergeDir, '.vscode-memory-leak-finder-results')
+        const hasArtifactResults = existsSync(artifactResultsPath)
+        const artifactSourceDir = hasArtifactResults ? artifactResultsPath : mergeDir
+        const result = await mergeDirectoryContents({
+          sourceDir: artifactSourceDir,
+          targetDir,
+          logger,
+        })
+        logger.log(`   ✓ Copied ${result.copied} of ${result.total} entries to target directory`)
+        if (result.skipped > 0) {
+          logger.log(`   ⚠️  Skipped ${result.skipped} entries while copying`)
+        }
       }
     } catch (error) {
       logger.error(`   ✗ Error copying from ${hasNestedResults ? 'nested' : 'source'} directory:`, error)

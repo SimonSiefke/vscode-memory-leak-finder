@@ -166,6 +166,7 @@ export const runTestsWithCallback = async ({
   downloadUserDataZipFileUrl,
   enableExtensions,
   enableProxy,
+  launchAgentWindow,
   filterValue,
   getTimeStamp,
   headlessMode,
@@ -256,6 +257,7 @@ export const runTestsWithCallback = async ({
         downloadUserDataZipFileUrl,
         enableExtensions,
         enableProxy,
+        launchAgentWindow,
         ide,
         insidersCommit,
         inspectExtensions,
@@ -297,6 +299,7 @@ export const runTestsWithCallback = async ({
         downloadUserDataZipFileUrl,
         enableExtensions,
         enableProxy,
+        launchAgentWindow,
         filterValue,
         headlessMode,
         ide,
@@ -433,6 +436,7 @@ export const runTestsWithCallback = async ({
               downloadUserDataZipFileUrl,
               enableExtensions,
               enableProxy,
+              launchAgentWindow,
               headlessMode,
               ide,
               ideVersion,
@@ -588,15 +592,21 @@ export const runTestsWithCallback = async ({
       }
     }
 
+    let restartAfterFailure = false
+    let stopAfterCrash = false
     for (let i = 0; i < formattedPaths.length; i++) {
+      if (stopAfterCrash) break
       const formattedPath = formattedPaths[i]
       const { absolutePath, dirent, relativeDirname, relativePath } = formattedPath
       const proxyTestFolderName = GetProxyTestFolderName.getProxyTestFolderName(absolutePath)
       const forceRun = runSkippedTestsAnyway || dirent === `${filterValue}.js`
 
-      const needsSetup = i === 0 || restartBetween
+      const needsSetup = i === 0 || restartBetween || restartAfterFailure
 
       if (needsSetup) {
+        if (i > 0 && recordVideo) {
+          await VideoRecording.finalize(workers.videoRpc, `part-${i}`)
+        }
         await disposeWorkers(workers)
         PrepareTestsOrAttach.state.promise = undefined
         const { devtoolsWebSocketUrl, functionTrackerRpc, initializationWorkerRpc, memoryRpc, pid, testWorkerRpc, videoRpc, webSocketUrl } =
@@ -613,6 +623,7 @@ export const runTestsWithCallback = async ({
             downloadUserDataZipFileUrl,
             enableExtensions,
             enableProxy,
+            launchAgentWindow,
             headlessMode,
             ide,
             ideVersion,
@@ -653,6 +664,7 @@ export const runTestsWithCallback = async ({
           videoRpc: videoRpc || emptyRpc,
           webSocketUrl,
         }
+        restartAfterFailure = false
       }
 
       if (enableProxy) {
@@ -704,10 +716,16 @@ export const runTestsWithCallback = async ({
         } else {
           let isLeak = false
           if (checkLeaks) {
-            if (measureAfter) {
+            // These targets may be created by the scenario itself. Attach before
+            // preparing instrumentation, then warm up again if preparation needs it.
+            if (measureAfter && (inspectIntegratedBrowser || inspectProcess || isMemoryCityMeasure(measure))) {
               await TestWorkerRunTests.testWorkerRunTests(testWorkerRpc, connectionId, absolutePath, forceRun, runMode, platform, 2)
             }
-            if (inspectIntegratedBrowser || inspectProcess) {
+            if (inspectIntegratedBrowser || inspectProcess || inspectExtensions) {
+              if (inspectExtensions) {
+                // Workspace setup can restart the extension host before measurement begins.
+                await disposeWorker('memory', workers.memoryRpc)
+              }
               if (inspectProcess) {
                 workers.memoryRpc = await MemoryLeakWorker.startWorker(
                   workers.devtoolsWebSocketUrl,
@@ -835,21 +853,34 @@ export const runTestsWithCallback = async ({
               }
             } else {
               const memoryRpc = workers.memoryRpc
-              await MemoryLeakFinder.start(memoryRpc, connectionId)
-              await TestWorkerRunTests.testWorkerRunTests(
-                testWorkerRpc,
-                connectionId,
-                absolutePath,
-                forceRun,
-                runMode,
-                platform,
-                runs,
-                () => MemoryLeakFinder.runCompletion(memoryRpc, connectionId),
-              )
-              if (timeoutBetween) {
-                await Timeout.setTimeout(timeoutBetween)
+              let needsRelease = true
+              try {
+                const prepared = await MemoryLeakFinder.prepare(memoryRpc, connectionId)
+                if (measureAfter && (!(inspectIntegratedBrowser || inspectProcess) || prepared)) {
+                  await TestWorkerRunTests.testWorkerRunTests(testWorkerRpc, connectionId, absolutePath, forceRun, runMode, platform, 2)
+                }
+                await MemoryLeakFinder.start(memoryRpc, connectionId)
+                await TestWorkerRunTests.testWorkerRunTests(
+                  testWorkerRpc,
+                  connectionId,
+                  absolutePath,
+                  forceRun,
+                  runMode,
+                  platform,
+                  runs,
+                  () => MemoryLeakFinder.runCompletion(memoryRpc, connectionId),
+                )
+                if (timeoutBetween) {
+                  await Timeout.setTimeout(timeoutBetween)
+                }
+                // stop releases resources even when capture fails.
+                needsRelease = false
+                await MemoryLeakFinder.stop(memoryRpc, connectionId)
+              } finally {
+                if (needsRelease) {
+                  await MemoryLeakFinder.releaseResources(memoryRpc, connectionId)
+                }
               }
-              await MemoryLeakFinder.stop(memoryRpc, connectionId)
 
               result = await MemoryLeakFinder.compare(memoryRpc, connectionId, context, resultPath)
             }
@@ -873,6 +904,16 @@ export const runTestsWithCallback = async ({
           }
         }
       } catch (error) {
+        // A failed setup or teardown can leave a debugger running, a dialog open,
+        // or a dead renderer. Keep its failure, but isolate the next scenario.
+        const message =
+          error instanceof Error
+            ? error.message
+            : typeof error === 'object' && error !== null && 'message' in error && typeof error.message === 'string'
+              ? error.message
+              : String(error)
+        stopAfterCrash = message.includes('Application crashed: target crashed')
+        restartAfterFailure = !stopAfterCrash
         if (wasOriginallySkipped) {
           skippedFailed++
         } else {

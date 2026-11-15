@@ -1,0 +1,9 @@
+{
+  "name": "electron-memory-leak-fixture",
+  "version": "1.0.0",
+  "private": true,
+  "main": "main.cjs",
+  "dependencies": {
+    "electron": "44.9.2"
+  }
+}

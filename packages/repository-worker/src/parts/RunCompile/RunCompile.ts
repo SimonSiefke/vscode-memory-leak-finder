@@ -2,9 +2,16 @@ import { dirname } from 'node:path'
 import { exec } from '../Exec/Exec.ts'
 import * as FileSystemWorker from '../FileSystemWorker/FileSystemWorker.ts'
 import { getNpmPathFromNvmrc } from '../GetNpmPathFromNvmrc/GetNpmPathFromNvmrc.ts'
+import { getPnpmCommandArgs } from '../GetPnpmCommandArgs/GetPnpmCommandArgs.ts'
 import * as Path from '../Path/Path.ts'
 
 const runBuildCommand = async (cwd: string, useNice: boolean, npmPath: string, args: readonly string[]) => {
+  const pnpmArgs = await getPnpmCommandArgs(cwd, args[0] === 'gulp' ? ['run', ...args] : args)
+  if (pnpmArgs) {
+    const selectedNpmPath = Path.join(dirname(npmPath), 'npm')
+    const options = { cwd, reject: false, env: { ...process.env, PATH: `${dirname(npmPath)}:${process.env.PATH}` } }
+    return useNice ? exec('nice', ['-n', '10', selectedNpmPath, ...pnpmArgs], options) : exec(selectedNpmPath, pnpmArgs, options)
+  }
   if (useNice) {
     return exec('nice', ['-n', '10', npmPath, ...args], { cwd, reject: false })
   }
