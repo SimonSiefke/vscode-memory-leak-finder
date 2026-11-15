@@ -56,6 +56,8 @@ export const create = ({ expect, platform, page, VError, electronApp, ideVersion
     },
     async ensureAccountsWidgetVisible() {
       try {
+        // The layout command can return before the title bar activity actions render.
+        await expect(page.locator('.part.titlebar .action-label[aria-label^="Manage"]')).toBeVisible()
         const accountsWidget = page.locator('.part.titlebar .action-label[aria-label^="Accounts"]')
         if (!(await accountsWidget.isVisible())) {
           await toggleAccountsWidget()
