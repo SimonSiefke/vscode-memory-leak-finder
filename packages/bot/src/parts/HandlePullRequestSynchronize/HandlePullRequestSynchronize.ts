@@ -3,6 +3,7 @@ import { createRequestId } from '../CreateRequestId/CreateRequestId.ts'
 import { isAuthorizedLogin } from '../IsAuthorizedLogin/IsAuthorizedLogin.ts'
 import { parseBotComment, type ParsedBotComment } from '../ParseBotComment/ParseBotComment.ts'
 import { startMeasureRun, type StartMeasureRunOctokit } from '../StartMeasureRun/StartMeasureRun.ts'
+import { toNumericGitHubId } from '../ToNumericGitHubId/ToNumericGitHubId.ts'
 
 type PullRequestSynchronizePayload = {
   readonly action: string
@@ -33,7 +34,7 @@ type PullRequestSynchronizeOctokit = StartMeasureRunOctokit & {
       readonly listComments: (options: { owner: string; repo: string; issue_number: number; page?: number; per_page: number }) => Promise<{
         data: {
           readonly body?: string
-          readonly id: number
+          readonly id: number | bigint
           readonly user?: {
             readonly login: string
           } | null
@@ -84,7 +85,7 @@ const listAllComments = async (
       per_page: 100,
       repo,
     })
-    comments.push(...response.data)
+    comments.push(...response.data.map((comment) => ({ ...comment, id: toNumericGitHubId(comment.id) })))
     if (response.data.length < 100) {
       return comments
     }

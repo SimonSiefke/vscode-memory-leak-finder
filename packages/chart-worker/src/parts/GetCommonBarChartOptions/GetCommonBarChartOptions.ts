@@ -3,7 +3,7 @@ export const getCommonBarChartOptions = (dataCount: number, options: any) => {
   const marginRight = options.marginRight || 250
   const fontSize = options.fontSize || 7
   const width = options.width || 640
-  const fixedBarHeight = 20 // Fixed height for each bar
+  const fixedBarHeight = options.rowHeight || 20 // Fixed height for each bar
   const marginTop = 0 // Zero margin to minimize spacing
   const marginBottom = 0 // Zero margin to minimize spacing
   // Use a reasonable height that ensures all bars have consistent minimum height

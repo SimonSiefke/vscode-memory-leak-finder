@@ -10,8 +10,8 @@ export const getMonkeyPatchElectronSafeStorageScript = ({ secretsPath }: { secre
         ? process.mainModule.require.bind(process.mainModule)
         : undefined
 
-  const fs = nodeRequire ? nodeRequire('node:fs') : undefined
-  const path = nodeRequire ? nodeRequire('node:path') : undefined
+  const fs = nodeRequire ? nodeRequire('fs') : undefined
+  const path = nodeRequire ? nodeRequire('path') : undefined
   const secretsPath = ${JSON.stringify(secretsPath)}
   const logPath = path ? path.join(path.dirname(secretsPath), 'secrets-log.txt') : ''
 

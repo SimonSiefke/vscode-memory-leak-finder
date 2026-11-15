@@ -1,0 +1,26 @@
+{
+  "name": "codelens-provider-command-disposal",
+  "displayName": "Codelens Provider Command Disposal",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "codelens-provider-command-disposal.setup",
+        "title": "Codelens Provider Command Disposal: Setup"
+      },
+      {
+        "command": "codelens-provider-command-disposal.run",
+        "title": "Codelens Provider Command Disposal: Run"
+      },
+      {
+        "command": "codelens-provider-command-disposal.cleanup",
+        "title": "Codelens Provider Command Disposal: Cleanup"
+      }
+    ]
+  }
+}

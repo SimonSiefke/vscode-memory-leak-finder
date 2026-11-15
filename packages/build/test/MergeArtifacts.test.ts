@@ -101,3 +101,32 @@ test('mergeArtifacts combines disjoint files from overlapping shard result trees
     await rm(workspaceRoot, { recursive: true, force: true })
   }
 })
+
+test('mergeArtifacts unwraps per-measure extension-host artifacts', async () => {
+  const workspaceRoot = await mkdtemp(join(tmpdir(), 'merge-extension-artifacts-'))
+  const targetDir = join(workspaceRoot, '.vscode-memory-leak-finder-results')
+  const extensionArtifactsDir = join(workspaceRoot, 'vscode-memory-leak-finder-results-linux-extensions')
+  const measures = ['array-count', 'function-count']
+
+  try {
+    for (const measure of measures) {
+      const resultsDir = join(extensionArtifactsDir, `${measure}-extensions`, 'extension-host', measure)
+      await mkdir(resultsDir, { recursive: true })
+      await writeFile(join(resultsDir, 'case.json'), JSON.stringify({ measure }))
+    }
+    const mergedResultsDir = join(extensionArtifactsDir, 'extension-host', 'symbol-count')
+    await mkdir(mergedResultsDir, { recursive: true })
+    await writeFile(join(mergedResultsDir, 'case.json'), JSON.stringify({ measure: 'symbol-count' }))
+
+    await mergeArtifacts({ root: workspaceRoot, targetDir })
+
+    for (const measure of measures) {
+      expect(await readFile(join(targetDir, 'extension-host', measure, 'case.json'), 'utf8')).toEqual(JSON.stringify({ measure }))
+    }
+    expect(await readFile(join(targetDir, 'extension-host', 'symbol-count', 'case.json'), 'utf8')).toEqual(
+      JSON.stringify({ measure: 'symbol-count' }),
+    )
+  } finally {
+    await rm(workspaceRoot, { recursive: true, force: true })
+  }
+})

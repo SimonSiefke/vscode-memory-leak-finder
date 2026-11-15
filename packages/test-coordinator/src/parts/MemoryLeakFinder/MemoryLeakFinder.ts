@@ -1,4 +1,6 @@
 export * from '../MemoryLeakFinderCompare/MemoryLeakFinderCompare.ts'
+export * from '../MemoryLeakFinderPrepare/MemoryLeakFinderPrepare.ts'
+export * from '../MemoryLeakFinderReleaseResources/MemoryLeakFinderReleaseResources.ts'
 export * from '../MemoryLeakFinderRunCompletion/MemoryLeakFinderRunCompletion.ts'
 export * from '../MemoryLeakFinderStart/MemoryLeakFinderStart.ts'
 export * from '../MemoryLeakFinderStop/MemoryLeakFinderStop.ts'

@@ -1,5 +1,7 @@
 export const ConnectDevtools = 'ConnectDevtools.connectDevtools'
 export const MemoryLeakFinderSetup = 'MemoryLeakFinderSetup.setup'
+export const MemoryLeakFinderPrepare = 'MemoryLeakFinderPrepare.prepare'
+export const MemoryLeakFinderReleaseResources = 'MemoryLeakFinderReleaseResources.releaseResources'
 export const MemoryLeakFinderStart = 'MemoryLeakFinderStart.start'
 export const MemoryLeakFinderRunCompletion = 'MemoryLeakFinderRunCompletion.runCompletion'
 export const MemoryLeakFinderStop = 'MemoryLeakFinderStop.stop'

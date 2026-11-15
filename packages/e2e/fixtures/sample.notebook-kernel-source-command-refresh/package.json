@@ -1,0 +1,40 @@
+{
+  "name": "notebook-kernel-source-command-refresh",
+  "displayName": "Notebook Kernel Source Command Refresh",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "notebooks": [
+      {
+        "type": "lifecycle-kernel-source",
+        "displayName": "Lifecycle kernel",
+        "selector": [
+          {
+            "filenamePattern": "*.lifecycle-kernel"
+          }
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "command": "notebook-kernel-source-command-refresh.setup",
+        "title": "Notebook Kernel Source Command Refresh: Setup"
+      },
+      {
+        "command": "notebook-kernel-source-command-refresh.run",
+        "title": "Notebook Kernel Source Command Refresh: Run"
+      },
+      {
+        "command": "notebook-kernel-source-command-refresh.cleanup",
+        "title": "Notebook Kernel Source Command Refresh: Cleanup"
+      }
+    ]
+  },
+  "enabledApiProposals": [
+    "notebookKernelSource"
+  ]
+}

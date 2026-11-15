@@ -1,0 +1,30 @@
+{
+  "name": "terminal-auto-reply-removal",
+  "displayName": "Terminal Auto Reply Removal",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "terminal-auto-reply-removal.setup",
+        "title": "Terminal Auto Reply Removal: Setup"
+      },
+      {
+        "command": "terminal-auto-reply-removal.run",
+        "title": "Terminal Auto Reply Removal: Run"
+      },
+      {
+        "command": "terminal-auto-reply-removal.cleanup",
+        "title": "Terminal Auto Reply Removal: Cleanup"
+      },
+      {
+        "command": "terminal-auto-reply-removal.close",
+        "title": "Close Auto Reply Terminal"
+      }
+    ]
+  }
+}

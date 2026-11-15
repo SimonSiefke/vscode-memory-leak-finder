@@ -1,5 +1,19 @@
 import * as Assert from '../Assert/Assert.ts'
 import * as EvaluateInUtilityContext from '../EvaluateInUtilityContext/EvaluateInUtilityContext.ts'
+import { DevtoolsProtocolInput } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+
+export const typeCharacters = async (rpc, text: string): Promise<void> => {
+  for (const character of text) {
+    await DevtoolsProtocolInput.dispatchKeyEvent(rpc, {
+      type: 'keyDown',
+      key: character,
+      text: character,
+      unmodifiedText: character,
+      windowsVirtualKeyCode: character.toUpperCase().charCodeAt(0),
+    })
+    await DevtoolsProtocolInput.dispatchKeyEvent(rpc, { type: 'keyUp', key: character })
+  }
+}
 
 export const press = async (rpc, utilityContext, key) => {
   Assert.object(rpc)

@@ -93,14 +93,29 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           platform,
           VError,
         })
-        await quickPick.executeCommand(WellKnownCommands.AutoFix)
         if (hasFixes) {
+          await quickPick.executeCommand(WellKnownCommands.AutoFix)
           // TODO
-        } else {
-          const overlayMessage = page.locator('.monaco-editor-overlaymessage')
-          await expect(overlayMessage).toBeVisible()
-          await expect(overlayMessage).toHaveText('No auto fixes available')
+          return
         }
+        const overlayMessage = page.locator('.monaco-editor-overlaymessage')
+        // Background diagnostics can cancel a manual code-action request before
+        // it produces a result. Reinvoke only this no-fixes operation, bounded by
+        // a total message wait, and keep transport/text failures visible.
+        const deadline = Date.now() + 6000
+        do {
+          await quickPick.executeCommand(WellKnownCommands.AutoFix)
+          const attemptDeadline = Math.min(deadline, Date.now() + 1500)
+          do {
+            if (await overlayMessage.isVisible()) {
+              await expect(overlayMessage).toHaveText('No auto fixes available')
+              return
+            }
+            await new Promise((resolve) => setTimeout(resolve, 50))
+          } while (Date.now() < attemptDeadline)
+        } while (Date.now() < deadline)
+        await expect(overlayMessage).toBeVisible({ timeout: 1 })
+        await expect(overlayMessage).toHaveText('No auto fixes available')
       } catch (error) {
         throw new VError(error, `Failed to execute auto fix`)
       }
@@ -171,7 +186,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
           return
         }
         const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
-        await quickPick.executeCommand(WellKnownCommands.ViewCloseAllEditors)
+        await quickPick.executeCommand(WellKnownCommands.ViewCloseAllEditors, { pressKeyOnce: true })
         await expect(tabs).toHaveCount(0, {
           timeout: 4000,
         })
@@ -188,6 +203,22 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to close all editor groups`)
+      }
+    },
+    async closeActiveEditorGroup() {
+      try {
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+        await quickPick.executeCommand('View: Close Editor Group')
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to close active editor group`)
+      }
+    },
+    async shouldHaveEditorGroupCount(count: number) {
+      try {
+        await expect(page.locator('.editor-group-container')).toHaveCount(count)
+      } catch (error) {
+        throw new VError(error, `Expected ${count} editor groups`)
       }
     },
     async closeAutoFix() {
@@ -364,6 +395,15 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to enable editor grid layout`)
       }
     },
+    async enableSingleColumnLayout() {
+      try {
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+        await quickPick.executeCommand(WellKnownCommands.EditorLayoutSingle)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to enable single-column editor layout`)
+      }
+    },
     async enableReadonly() {
       try {
         await page.waitForIdle()
@@ -429,15 +469,10 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async focus() {
       const editor = page.locator('.editor-instance')
       await expect(editor).toBeVisible()
-      if (ideVersion && typeof ideVersion === 'object' && 'minor' in ideVersion && ideVersion.minor <= 100) {
-        const editorInput = editor.locator('.inputarea')
-        await editorInput.focus()
-        await expect(editorInput).toBeFocused()
-      } else {
-        const editContext = editor.locator('.native-edit-context')
-        await editContext.focus()
-        await expect(editContext).toBeFocused()
-      }
+      // Input mode depends on build quality and settings and can change after focus.
+      const editorInput = editor.locator(':is(.native-edit-context, .inputarea)').first()
+      await editorInput.focus()
+      await expect(editor).toBeFocused({ descendantSelector: ':is(.native-edit-context, .inputarea)' })
     },
     async focusBottomEditorGroup() {
       try {
@@ -798,7 +833,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
         const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
         await quickPick.openFile(fileName)
-        const tab = page.locator('.tab', { hasText: fileName })
+        const tab = page.locator(`.tab[data-resource-name=${JSON.stringify(basename(fileName))}]`)
         await expect(tab).toBeVisible()
         await page.waitForIdle()
         if (isNotebook(fileName)) {
@@ -1060,8 +1095,12 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to save all files`)
       }
     },
-    async scrollDown() {
+    async scrollDown({ viaKeyBoard = false } = {}) {
       try {
+        if (viaKeyBoard) {
+          await page.keyboard.press(IsMacos.isMacos(platform) ? 'Meta+ArrowDown' : 'Control+End')
+          return
+        }
         await page.waitForIdle()
         await this.selectAll({ viaKeyBoard: false })
         await page.waitForIdle()
@@ -1582,6 +1621,12 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to verify editor text ${text}`)
       }
     },
+    async shouldContainText(text: string) {
+      const lines = page.locator('.monaco-editor .view-lines')
+      await expect(lines).toBeVisible()
+      const escaped = text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replaceAll(' ', Character.NonBreakingSpace)
+      await expect(lines).toHaveText(new RegExp(escaped))
+    },
     async shouldHaveToken(text: string, color: string) {
       await page.waitForIdle()
       const token = page.locator(`[class^="mtk"]`, {
@@ -1924,6 +1969,9 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to type ${text}`)
       }
     },
+    async typeCharacters(text: string) {
+      await page.keyboard.typeCharacters(text)
+    },
     async undo({ viaKeyBoard = false } = {}) {
       try {
         if (viaKeyBoard) {
@@ -2051,15 +2099,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       await expect(editor).toBeVisible()
       await page.waitForIdle()
 
-      if (ideVersion && typeof ideVersion === 'object' && 'minor' in ideVersion && ideVersion.minor <= 100) {
-        const editorInput = editor.locator('.inputarea')
-        await expect(editorInput).toBeFocused()
-        await page.waitForIdle()
-      } else {
-        const editContext = editor.locator('.native-edit-context')
-        await expect(editContext).toBeFocused()
-        await page.waitForIdle()
-      }
+      await expect(editor).toBeFocused({ descendantSelector: ':is(.native-edit-context, .inputarea)' })
       await page.waitForIdle()
     },
     async waitForVideoReady(hasError: boolean) {

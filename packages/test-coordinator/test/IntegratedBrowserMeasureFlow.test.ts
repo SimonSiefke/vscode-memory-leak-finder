@@ -1,5 +1,6 @@
 import { beforeEach, expect, jest, test } from '@jest/globals'
 import { join } from 'node:path'
+import type { RunTestsWithCallbackOptions } from '../src/parts/RunTestsOptions/RunTestsOptions.ts'
 
 const events: string[] = []
 let hangNextWorkerDispose = false
@@ -60,6 +61,8 @@ const mockMemoryStart = jest.fn(async () => {
   events.push('measure-start')
 })
 const mockMemoryStop = jest.fn(async () => undefined)
+const mockMemoryPrepare = jest.fn(async () => false)
+const mockMemoryReleaseResources = jest.fn(async () => undefined)
 const mockMemoryCompare = jest.fn(async (..._args: readonly unknown[]) => ({
   isLeak: false,
   summary: '',
@@ -90,12 +93,20 @@ jest.unstable_mockModule('../src/parts/MemoryLeakWorker/MemoryLeakWorker.ts', ()
 
 jest.unstable_mockModule('../src/parts/MemoryLeakFinder/MemoryLeakFinder.ts', () => ({
   compare: mockMemoryCompare,
+  prepare: mockMemoryPrepare,
+  releaseResources: mockMemoryReleaseResources,
   start: mockMemoryStart,
   stop: mockMemoryStop,
 }))
 
+const mockRunTests = jest.fn(async (..._args: readonly unknown[]) => undefined)
+
 jest.unstable_mockModule('../src/parts/TestWorkerRunTests/TestWorkerRunTests.ts', () => ({
-  testWorkerRunTests: jest.fn(async () => undefined),
+  testWorkerRunTests: mockRunTests,
+}))
+
+jest.unstable_mockModule('../src/parts/GetPrettyError/GetPrettyError.ts', () => ({
+  getPrettyError: async (error: unknown) => String(error),
 }))
 
 jest.unstable_mockModule('../src/parts/TestWorkerTeardownTest/TestWorkerTearDownTest.ts', () => ({
@@ -113,66 +124,135 @@ beforeEach(() => {
   events.length = 0
   hangNextWorkerDispose = false
   jest.clearAllMocks()
+  mockMemoryPrepare.mockReset().mockResolvedValue(false)
+  mockMemoryReleaseResources.mockReset().mockResolvedValue(undefined)
+  mockMemoryStop.mockReset().mockResolvedValue(undefined)
+  mockRunTests.mockReset().mockResolvedValue(undefined)
+})
+
+const defaultOptions: RunTestsWithCallbackOptions = {
+  addDisposable: () => {},
+  allowCopilotAuthInCi: false,
+  arch: 'x64',
+  buildVscodeMinified: false,
+  callback: async () => {},
+  checkLeaks: true,
+  clearDisposables: async () => {},
+  clearExtensions: false,
+  color: false,
+  commit: 'abc123',
+  compressVideo: false,
+  continueValue: '',
+  cwd: '/test-cwd',
+  downloadUserDataZipFileToken: '',
+  downloadUserDataZipFileUrl: '',
+  enableExtensions: false,
+  enableProxy: false,
+  filterValue: 'react-vite-simple-browser',
+  getTimeStamp: () => 0,
+  headlessMode: true,
+  ide: 'vscode',
+  ideVersion: 'stable',
+  insidersCommit: '',
+  inspectExtensions: false,
+  inspectExtensionsPort: 0,
+  inspectIntegratedBrowser: true,
+  inspectPtyHost: false,
+  inspectPtyHostPort: 0,
+  inspectSharedProcess: false,
+  inspectSharedProcessPort: 0,
+  isGithubActions: false,
+  login: false,
+  measure: 'named-function-count3',
+  measureAfter: false,
+  measureNode: false,
+  openDevtools: false,
+  pageObjectPath: '',
+  platform: 'linux',
+  recordVideo: false,
+  restartBetween: false,
+  root: '/test-root',
+  runMode: 1,
+  runNetworkTestsAnyway: false,
+  runs: 1,
+  runSkippedTestsAnyway: true,
+  screencastQuality: 100,
+  setupOnly: false,
+  startupRuns: 1,
+  timeoutBetween: 0,
+  timeouts: false,
+  trackFunctions: false,
+  updateUrl: '',
+  useProxyMock: false,
+  vscodePath: '',
+  vscodeVersion: '1.0.0',
+}
+
+const runMeasurement = (overrides: Partial<RunTestsWithCallbackOptions> = {}) => runTestsWithCallback({ ...defaultOptions, ...overrides })
+
+test.each(['renderer', 'integrated-browser', 'process'])(
+  'promise tracking is prepared before the measured warmup for %s',
+  async (target) => {
+    mockPrepareTestsAndAttach.mockResolvedValueOnce({
+      devtoolsWebSocketUrl: 'ws://browser',
+      functionTrackerRpc: rpc,
+      initializationWorkerRpc: rpc,
+      memoryRpc,
+      pid: 123,
+      testWorkerRpc: rpc,
+      videoRpc: rpc,
+      webSocketUrl: 'ws://electron',
+    })
+    mockMemoryPrepare.mockImplementationOnce(async () => {
+      events.push('prepare')
+      return true
+    })
+    mockRunTests.mockImplementation(async (...args) => {
+      events.push(`run:${args[6]}`)
+    })
+    mockMemoryStop.mockImplementationOnce(async () => {
+      events.push('stop')
+    })
+    const result = await runMeasurement({
+      inspectIntegratedBrowser: target === 'integrated-browser',
+      inspectProcess: target === 'process' ? 'vite.js' : '',
+      measure: 'promisesWithStackTrace',
+      measureAfter: true,
+      runs: 37,
+    })
+
+    expect(result).toMatchObject({ failed: 0, passed: 1 })
+    const startup = target === 'renderer' ? [] : ['memory-dispose', ...(target === 'integrated-browser' ? ['snapshot-targets'] : [])]
+    const attach = target === 'renderer' ? [] : ['run:2', 'start-memory-worker']
+    expect(events).toEqual([...startup, 'setup-test', ...attach, 'prepare', 'run:2', 'measure-start', 'run:37', 'stop', 'memory-dispose'])
+    expect(mockMemoryReleaseResources).not.toHaveBeenCalled()
+  },
+)
+
+test.each(['prepare', 'warmup', 'start', 'run', 'stop'])('measurement resources are released when %s fails', async (phase) => {
+  const error = new Error(`${phase} failed`)
+  mockMemoryPrepare.mockResolvedValueOnce(true)
+  if (phase === 'prepare') {
+    mockMemoryPrepare.mockReset().mockRejectedValueOnce(error)
+  } else if (phase === 'warmup') {
+    mockRunTests.mockRejectedValueOnce(error)
+  } else if (phase === 'start') {
+    mockMemoryStart.mockRejectedValueOnce(error)
+  } else if (phase === 'run') {
+    mockRunTests.mockResolvedValueOnce(undefined).mockRejectedValueOnce(error)
+  } else {
+    mockMemoryStop.mockRejectedValueOnce(error)
+  }
+  const result = await runMeasurement({ inspectIntegratedBrowser: false, measureAfter: true })
+
+  expect(result).toMatchObject({ failed: 1, passed: 0 })
+  expect(mockMemoryCompare).not.toHaveBeenCalled()
+  // stop already releases resources in its worker-side finally block.
+  expect(mockMemoryReleaseResources).toHaveBeenCalledTimes(phase === 'stop' ? 0 : 1)
 })
 
 test('runTestsWithCallback - inspect integrated browser starts memory worker after setup', async () => {
-  const result = await runTestsWithCallback({
-    addDisposable: () => {},
-    allowCopilotAuthInCi: false,
-    arch: 'x64',
-    buildVscodeMinified: false,
-    callback: async () => {},
-    checkLeaks: true,
-    clearDisposables: async () => {},
-    clearExtensions: false,
-    color: false,
-    commit: 'abc123',
-    compressVideo: false,
-    continueValue: '',
-    cwd: '/test-cwd',
-    downloadUserDataZipFileToken: '',
-    downloadUserDataZipFileUrl: '',
-    enableExtensions: false,
-    enableProxy: false,
-    filterValue: 'react-vite-simple-browser',
-    getTimeStamp: () => 0,
-    headlessMode: true,
-    ide: 'vscode',
-    ideVersion: 'stable',
-    insidersCommit: '',
-    inspectExtensions: false,
-    inspectExtensionsPort: 0,
-    inspectIntegratedBrowser: true,
-    inspectPtyHost: false,
-    inspectPtyHostPort: 0,
-    inspectSharedProcess: false,
-    inspectSharedProcessPort: 0,
-    isGithubActions: false,
-    login: false,
-    measure: 'named-function-count3',
-    measureAfter: false,
-    measureNode: false,
-    openDevtools: false,
-    pageObjectPath: '',
-    platform: 'linux',
-    recordVideo: false,
-    restartBetween: false,
-    root: '/test-root',
-    runMode: 1,
-    runNetworkTestsAnyway: false,
-    runs: 1,
-    runSkippedTestsAnyway: true,
-    screencastQuality: 100,
-    setupOnly: false,
-    startupRuns: 1,
-    timeoutBetween: 0,
-    timeouts: false,
-    trackFunctions: false,
-    updateUrl: '',
-    useProxyMock: false,
-    vscodePath: '',
-    vscodeVersion: '1.0.0',
-  })
+  const result = await runMeasurement()
 
   expect(result.type).toBe('success')
   expect(events).toEqual(['snapshot-targets', 'setup-test', 'start-memory-worker', 'measure-start', 'memory-dispose'])

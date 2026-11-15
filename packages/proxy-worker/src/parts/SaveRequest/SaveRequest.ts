@@ -42,7 +42,11 @@ export const saveRequest = async (
       responseType = 'sse'
       const sseFilePath = await SaveSseData.saveSseData(responseData, url, timestamp)
       responseBodyData = `file-reference:${sseFilePath}`
-    } else if (contentTypeLower.startsWith('image/')) {
+    } else if (
+      contentTypeLower.startsWith('image/') ||
+      contentTypeLower.includes('application/octet-stream') ||
+      contentTypeLower.includes('binary/octet-stream')
+    ) {
       responseType = 'binary'
       // Decompress if needed before saving
       const compressionWorker = await CompressionWorker.getCompressionWorker()

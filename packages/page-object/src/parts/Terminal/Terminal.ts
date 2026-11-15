@@ -35,8 +35,16 @@ const waitForTerminalReady = async ({ page, row1 }: { page: any; row1: any }): P
 
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
-export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
+export const create = ({ electronApp, expect, ideVersion, page, platform, VError, workspacePath }: CreateParams) => {
   return {
+    async waitForShellPrompt() {
+      await expect(page.locator('.terminal .xterm-screen')).toBeVisible()
+      await expect(page.locator('.terminal .xterm-accessibility-tree')).toHaveText(/\$\s/)
+    },
+    async shouldHaveOutputLine(text: string) {
+      const line = page.locator('.terminal .xterm-accessibility-tree > div', { hasExactText: text })
+      await expect(line).toHaveCount(1)
+    },
     async add() {
       try {
         await page.waitForIdle()
@@ -87,14 +95,23 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to close terminal find`)
       }
     },
-    async execute(command: string, { waitForFile = '' } = {}) {
+    async execute(command: string, { waitForFile = '', viaNativeKeyboard = false } = {}) {
       try {
         await page.waitForIdle()
-        await this.type(command)
+        if (viaNativeKeyboard) await page.keyboard.typeCharacters(command)
+        else await this.type(command)
         await page.keyboard.press('Enter')
         await page.waitForIdle()
         if (waitForFile) {
-          const workspace = Workspace.create({ electronApp, expect, ideVersion, page, platform, VError })
+          const workspace = Workspace.create({
+            electronApp,
+            expect,
+            ideVersion,
+            page,
+            platform,
+            VError,
+            ...(workspacePath ? { workspacePath } : {}),
+          })
           const exists = await workspace.waitForFile(waitForFile)
           if (!exists) {
             throw new Error(`expected file to be created`)
@@ -329,13 +346,14 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
         await page.focus()
         const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
-        await quickPick.executeCommand(WellKnownCommands.FocusTerminal)
+        await quickPick.executeCommand(WellKnownCommands.FocusTerminal, { pressKeyOnce: true })
         const terminalSplitPane = page.locator('.terminal-split-pane')
         await expect(terminalSplitPane).toBeVisible()
         await page.waitForIdle()
         const terminal = page.locator('.terminal')
         await expect(terminal).toHaveCount(1)
         await expect(terminal).toBeVisible()
+        await terminal.locator('.xterm-screen').click()
         await expect(terminal).toHaveClass('focus')
         await page.waitForIdle()
         if (waitForReady) {

@@ -85,8 +85,10 @@ export const downloadAndBuildVscodeFromCommit = async (
   const existsNodeModulesPath = await FileSystemWorker.pathExists(nodeModulesPath)
   const existsNodeModulesLockPath = await FileSystemWorker.pathExists(nodeModulesPackageLock)
   const existsOutPath = await FileSystemWorker.pathExists(outPath)
+  const usesPnpm = await FileSystemWorker.pathExists(Path.join(repoPathWithCommitHash, 'pnpm-lock.yaml'))
+  const installCommand = usesPnpm ? 'pnpm install' : 'npm ci'
   const hasValidNodeModules =
-    existsNodeModulesPath && existsNodeModulesLockPath && (await hasCompleteTopLevelNodeModules(repoPathWithCommitHash))
+    !usesPnpm && existsNodeModulesPath && existsNodeModulesLockPath && (await hasCompleteTopLevelNodeModules(repoPathWithCommitHash))
 
   const needsInstall = (buildVscodeMinified ? !existsMinifiedExecutablePath : !existsMainJsPath) && !hasValidNodeModules
   const needsCompile = buildVscodeMinified ? !existsMinifiedExecutablePath : !existsMainJsPath && !existsOutPath
@@ -99,16 +101,17 @@ export const downloadAndBuildVscodeFromCommit = async (
       await preCacheRipgrep(platform, arch)
     } catch (error) {
       Logger.log(`[repository] Warning: Failed to pre-cache ripgrep: ${error}`)
-      Logger.log(`[repository] Continuing with npm ci - may encounter GitHub API issues`)
+      Logger.log(`[repository] Continuing with ${installCommand} - may encounter GitHub API issues`)
     }
   }
 
   if (needsInstall) {
     if (existsNodeModulesPath && !hasValidNodeModules) {
-      Logger.log(`[repository] node_modules cache for commit ${commitHash} is incomplete, running npm ci...`)
+      Logger.log(`[repository] node_modules cache for commit ${commitHash} is incomplete, running ${installCommand}...`)
     }
     Logger.log(`[repository] Installing dependencies for commit ${commitHash}...`)
-    if (nodeModulesCacheDir) {
+    // The reusable cache captures npm trees only, not pnpm's workspace/install state.
+    if (nodeModulesCacheDir && !usesPnpm) {
       const nodeModulesHash = await computeVscodeNodeModulesCacheKey(repoPathWithCommitHash)
       const cacheExists = await FileSystemWorker.pathExists(Path.join(nodeModulesCacheDir, nodeModulesHash))
       if (cacheExists) {
@@ -125,7 +128,7 @@ export const downloadAndBuildVscodeFromCommit = async (
       await InstallDependencies.installDependencies(repoPathWithCommitHash, useNice)
     }
   } else if (!existsMainJsPath) {
-    Logger.log(`[repository] node_modules already exists in repo for commit ${commitHash}, skipping npm ci...`)
+    Logger.log(`[repository] node_modules already exists in repo for commit ${commitHash}, skipping ${installCommand}...`)
   }
 
   // Compile if needed

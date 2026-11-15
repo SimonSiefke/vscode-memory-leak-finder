@@ -69,3 +69,18 @@ test('clickCodeLens clicks the matching code lens', async () => {
   expect(toBeVisible).toHaveBeenCalledWith({ timeout: 120_000 })
   expect(click).toHaveBeenCalledTimes(1)
 })
+
+test('keyboard scrolling dispatches a native document-end key without opening the command palette', async () => {
+  const press = jest.fn(async (_key: string) => {})
+  const page = { keyboard: { press } }
+  const editor = Editor.create({
+    electronApp: {},
+    expect: jest.fn(),
+    ideVersion: { major: 1, minor: 140, patch: 0 },
+    page,
+    platform: 'linux',
+    VError: TestError,
+  })
+  await editor.scrollDown({ viaKeyBoard: true })
+  expect(press).toHaveBeenCalledWith('Control+End')
+})

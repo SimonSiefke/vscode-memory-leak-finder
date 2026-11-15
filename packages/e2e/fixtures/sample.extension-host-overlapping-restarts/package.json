@@ -1,0 +1,29 @@
+{
+  "name": "extension-host-overlapping-restarts",
+  "displayName": "Extension Host Overlapping Restarts",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "extension-host-overlapping-restarts.setup",
+        "title": "Extension Host Overlapping Restarts: Setup"
+      },
+      {
+        "command": "extension-host-overlapping-restarts.run",
+        "title": "Extension Host Overlapping Restarts: Run"
+      },
+      {
+        "command": "extension-host-overlapping-restarts.cleanup",
+        "title": "Extension Host Overlapping Restarts: Cleanup"
+      }
+    ]
+  },
+  "activationEvents": [
+    "onStartupFinished"
+  ]
+}

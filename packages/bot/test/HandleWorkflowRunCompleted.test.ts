@@ -7,7 +7,7 @@ type UpdateCommentCall = {
   readonly comment_id: number
 }
 
-test('handleWorkflowRunCompleted includes bot-hosted failure video urls in the updated comment', async () => {
+test.each([false, true])('handleWorkflowRunCompleted includes failure videos with bigint IDs: %s', async (useBigIntIds) => {
   const summary: MeasureWorkflowSummary = {
     actorLogin: 'SimonSiefke',
     artifacts: {
@@ -54,17 +54,17 @@ test('handleWorkflowRunCompleted includes bot-hosted failure video urls in the u
                   artifacts: [
                     {
                       archive_download_url: 'https://api.github.com/repos/SimonSiefke/vscode-memory-leak-finder/actions/artifacts/10/zip',
-                      id: 10,
+                      id: useBigIntIds ? 10n : 10,
                       name: 'measure-run-123-456-summary',
                     },
                     {
                       archive_download_url: 'https://api.github.com/repos/SimonSiefke/vscode-memory-leak-finder/actions/artifacts/11/zip',
-                      id: 11,
+                      id: useBigIntIds ? 11n : 11,
                       name: 'measure-run-123-456-base-video',
                     },
                     {
                       archive_download_url: 'https://api.github.com/repos/SimonSiefke/vscode-memory-leak-finder/actions/artifacts/12/zip',
-                      id: 12,
+                      id: useBigIntIds ? 12n : 12,
                       name: 'measure-run-123-456-candidate-video',
                     },
                   ],

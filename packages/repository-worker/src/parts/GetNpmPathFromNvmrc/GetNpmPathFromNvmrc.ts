@@ -2,6 +2,7 @@ import { homedir } from 'node:os'
 import { dirname } from 'node:path'
 import * as FileSystemWorker from '../FileSystemWorker/FileSystemWorker.ts'
 import * as InstallNodeVersion from '../InstallNodeVersion/InstallNodeVersion.ts'
+import * as Nvm from '../Nvm/Nvm.ts'
 import * as Path from '../Path/Path.ts'
 
 const getNvmDirectories = (): readonly string[] => {
@@ -16,8 +17,12 @@ const getNvmDirectories = (): readonly string[] => {
 }
 
 const findNpmPathInNvm = async (nodeVersion: string): Promise<string | undefined> => {
+  const resolvedVersion = /^\d+\.\d+\.\d+$/.test(nodeVersion) ? nodeVersion : await Nvm.resolveVersion(nodeVersion)
+  if (!resolvedVersion) {
+    return undefined
+  }
   for (const nvmDirectory of getNvmDirectories()) {
-    const binDirectory = Path.join(nvmDirectory, 'versions', 'node', `v${nodeVersion}`, 'bin')
+    const binDirectory = Path.join(nvmDirectory, 'versions', 'node', `v${resolvedVersion}`, 'bin')
     const nodePath = Path.join(binDirectory, 'node')
     const npmPath = Path.join(binDirectory, 'npm')
     if ((await FileSystemWorker.pathExists(nodePath)) && (await FileSystemWorker.pathExists(npmPath))) {

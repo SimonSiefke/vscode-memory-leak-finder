@@ -2,6 +2,9 @@ import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
 export const create = ({ expect, page, VError }: CreateParams) => {
   return {
+    async shouldHaveMatchesCount(text: string) {
+      await expect(page.locator('.find-widget .matchesCount')).toHaveText(text)
+    },
     async openReplace() {
       try {
         const findWidget = page.locator('.find-widget.visible')

@@ -7,7 +7,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     async show() {
       await this.showAndWaitFor('Git')
     },
-    async showAndWaitFor(name: string) {
+    async showAndWaitFor(name: string, ...extensionIds: string[]) {
       const quickPick = QuickPick.create({
         electronApp,
         expect,
@@ -17,12 +17,19 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         VError,
       })
       await quickPick.executeCommand(WellKnownCommands.ShowRunningExtensions)
-      const tabLabel = page.locator('.tab-label[aria-label="Running Extensions"]')
-      await expect(tabLabel).toBeVisible()
-      const extension = page.locator('.editor-container .extension .name', {
-        hasExactText: name,
-      })
+      await expect(page.locator('.runtime-extensions-editor')).toBeVisible()
+      if (ideVersion.minor >= 114) {
+        const openInMainWindow = page.locator('[aria-label="Open Modal Editor in Main Window"]')
+        await expect(openInMainWindow).toBeVisible()
+        await openInMainWindow.click()
+      }
+      const extension = page.locator('.runtime-extensions-editor .extension .name', { hasExactText: name })
       await expect(extension).toBeVisible()
+      for (const id of extensionIds) {
+        await expect(page.locator(`.runtime-extensions-editor .monaco-list-row[aria-label="${id}"]`)).toBeVisible()
+      }
+      const activating = page.locator('.runtime-extensions-editor .activation-time', { hasExactText: 'Activating...' })
+      await expect(activating).toBeHidden()
       await page.waitForIdle()
     },
     async startDebuggingExtensionHost() {
