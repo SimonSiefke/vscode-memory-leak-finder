@@ -8,6 +8,9 @@ export const isImportantErrorMessage = (data: string): boolean => {
   if (data.includes('The `punycode` module is deprecated')) {
     return false
   }
+  if (data.includes('(electron) Sending uncompressed crash reports is deprecated')) {
+    return false
+  }
   if (data.includes('fs.Stats constructor is deprecated')) {
     return false
   }

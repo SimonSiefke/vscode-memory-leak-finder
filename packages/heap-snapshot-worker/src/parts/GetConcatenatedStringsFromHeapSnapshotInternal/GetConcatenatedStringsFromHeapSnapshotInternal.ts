@@ -70,6 +70,7 @@ const resolveString = (
   nameFieldIndex: number,
   children: StringChildren,
   cache: Map<number, string | null>,
+  maximumLength = Number.POSITIVE_INFINITY,
 ): string | null => {
   const { nodes, strings } = snapshot
   const visiting = new Set<number>()
@@ -147,15 +148,23 @@ const resolveString = (
     }
 
     const secondValue = cache.get(children.second[nodeIndex])
-    cache.set(nodeIndex, secondValue === undefined || secondValue === null ? null : `${firstValue}${secondValue}`)
+    cache.set(
+      nodeIndex,
+      secondValue === undefined || secondValue === null || firstValue.length + secondValue.length > maximumLength
+        ? null
+        : `${firstValue}${secondValue}`,
+    )
     visiting.delete(nodeIndex)
   }
 
   return cache.get(rootNodeIndex) ?? null
 }
 
-export const getConcatenatedStringsFromHeapSnapshotInternal = (snapshot: Snapshot): readonly string[] => {
-  const { meta, nodes, strings } = snapshot
+export const createStringValueResolver = (
+  snapshot: Snapshot,
+  maximumLength = Number.POSITIVE_INFINITY,
+): ((nodeIndex: number) => string | null) => {
+  const { meta } = snapshot
   const { edge_fields, edge_types, node_fields, node_types } = meta
   const {
     ITEMS_PER_EDGE,
@@ -165,13 +174,12 @@ export const getConcatenatedStringsFromHeapSnapshotInternal = (snapshot: Snapsho
     edgeToNodeFieldIndex,
     edgeTypeFieldIndex,
     nameFieldIndex,
-    nodeTypes,
     typeFieldIndex,
   } = computeHeapSnapshotIndices(node_types, node_fields, edge_types, edge_fields)
-  const concatenatedStringTypeIndex = nodeTypes.indexOf('concatenated string')
-  const stringTypeIndex = nodeTypes.indexOf('string')
+  const types = node_types[typeFieldIndex] ?? []
+  const concatenatedStringTypeIndex = types.indexOf('concatenated string')
+  const stringTypeIndex = types.indexOf('string')
   if (
-    concatenatedStringTypeIndex < 0 ||
     stringTypeIndex < 0 ||
     ITEMS_PER_NODE <= 0 ||
     ITEMS_PER_EDGE <= 0 ||
@@ -182,7 +190,7 @@ export const getConcatenatedStringsFromHeapSnapshotInternal = (snapshot: Snapsho
     edgeNameFieldIndex < 0 ||
     edgeToNodeFieldIndex < 0
   ) {
-    return []
+    return () => null
   }
 
   const children = getStringChildren(
@@ -195,15 +203,11 @@ export const getConcatenatedStringsFromHeapSnapshotInternal = (snapshot: Snapsho
     edgeTypeFieldIndex,
     edgeNameFieldIndex,
     edgeToNodeFieldIndex,
-    edge_types[0],
+    edge_types[edgeTypeFieldIndex],
   )
   const cache = new Map<number, string | null>()
-  const concatenatedStrings: string[] = []
-  for (let nodeIndex = 0, nodeOffset = 0; nodeOffset < nodes.length; nodeIndex++, nodeOffset += ITEMS_PER_NODE) {
-    if (nodes[nodeOffset + typeFieldIndex] !== concatenatedStringTypeIndex) {
-      continue
-    }
-    const value = resolveString(
+  return (nodeIndex) =>
+    resolveString(
       nodeIndex,
       snapshot,
       stringTypeIndex,
@@ -213,15 +217,23 @@ export const getConcatenatedStringsFromHeapSnapshotInternal = (snapshot: Snapsho
       nameFieldIndex,
       children,
       cache,
+      maximumLength,
     )
-    if (value !== null) {
-      concatenatedStrings.push(value)
-      continue
-    }
-    const fallbackValue = strings[nodes[nodeOffset + nameFieldIndex]]
-    if (typeof fallbackValue === 'string') {
-      concatenatedStrings.push(fallbackValue)
-    }
+}
+
+export const getConcatenatedStringsFromHeapSnapshotInternal = (snapshot: Snapshot): readonly string[] => {
+  const fields = snapshot.meta.node_fields
+  const typeOffset = fields.indexOf('type')
+  const nameOffset = fields.indexOf('name')
+  const types = snapshot.meta.node_types[typeOffset]
+  const concatenatedType = types?.indexOf('concatenated string') ?? -1
+  if (fields.length === 0 || typeOffset < 0 || concatenatedType < 0) return []
+  const resolveValue = createStringValueResolver(snapshot)
+  const values: string[] = []
+  for (let offset = 0; offset < snapshot.nodes.length; offset += fields.length) {
+    if (snapshot.nodes[offset + typeOffset] !== concatenatedType) continue
+    const value = resolveValue(offset / fields.length) ?? snapshot.strings[snapshot.nodes[offset + nameOffset]]
+    if (typeof value === 'string') values.push(value)
   }
-  return concatenatedStrings
+  return values
 }

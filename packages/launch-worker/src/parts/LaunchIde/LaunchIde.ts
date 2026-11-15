@@ -41,6 +41,7 @@ export const setupIde = async ({
   downloadUserDataZipFileUrl: string
   enableExtensions: boolean
   enableProxy: boolean
+  launchAgentWindow?: boolean | undefined
   ide: string
   insidersCommit: string
   inspectExtensions: boolean
@@ -96,6 +97,7 @@ export const launchIde = async ({
   downloadUserDataZipFileUrl,
   enableExtensions,
   enableProxy,
+  launchAgentWindow,
   headlessMode,
   ide,
   insidersCommit,
@@ -128,6 +130,7 @@ export const launchIde = async ({
   downloadUserDataZipFileUrl: string
   enableExtensions: boolean
   enableProxy: boolean
+  launchAgentWindow?: boolean | undefined
   headlessMode: boolean
   ide: string
   insidersCommit: string
@@ -201,6 +204,7 @@ export const launchIde = async ({
     downloadUserDataZipFileUrl,
     enableExtensions,
     enableProxy,
+    launchAgentWindow,
     headlessMode,
     insidersCommit,
     inspectExtensions,

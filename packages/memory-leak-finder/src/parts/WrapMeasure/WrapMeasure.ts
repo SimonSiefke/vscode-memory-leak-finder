@@ -9,6 +9,13 @@ export const wrapMeasure = (measure: Dynamic) => {
         compare(before: Dynamic, after: Dynamic, context: Dynamic) {
           return measure.compare(before, after, context, ...args)
         },
+        async prepare() {
+          if (!measure.prepare) {
+            return false
+          }
+          await measure.prepare(...args)
+          return true
+        },
         async releaseResources() {
           if (measure.releaseResources) {
             await measure.releaseResources(...args)

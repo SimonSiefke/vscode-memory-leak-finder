@@ -20,13 +20,22 @@ const doStart = async (connectionId: number): Promise<unknown> => {
 }
 
 export const start = async (connectionId: number, electronTargetId: string): Promise<unknown> => {
-  const crashInfo = WaitForCrash.waitForCrash(electronTargetId)
-  const resultPromise = doStart(connectionId)
-  const intermediateResult = await Promise.race([crashInfo.promise, resultPromise])
-  if (isRecord(intermediateResult) && intermediateResult.crashed) {
-    throw new Error('target crashed')
+  const state = MemoryLeakFinderState.get(connectionId)
+  if (!state) {
+    throw new Error('no measure found')
   }
-  crashInfo.dispose()
+  const crashInfo = WaitForCrash.waitForCrash(electronTargetId, state.rpc)
+  const resultPromise = doStart(connectionId)
+  let intermediateResult
+  try {
+    intermediateResult = await Promise.race([crashInfo.promise, resultPromise])
+    if (isRecord(intermediateResult) && intermediateResult.crashed) {
+      await state.rpc.dispose()
+      throw new Error('Application crashed: target crashed')
+    }
+  } finally {
+    crashInfo.dispose()
+  }
   if (isRecord(intermediateResult) && intermediateResult.connectionClosed) {
     return { connectionClosed: true }
   }

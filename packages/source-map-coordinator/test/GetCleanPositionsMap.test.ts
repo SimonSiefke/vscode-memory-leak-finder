@@ -22,19 +22,16 @@ jest.unstable_mockModule('../src/parts/LaunchSourceMapWorker/LaunchSourceMapWork
   }
 })
 
-jest.unstable_mockModule('../src/parts/LoadSourceMap/LoadSourceMap.ts', () => {
-  return {
-    loadSourceMap: jest.fn(async (url: string) => {
-      if (url === 'bad.js.map') {
-        throw new Error('bad source map')
-      }
-      return {
-        mappings: '',
-        sources: [],
-        version: 3,
-      }
-    }),
+const disposeLoader = jest.fn(async () => {})
+const loadSourceMap = jest.fn(async (url: string) => {
+  if (url === 'bad.js.map') {
+    throw new Error('bad source map')
   }
+  return { mappings: '', sources: [], version: 3 }
+})
+const createSourceMapLoader = jest.fn(async () => ({ loadSourceMap, [Symbol.asyncDispose]: disposeLoader }))
+jest.unstable_mockModule('../src/parts/LoadSourceMap/LoadSourceMap.ts', () => {
+  return { createSourceMapLoader }
 })
 
 const { getCleanPositionsMap } = await import('../src/parts/GetCleanPositionsMap/GetCleanPositionsMap.ts')
@@ -61,4 +58,7 @@ test('getCleanPositionsMap - resolves source maps independently', async () => {
       sourcesHash: undefined,
     },
   ])
+  expect(createSourceMapLoader).toHaveBeenCalledTimes(1)
+  expect(loadSourceMap.mock.calls.map(([url]) => url)).toEqual(['bad.js.map', 'good.js.map'])
+  expect(disposeLoader).toHaveBeenCalledTimes(1)
 })

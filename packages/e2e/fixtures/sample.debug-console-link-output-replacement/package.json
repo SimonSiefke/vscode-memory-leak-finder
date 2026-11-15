@@ -1,0 +1,35 @@
+{
+  "name": "debug-console-link-output-replacement",
+  "displayName": "Debug Console Link Output Replacement",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "debuggers": [
+      {
+        "type": "lifecycle-links",
+        "label": "Lifecycle links",
+        "languages": [
+          "plaintext"
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "command": "debug-console-link-output-replacement.setup",
+        "title": "Debug Console Link Output Replacement: Setup"
+      },
+      {
+        "command": "debug-console-link-output-replacement.run",
+        "title": "Debug Console Link Output Replacement: Run"
+      },
+      {
+        "command": "debug-console-link-output-replacement.cleanup",
+        "title": "Debug Console Link Output Replacement: Cleanup"
+      }
+    ]
+  }
+}

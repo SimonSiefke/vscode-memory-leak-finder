@@ -1,0 +1,26 @@
+{
+  "name": "editor-decoration-type-disposal",
+  "displayName": "Editor Decoration Type Disposal",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "editor-decoration-type-disposal.setup",
+        "title": "Editor Decoration Type Disposal: Setup"
+      },
+      {
+        "command": "editor-decoration-type-disposal.run",
+        "title": "Editor Decoration Type Disposal: Run"
+      },
+      {
+        "command": "editor-decoration-type-disposal.cleanup",
+        "title": "Editor Decoration Type Disposal: Cleanup"
+      }
+    ]
+  }
+}

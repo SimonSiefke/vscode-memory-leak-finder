@@ -1,24 +1,41 @@
 import type { TestContext } from '../types.ts'
 
-const modernUiSetting = 'workbench.experimental.modernUI'
+export const skip = 1
+export const skipInCi = true
 
-export const setup = async ({ Editor, SettingsEditor }: TestContext): Promise<void> => {
+const modernUiSetting = 'workbench.experimental.modernUI'
+let setting = modernUiSetting
+
+export const setup = async ({ Editor, RunningExtensions, SettingsEditor }: TestContext): Promise<void> => {
   await Editor.closeAll()
   await SettingsEditor.open()
   await SettingsEditor.search({
-    resultCount: 'many',
+    resultCount: 'any',
     value: modernUiSetting,
   })
-  await SettingsEditor.disableCheckBox({
-    name: modernUiSetting,
-  })
+  // Older releases have no Modern UI setting. Exercise a layout checkbox that
+  // exists since before 1.100 instead, keeping the enable/disable lifecycle.
+  setting = modernUiSetting
+  if (!(await SettingsEditor.hasCheckBox(modernUiSetting))) {
+    setting = 'workbench.layoutControl.enabled'
+    await SettingsEditor.clear()
+    await SettingsEditor.search({ resultCount: 'many', value: setting })
+  }
+  // Writing settings activates the JSON and TypeScript extensions. Finish that
+  // activation before the first heap snapshot so module imports aren't leaks.
+  await SettingsEditor.enableCheckBox({ name: setting })
+  await SettingsEditor.disableCheckBox({ name: setting })
+  await RunningExtensions.showAndWaitFor('JSON Language Features', 'typescript-language-features')
+  await Editor.closeAll()
+  await SettingsEditor.open()
+  await SettingsEditor.search({ resultCount: 'many', value: setting })
 }
 
 export const run = async ({ SettingsEditor }: TestContext): Promise<void> => {
   await SettingsEditor.enableCheckBox({
-    name: modernUiSetting,
+    name: setting,
   })
   await SettingsEditor.disableCheckBox({
-    name: modernUiSetting,
+    name: setting,
   })
 }

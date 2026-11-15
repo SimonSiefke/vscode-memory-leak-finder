@@ -1,0 +1,26 @@
+{
+  "name": "type-hierarchy-late-cancellation",
+  "displayName": "Type Hierarchy Late Cancellation",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "type-hierarchy-late-cancellation.setup",
+        "title": "Type Hierarchy Late Cancellation: Setup"
+      },
+      {
+        "command": "type-hierarchy-late-cancellation.run",
+        "title": "Type Hierarchy Late Cancellation: Run"
+      },
+      {
+        "command": "type-hierarchy-late-cancellation.cleanup",
+        "title": "Type Hierarchy Late Cancellation: Cleanup"
+      }
+    ]
+  }
+}

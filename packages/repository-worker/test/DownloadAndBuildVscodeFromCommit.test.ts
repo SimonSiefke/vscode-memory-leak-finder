@@ -162,6 +162,24 @@ afterEach(() => {
 const { downloadAndBuildVscodeFromCommit } =
   await import('../src/parts/DownloadAndBuildVscodeFromCommit/DownloadAndBuildVscodeFromCommit.ts')
 
+test('downloadAndBuildVscodeFromCommit bypasses npm caches for pnpm revisions', async () => {
+  const commitHash = '0123456789abcdef0123456789abcdef01234567'
+  const repoPath = Path.join('/test/repos', `${commitHash}-minified/source`)
+  mockResolveCommitHash.mockImplementation(async () => ({ commitHash, owner: 'microsoft' }))
+  mockPathExists.mockImplementation(
+    (path) =>
+      path === `${repoPath}/pnpm-lock.yaml` ||
+      path === `${repoPath}/node_modules` ||
+      path === `${repoPath}/node_modules/.package-lock.json`,
+  )
+  await downloadAndBuildVscodeFromCommit('linux', 'x64', commitHash, DEFAULT_REPO_URL, '/test/repos', '/test/cache', false, true)
+  expect(mockInstallDependencies).toHaveBeenCalledWith(repoPath, false)
+  expect(mockCopyNodeModulesFromCacheToRepositoryFolder).not.toHaveBeenCalled()
+  expect(mockAddNodeModulesToCache).not.toHaveBeenCalled()
+  expect(mockHasCompleteTopLevelNodeModules).not.toHaveBeenCalled()
+  expect(mockRunMinifiedBuild).toHaveBeenCalled()
+})
+
 test('downloadAndBuildVscodeFromCommit - clones when cached node_modules exist without git metadata', async () => {
   const testCommitHash = '0123456789abcdef0123456789abcdef01234567'
   const reposDir = Path.join('/test', '.vscode-repos')

@@ -1,0 +1,33 @@
+{
+  "name": "inline-edit-side-by-side-disposal",
+  "displayName": "Inline Edit Side By Side Disposal",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "inline-edit-side-by-side-disposal.setup",
+        "title": "Inline Edit Side By Side Disposal: Setup"
+      },
+      {
+        "command": "inline-edit-side-by-side-disposal.run",
+        "title": "Inline Edit Side By Side Disposal: Run"
+      },
+      {
+        "command": "inline-edit-side-by-side-disposal.cleanup",
+        "title": "Inline Edit Side By Side Disposal: Cleanup"
+      },
+      {
+        "command": "inline-edit-side-by-side-disposal.hide",
+        "title": "Dismiss Lifecycle Inline Edit"
+      }
+    ]
+  },
+  "enabledApiProposals": [
+    "inlineCompletionsAdditions"
+  ]
+}

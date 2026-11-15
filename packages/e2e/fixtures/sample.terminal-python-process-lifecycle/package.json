@@ -1,0 +1,26 @@
+{
+  "name": "terminal-python-process-lifecycle",
+  "displayName": "Python Terminal Process Lifecycle",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "terminal-python-process-lifecycle.setup",
+        "title": "Python Terminal Process Lifecycle: Setup"
+      },
+      {
+        "command": "terminal-python-process-lifecycle.run",
+        "title": "Python Terminal Process Lifecycle: Run"
+      },
+      {
+        "command": "terminal-python-process-lifecycle.cleanup",
+        "title": "Python Terminal Process Lifecycle: Cleanup"
+      }
+    ]
+  }
+}

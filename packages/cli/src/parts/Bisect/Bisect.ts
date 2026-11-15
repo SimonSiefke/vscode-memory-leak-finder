@@ -31,6 +31,7 @@ export const bisect = async (options: StartRunningOptions): Promise<BisectResult
       cwd: options.cwd,
       enableExtensions: options.enableExtensions,
       enableProxy: options.enableProxy,
+      launchAgentWindow: options.launchAgentWindow,
       filterValue: options.filterValue,
       headlessMode: options.headlessMode,
       ide: options.ide,

@@ -1,4 +1,5 @@
 import { expect, test } from '@jest/globals'
+import { JSDOM } from 'jsdom'
 import { createChart } from '../src/parts/CreateChart/CreateChart.ts'
 
 test('main', async () => {
@@ -10,7 +11,7 @@ test('main', async () => {
     yLabel: 'Y',
   }
   expect(await createChart(data, options))
-    .toBe(`<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" class=\"plot-d6a7b5\" fill=\"currentColor\" font-family=\"system-ui, sans-serif\" font-size=\"10\" text-anchor=\"middle\" width=\"640\" height=\"400\" viewBox=\"0 0 640 400\" style=\"overflow: visible; background: white;\"><style>:where(.plot-d6a7b5) {
+    .toBe(`<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" class=\"plot-d6a7b5\" fill=\"currentColor\" font-family=\"system-ui, sans-serif\" font-size=\"10\" text-anchor=\"middle\" width=\"640\" height=\"410\" viewBox=\"0 0 640 410\" style=\"overflow: visible; background: white; font-size: 13px;\"><style>:where(.plot-d6a7b5) {
   --plot-background: white;
   display: block;
   height: auto;
@@ -20,7 +21,7 @@ test('main', async () => {
 :where(.plot-d6a7b5 text),
 :where(.plot-d6a7b5 tspan) {
   white-space: pre;
-}</style><g aria-label=\"y-axis label\" text-anchor=\"start\" transform=\"translate(-57,-17)\"><text y=\"0.71em\" transform=\"translate(60,20)\">Y</text></g><g aria-label=\"x-axis label\" text-anchor=\"end\" transform=\"translate(17,27)\"><text transform=\"translate(620,370)\">X</text></g></svg>`)
+}</style><g aria-label=\"y-axis label\" text-anchor=\"start\" transform=\"translate(-67,-27)\"><text y=\"0.71em\" transform=\"translate(70,30)\">Y</text></g><g aria-label=\"x-axis label\" text-anchor=\"end\" transform=\"translate(17,27)\"><text transform=\"translate(620,380)\">X</text></g></svg>`)
 })
 
 test('bar chart highlights missing rows with full-width non-overlapping row boxes', async () => {
@@ -42,6 +43,43 @@ test('bar chart highlights missing rows with full-width non-overlapping row boxe
   expect(result).toContain('width="624"')
   expect(result).toContain('y="30.5"')
   expect(result).toContain('height="45"')
+})
+
+test('default line charts allow enough left margin for large byte totals', async () => {
+  const result = await createChart(
+    [
+      { index: 0, count: 24_000_000 },
+      { index: 1, count: 36_000_000 },
+    ],
+    { marginLeft: 90, x: 'index', xLabel: 'Test Case Index', y: 'count', yLabel: 'String Object Size (bytes)' },
+  )
+  expect(result).toContain('aria-label="line"')
+  expect(result).toContain('30,000,000')
+  expect(result).toContain('translate(90,')
+})
+
+test.each([
+  { label: 'small values', values: [1, 4] },
+  { label: 'decimal values', values: [100, 103] },
+  { label: 'large values', values: [10_000_000, 40_000_000] },
+])('default line charts keep consistent space above the y-axis ticks for $label', async ({ label, values }) => {
+  const svg = await createChart(
+    values.map((count, index) => ({ count, index })),
+    { x: 'index', xLabel: 'Index', y: 'count', yLabel: 'Count' },
+  )
+  const document = new JSDOM(svg, { contentType: 'image/svg+xml' }).window.document
+  const yAxisLabel = document.querySelector('[aria-label="y-axis label"]')
+  const yAxisLabelText = yAxisLabel?.querySelector('text')
+  const yAxisTickLabels = [...document.querySelectorAll('[aria-label="y-axis tick label"] text')]
+  const topTick = yAxisTickLabels.reduce((top, tick) => {
+    const transform = tick.getAttribute('transform') || ''
+    const y = Number(transform.match(/,([\d.]+)\)$/)?.[1])
+    return Math.min(top, y)
+  }, Number.POSITIVE_INFINITY)
+
+  expect(yAxisLabel?.getAttribute('transform')).toBe('translate(-67,-27)')
+  expect(yAxisLabelText?.getAttribute('transform')).toBe('translate(70,30)')
+  expect(topTick).toBe(30)
 })
 
 test('memory comparison chart renders growth, shrinkage, byte formatting, inspected rows, and omissions', async () => {
@@ -330,6 +368,7 @@ test('cpu profile flame chart renders frames, ticks, labels, and tooltips', asyn
         hitCount: 1,
         location: 'file:///workbench.js:10:4',
         name: 'render<Workbench>',
+        originalLocation: 'src/workbench.ts:3:7',
         selfTimeMs: 2,
         startMs: 0,
         totalTimeMs: 5,
@@ -368,7 +407,8 @@ test('cpu profile flame chart renders frames, ticks, labels, and tooltips', asyn
   expect(result).toContain('CPU Profile Flame Chart')
   expect(result).toContain('5 ms')
   expect(result).toContain('render&lt;Workbench&gt;')
-  expect(result).toContain('Location: file:///workbench.js:10:4')
+  expect(result).toContain('Location: src/workbench.ts:3:7')
+  expect(result).toContain('Generated location: file:///workbench.js:10:4')
   expect(result).toContain('data-frame="0"')
   expect(result).toContain('data-frame="1"')
   expect(result).not.toContain('data-frame="2"')

@@ -15,8 +15,8 @@ const removeOptions = {
   retryDelay: 100,
 } as const
 
-export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
-  const workspace = join(Root.root, '.vscode-test-workspace')
+export const create = ({ electronApp, expect, ideVersion, page, platform, VError, workspacePath }: CreateParams) => {
+  const workspace = workspacePath ?? join(Root.root, '.vscode-test-workspace')
   return {
     async add(file: { name: string; content: string }) {
       const absolutePath = join(workspace, file.name)
@@ -50,7 +50,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       return workspace
     },
     getWorkspaceFilePath(relativePath: string): string {
-      const filePath = join(Root.root, '.vscode-test-workspace', relativePath)
+      const filePath = join(workspace, relativePath)
       return filePath
     },
     getWorkspacePath() {
