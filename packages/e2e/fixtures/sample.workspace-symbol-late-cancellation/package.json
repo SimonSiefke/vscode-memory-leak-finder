@@ -1,0 +1,26 @@
+{
+  "name": "workspace-symbol-late-cancellation",
+  "displayName": "Workspace Symbol Late Cancellation",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "workspace-symbol-late-cancellation.setup",
+        "title": "Workspace Symbol Late Cancellation: Setup"
+      },
+      {
+        "command": "workspace-symbol-late-cancellation.run",
+        "title": "Workspace Symbol Late Cancellation: Run"
+      },
+      {
+        "command": "workspace-symbol-late-cancellation.cleanup",
+        "title": "Workspace Symbol Late Cancellation: Cleanup"
+      }
+    ]
+  }
+}

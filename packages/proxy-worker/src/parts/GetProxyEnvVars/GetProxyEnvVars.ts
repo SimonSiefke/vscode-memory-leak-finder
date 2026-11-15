@@ -13,9 +13,10 @@ export const getProxyEnvVars = async (proxyUrl: string | null): Promise<Record<s
     envVars.NO_PROXY = noProxy
     envVars.no_proxy = noProxy
 
-    // Set NODE_EXTRA_CA_CERTS to trust our MITM proxy CA certificate
+    // Use the same proxy CA in Node.js and pip.
     const caCertPath = getCACertPath()
     envVars.NODE_EXTRA_CA_CERTS = caCertPath
+    envVars.PIP_CERT = caCertPath
 
     console.log(`[Proxy] Generated proxy environment variables: HTTP_PROXY=${proxyUrl}`)
     console.log(`[Proxy] Set NODE_EXTRA_CA_CERTS=${caCertPath}`)

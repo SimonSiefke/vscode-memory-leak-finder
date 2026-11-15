@@ -60,13 +60,6 @@ test('demonstrate improved undefined property detection', () => {
   expect(stringProp).toBeDefined()
   expect(stringProp!.value).toBe('"normalString"')
   expect(stringProp!.targetType).toBe('string')
-
-  console.log('\n=== OBJECT PROPERTY ANALYSIS ===')
-  console.log('Properties found:')
-  result!.properties.forEach((prop) => {
-    const valueDisplay = prop.value?.startsWith('[undefined ') ? `**${prop.value}**` : prop.value
-    console.log(`  ${prop.name}: ${valueDisplay} (${prop.targetType})`)
-  })
 })
 
 test('demonstrate undefined vs string undefined differences', () => {
@@ -125,12 +118,4 @@ test('demonstrate undefined vs string undefined differences', () => {
   expect(stringValueProp).toBeDefined()
   expect(stringValueProp!.value).toBe('"undefined"')
   expect(stringValueProp!.targetType).toBe('string')
-
-  console.log('\n=== UNDEFINED vs STRING "undefined" ===')
-  console.log('Now you can clearly see the difference:')
-  result!.properties.forEach((prop) => {
-    const typeIndicator = prop.targetType === 'hidden' ? ' (TRUE undefined value)' : ' (string containing "undefined")'
-    const valueDisplay = prop.value?.startsWith('[undefined ') ? prop.value : prop.value
-    console.log(`  ${prop.name}: ${valueDisplay} (${prop.targetType})${typeIndicator}`)
-  })
 })

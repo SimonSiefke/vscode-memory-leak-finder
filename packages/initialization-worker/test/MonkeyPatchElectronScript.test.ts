@@ -1,4 +1,6 @@
-import { expect, test } from '@jest/globals'
+import { EventEmitter } from 'node:events'
+import { runInNewContext } from 'node:vm'
+import { expect, jest, test } from '@jest/globals'
 import { getMonkeyPatchElectronSafeStorageScript } from '../src/parts/MonkeyPatchElectronSafeStorageScript/MonkeyPatchElectronSafeStorageScript.ts'
 import * as MonkeyPatchElectronScript from '../src/parts/MonkeyPatchElectronScript/MonkeyPatchElectronScript.ts'
 
@@ -47,4 +49,25 @@ test('getMonkeyPatchElectronSafeStorageScript - logs safeStorage read events', (
   expect(script).toContain('safeStorage encryptedStringBase64=')
   expect(script).toContain('safeStorage decryptedData=')
   expect(script).toContain('safeStorage self-test success=')
+})
+
+test('ready-event patch works without Promise.withResolvers in historical Electron', async () => {
+  const app = Object.assign(new EventEmitter(), {
+    whenReady: () => Promise.resolve('ready'),
+    isReady: () => false,
+    commandLine: { appendSwitch: jest.fn() },
+  })
+  const listener = jest.fn()
+  app.on('ready', listener)
+  const release = runInNewContext(
+    `Promise.withResolvers = undefined; (${MonkeyPatchElectronScript.monkeyPatchElectronScript}).call(electron)`,
+    { electron: { app } },
+  )
+  app.emit('ready', 'event')
+  expect(listener).not.toHaveBeenCalled()
+  expect(app.isReady()).toBe(false)
+  await release()
+  expect(app.isReady()).toBe(true)
+  expect(listener).toHaveBeenCalledWith('event')
+  await expect(app.whenReady()).resolves.toBe('ready')
 })

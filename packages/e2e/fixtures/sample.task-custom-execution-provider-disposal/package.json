@@ -1,0 +1,39 @@
+{
+  "name": "task-custom-execution-provider-disposal",
+  "displayName": "Task Custom Execution Provider Disposal",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "taskDefinitions": [
+      {
+        "type": "disposal-task",
+        "required": [
+          "task"
+        ],
+        "properties": {
+          "task": {
+            "type": "string"
+          }
+        }
+      }
+    ],
+    "commands": [
+      {
+        "command": "task-custom-execution-provider-disposal.setup",
+        "title": "Task Custom Execution Provider Disposal: Setup"
+      },
+      {
+        "command": "task-custom-execution-provider-disposal.run",
+        "title": "Task Custom Execution Provider Disposal: Run"
+      },
+      {
+        "command": "task-custom-execution-provider-disposal.cleanup",
+        "title": "Task Custom Execution Provider Disposal: Cleanup"
+      }
+    ]
+  }
+}

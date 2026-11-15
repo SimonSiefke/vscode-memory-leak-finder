@@ -27,6 +27,11 @@ export const loadSourceMap = async (url: string, hash: string): Promise<any> => 
         throw error
       }
     }
+  } else if (existsSync(originalPath)) {
+    // The normalized map and extracted sources are cached separately. Rebuild
+    // the extracted files from the original map when the normalized cache hits
+    // so a partial source cache restore cannot leave reports without frames.
+    await normalizeSourceMap(originalPath, outFilePath)
   }
   const data = await readJson(outFilePath)
   return data

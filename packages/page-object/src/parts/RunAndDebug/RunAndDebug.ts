@@ -395,17 +395,9 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         const stopButton = debugToolBar.locator('[aria-label^="Stop"]')
         await expect(stopButton).toBeVisible()
         await page.waitForIdle()
-        const quickPick = QuickPick.create({
-          electronApp,
-          expect,
-          ideVersion,
-          page,
-          platform,
-          VError,
-        })
-        await quickPick.executeCommand(WellKnownCommands.DebugStop)
+        await stopButton.click()
         await expect(stopButton).toBeHidden({
-          timeout: 5000,
+          timeout: 30_000,
         })
         await expect(debugToolBar).toBeHidden()
         await page.waitForIdle()
@@ -493,7 +485,8 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       await expect(sessionLabel).toBeVisible()
       await expect(sessionLabel).toHaveText(/Paused/)
       await page.waitForIdle()
-      const stackFrame = page.locator('.debug-call-stack .monaco-list-row.selected')
+      // The session row can remain selected after the debugger pauses.
+      const stackFrame = page.locator('.debug-call-stack .monaco-list-row:has(.stack-frame)').first()
       await expect(stackFrame).toBeVisible()
       await expect(stackFrame).toHaveAttribute('aria-label', getStackFrameLabelPattern(file, line))
       if (callStackSize) {
@@ -525,7 +518,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       await expect(sessionLabel).toBeVisible()
       await expect(sessionLabel).toHaveText(/Paused/)
       await page.waitForIdle()
-      const stackFrame = page.locator('.debug-call-stack .monaco-list-row.selected')
+      const stackFrame = page.locator('.debug-call-stack .monaco-list-row:has(.stack-frame)').first()
       await expect(stackFrame).toBeVisible()
       await expect(stackFrame).toHaveAttribute('aria-label', `Stack Frame <anonymous>, line ${line}, ${file}`)
       await page.waitForIdle()

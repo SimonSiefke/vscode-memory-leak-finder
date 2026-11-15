@@ -4,6 +4,7 @@ import { exec } from '../Exec/Exec.ts'
 import * as FileSystemWorker from '../FileSystemWorker/FileSystemWorker.ts'
 import { findPackageLockFiles } from '../FindPackageLockFiles/FindPackageLockFiles.ts'
 import * as GetNpmPathFromNvmrc from '../GetNpmPathFromNvmrc/GetNpmPathFromNvmrc.ts'
+import { getPnpmCommandArgs } from '../GetPnpmCommandArgs/GetPnpmCommandArgs.ts'
 import { hasCompleteTopLevelNodeModules } from '../HasCompleteTopLevelNodeModules/HasCompleteTopLevelNodeModules.ts'
 import * as Logger from '../Logger/Logger.ts'
 import * as Path from '../Path/Path.ts'
@@ -14,7 +15,7 @@ interface ExecOptions {
   reject: boolean
 }
 
-interface NpmCommand {
+interface InstallCommand {
   command: string
   args: string[]
   options: ExecOptions
@@ -26,15 +27,15 @@ interface ExecResult {
   stdout: string
 }
 
-const maxNpmCiAttempts = 3
-const npmCiRetryDelay = 2000
+const maxInstallAttempts = 3
+const installRetryDelay = 2000
 
 const sleep = async (ms: number): Promise<void> => {
   await new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 const getOutput = (stderr: string, stdout: string): string => {
-  return stderr || stdout || 'No npm output captured'
+  return stderr || stdout || 'No package manager output captured'
 }
 
 const getErrorOutput = (error: unknown): string => {
@@ -53,11 +54,11 @@ const getErrorOutput = (error: unknown): string => {
   return String(error)
 }
 
-const getCommandText = (command: NpmCommand): string => {
+const getCommandText = (command: InstallCommand): string => {
   return [command.command, ...command.args].join(' ')
 }
 
-const createNpmCommand = async (cwd: string, useNice: boolean, args: readonly string[]): Promise<NpmCommand> => {
+const createInstallCommand = async (cwd: string, useNice: boolean, args: readonly string[]): Promise<InstallCommand> => {
   const npmPath = await GetNpmPathFromNvmrc.getNpmPathFromNvmrc(cwd)
   const binDirname = getDirname(npmPath)
   const oldPath = process.env.PATH
@@ -90,42 +91,46 @@ const createNpmCommand = async (cwd: string, useNice: boolean, args: readonly st
   }
 }
 
-const throwNpmCiFailed = (cwd: string, command: NpmCommand, result: ExecResult): never => {
+const throwInstallFailed = (cwd: string, command: InstallCommand, result: ExecResult, operation: string): never => {
   const commandText = getCommandText(command)
   const output = getOutput(result.stderr, result.stdout)
   throw new Error(
-    `npm ci failed in directory '${cwd}' after ${maxNpmCiAttempts} attempts\nCommand: ${commandText}\nExit code: ${result.exitCode}\n${output}`,
+    `${operation} failed in directory '${cwd}' after ${maxInstallAttempts} attempts\nCommand: ${commandText}\nExit code: ${result.exitCode}\n${output}`,
   )
 }
 
-const throwNpmCiError = (cwd: string, command: NpmCommand, error: unknown): never => {
+const throwInstallError = (cwd: string, command: InstallCommand, error: unknown, operation: string): never => {
   const commandText = getCommandText(command)
   const output = getErrorOutput(error)
-  throw new Error(`npm ci failed in directory '${cwd}' after ${maxNpmCiAttempts} attempts\nCommand: ${commandText}\n${output}`)
+  throw new Error(`${operation} failed in directory '${cwd}' after ${maxInstallAttempts} attempts\nCommand: ${commandText}\n${output}`)
 }
 
-const doNpmCommand = async (cwd: string, useNice: boolean, args: readonly string[]): Promise<void> => {
-  const command = await createNpmCommand(cwd, useNice, args)
-  for (let attempt = 1; attempt <= maxNpmCiAttempts; attempt++) {
+const doInstallCommand = async (cwd: string, useNice: boolean, args: readonly string[], operation: string): Promise<void> => {
+  const command = await createInstallCommand(cwd, useNice, args)
+  if (operation === 'pnpm install') {
+    // VS Code's postinstall launches additional install roots. Freeze those too.
+    command.options.env.pnpm_config_frozen_lockfile = 'true'
+  }
+  for (let attempt = 1; attempt <= maxInstallAttempts; attempt++) {
     let result: ExecResult
     try {
       result = await exec(command.command, command.args, command.options)
     } catch (error) {
-      if (attempt === maxNpmCiAttempts) {
-        throwNpmCiError(cwd, command, error)
+      if (attempt === maxInstallAttempts) {
+        throwInstallError(cwd, command, error, operation)
       }
-      Logger.log(`[repository] npm ci failed in '${cwd}', retrying in 2 seconds... (attempt ${attempt}/${maxNpmCiAttempts})`)
-      await sleep(npmCiRetryDelay)
+      Logger.log(`[repository] ${operation} failed in '${cwd}', retrying in 2 seconds... (attempt ${attempt}/${maxInstallAttempts})`)
+      await sleep(installRetryDelay)
       continue
     }
     if (result.exitCode === 0) {
       return
     }
-    if (attempt === maxNpmCiAttempts) {
-      throwNpmCiFailed(cwd, command, result)
+    if (attempt === maxInstallAttempts) {
+      throwInstallFailed(cwd, command, result, operation)
     }
-    Logger.log(`[repository] npm ci failed in '${cwd}', retrying in 2 seconds... (attempt ${attempt}/${maxNpmCiAttempts})`)
-    await sleep(npmCiRetryDelay)
+    Logger.log(`[repository] ${operation} failed in '${cwd}', retrying in 2 seconds... (attempt ${attempt}/${maxInstallAttempts})`)
+    await sleep(installRetryDelay)
   }
 }
 
@@ -138,7 +143,8 @@ const getInstallArgs = (cwd: string): readonly string[] => {
 
 const installDependenciesInDirectory = async (cwd: string, useNice: boolean): Promise<void> => {
   try {
-    await doNpmCommand(cwd, useNice, getInstallArgs(cwd))
+    const pnpmArgs = await getPnpmCommandArgs(cwd, ['install', '--frozen-lockfile'])
+    await doInstallCommand(cwd, useNice, pnpmArgs ?? getInstallArgs(cwd), pnpmArgs ? 'pnpm install' : 'npm ci')
   } catch (error) {
     throw new VError(error, `Failed to install dependencies in directory '${cwd}'`)
   }
@@ -154,6 +160,10 @@ const getNestedPackageDirectories = async (cwd: string): Promise<readonly string
 }
 
 export const ensureNestedDependencies = async (cwd: string, useNice: boolean): Promise<number> => {
+  // pnpm's workspace install and VS Code's postinstall own the nested roots.
+  if (await FileSystemWorker.pathExists(Path.join(cwd, 'pnpm-lock.yaml'))) {
+    return 0
+  }
   const packageDirectories = await getNestedPackageDirectories(cwd)
   let installedCount = 0
   for (const packageDirectory of packageDirectories) {

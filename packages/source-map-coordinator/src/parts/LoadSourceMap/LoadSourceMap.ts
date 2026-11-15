@@ -19,12 +19,18 @@ const launchLoadSourceMapWorker = async () => {
   }
 }
 
-export const loadSourceMap = async (url: string, hash: string): Promise<any> => {
-  try {
-    await using rpc = await launchLoadSourceMapWorker()
-    const sourceMap = await rpc.invoke('LoadSourceMap.loadSourceMap', url, hash)
-    return sourceMap
-  } catch (error) {
-    throw new VError(error, `Failed to load source map for ${url}`)
+export const createSourceMapLoader = async () => {
+  const rpc = await launchLoadSourceMapWorker()
+  return {
+    async loadSourceMap(url: string, hash: string): Promise<any> {
+      try {
+        return await rpc.invoke('LoadSourceMap.loadSourceMap', url, hash)
+      } catch (error) {
+        throw new VError(error, `Failed to load source map for ${url}`)
+      }
+    },
+    async [Symbol.asyncDispose]() {
+      await rpc[Symbol.asyncDispose]()
+    },
   }
 }

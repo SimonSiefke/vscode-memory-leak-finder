@@ -1,3 +1,4 @@
+export * as AgentsWindow from '../AgentsWindow/AgentsWindow.ts'
 export * as ActivityBar from '../ActivityBar/ActivityBar.ts'
 export * as AccessibilityHelp from '../AccessibilityHelp/AccessibilityHelp.ts'
 export * as CallHierarchy from '../CallHierarchy/CallHierarchy.ts'

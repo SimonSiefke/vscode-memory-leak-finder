@@ -1,5 +1,9 @@
 import type { TestContext } from '../types.ts'
 
+// Flaky quick-pick visibility during Explorer setup on Linux CI; keep runnable locally.
+// https://github.com/SimonSiefke/vscode-memory-leak-finder/actions/runs/41893151874/job/126798192348
+export const skipInCi = process.platform === 'linux'
+
 export const setup = async ({ Explorer, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {

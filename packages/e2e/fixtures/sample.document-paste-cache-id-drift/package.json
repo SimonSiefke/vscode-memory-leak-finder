@@ -1,0 +1,26 @@
+{
+  "name": "document-paste-cache-id-drift",
+  "displayName": "Document Paste Cache Id Drift",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "document-paste-cache-id-drift.setup",
+        "title": "Document Paste Cache Id Drift: Setup"
+      },
+      {
+        "command": "document-paste-cache-id-drift.run",
+        "title": "Document Paste Cache Id Drift: Run"
+      },
+      {
+        "command": "document-paste-cache-id-drift.cleanup",
+        "title": "Document Paste Cache Id Drift: Cleanup"
+      }
+    ]
+  }
+}

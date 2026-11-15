@@ -1,0 +1,30 @@
+{
+  "name": "terminal-detach-reattach-lifecycle",
+  "displayName": "Terminal Detach Reattach Lifecycle",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "terminal-detach-reattach-lifecycle.setup",
+        "title": "Terminal Detach Reattach Lifecycle: Setup"
+      },
+      {
+        "command": "terminal-detach-reattach-lifecycle.run",
+        "title": "Terminal Detach Reattach Lifecycle: Run"
+      },
+      {
+        "command": "terminal-detach-reattach-lifecycle.cleanup",
+        "title": "Terminal Detach Reattach Lifecycle: Cleanup"
+      },
+      {
+        "command": "terminal-detach-reattach-lifecycle.verify",
+        "title": "Verify Persistent Terminal Identity"
+      }
+    ]
+  }
+}

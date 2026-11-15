@@ -1,0 +1,34 @@
+{
+  "name": "chat-participant-disposal",
+  "displayName": "Chat Participant Disposal",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "chatParticipants": [
+      {
+        "id": "chat-participant-disposal.participant",
+        "name": "disposal",
+        "fullName": "Disposal fixture",
+        "description": "Local registration lifecycle fixture"
+      }
+    ],
+    "commands": [
+      {
+        "command": "chat-participant-disposal.setup",
+        "title": "Chat Participant Disposal: Setup"
+      },
+      {
+        "command": "chat-participant-disposal.run",
+        "title": "Chat Participant Disposal: Run"
+      },
+      {
+        "command": "chat-participant-disposal.cleanup",
+        "title": "Chat Participant Disposal: Cleanup"
+      }
+    ]
+  }
+}

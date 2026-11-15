@@ -2,6 +2,7 @@ import type { NodePath, Visitor } from '@babel/core'
 import * as t from '@babel/types'
 
 export interface CreateAllocationWrapperPluginOptions {
+  readonly trackBytes?: boolean
   readonly allocationLocations?: Map<any, { line: number; column: number }>
   readonly scriptId?: number | string
 }
@@ -63,13 +64,14 @@ const getFactoryCallType = (path: NodePath<t.CallExpression>): string | undefine
 }
 
 export const createAllocationWrapperPlugin = (options: CreateAllocationWrapperPluginOptions): Visitor => {
-  const { allocationLocations = new Map(), scriptId = 123 } = options
+  const { allocationLocations = new Map(), scriptId = 123, trackBytes = false } = options
+  const trackerName = trackBytes ? 'trackAllocationBytes' : 'trackAllocation'
   const scriptIdNode = typeof scriptId === 'number' ? t.numericLiteral(scriptId) : t.stringLiteral(scriptId)
 
   const wrapAllocation = (path: NodePath<t.Expression>, type: string) => {
     const node = path.node
     const location = getLocation(node, allocationLocations)
-    const wrapped = t.callExpression(t.identifier('trackAllocation'), [
+    const wrapped = t.callExpression(t.identifier(trackerName), [
       node,
       scriptIdNode,
       t.numericLiteral(location.line),
@@ -78,6 +80,46 @@ export const createAllocationWrapperPlugin = (options: CreateAllocationWrapperPl
     ])
     path.replaceWith(wrapped)
     path.skip()
+  }
+
+  if (trackBytes) {
+    return {
+      // Visit children first so nested allocations get their own shallow size.
+      Expression: {
+        enter(path: NodePath<t.Expression>) {
+          if (t.isCallExpression(path.node) && isIdentifierNamed(path.node.callee, trackerName)) path.skip()
+        },
+        exit(path: NodePath<t.Expression>) {
+          const node = path.node
+          if (t.isArrayExpression(node)) wrapAllocation(path, 'Array')
+          else if (t.isObjectExpression(node)) wrapAllocation(path, 'Object')
+          else if (t.isNewExpression(node)) wrapAllocation(path, getNewExpressionType(node))
+          else if (t.isRegExpLiteral(node)) wrapAllocation(path, 'RegExp')
+          else if (t.isCallExpression(node)) {
+            const factoryType = getFactoryCallType(path as NodePath<t.CallExpression>)
+            if (factoryType) wrapAllocation(path, factoryType)
+            else if (
+              t.isIdentifier(node.callee) &&
+              ['String', 'Number', 'BigInt'].includes(node.callee.name) &&
+              !path.scope.getBinding(node.callee.name)
+            ) {
+              wrapAllocation(path, node.callee.name)
+            }
+          } else if (t.isTemplateLiteral(node) && node.expressions.length > 0 && !path.parentPath.isTaggedTemplateExpression()) {
+            wrapAllocation(path, 'Computed')
+          } else if (
+            t.isBinaryExpression(node) &&
+            !['in', 'instanceof', '==', '!=', '===', '!==', '<', '<=', '>', '>='].includes(node.operator)
+          ) {
+            wrapAllocation(path, 'Computed')
+          } else if (t.isAssignmentExpression(node) && !['=', '&&=', '||=', '??='].includes(node.operator)) {
+            wrapAllocation(path, 'Computed')
+          } else if (t.isUnaryExpression(node) && ['+', '-', '~'].includes(node.operator)) {
+            wrapAllocation(path, 'Computed')
+          }
+        },
+      },
+    }
   }
 
   const visitor: Visitor = {

@@ -5,8 +5,8 @@ import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as Root from '../Root/Root.ts'
 import * as WebView from '../WebView/WebView.ts'
 
-export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
-  const workspace = join(Root.root, '.vscode-test-workspace')
+export const create = ({ electronApp, expect, ideVersion, page, platform, VError, workspacePath }: CreateParams) => {
+  const workspace = workspacePath ?? join(Root.root, '.vscode-test-workspace')
 
   return {
     async addMarkdownCell() {
@@ -180,6 +180,24 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to scroll up in notebook`)
+      }
+    },
+    async focusReplInput() {
+      try {
+        const input = page.locator('.interactive-editor .input-cell-container :is(.native-edit-context, .inputarea)')
+        await expect(input).toBeVisible()
+        await input.focus()
+        await expect(input).toBeFocused()
+      } catch (error) {
+        throw new VError(error, 'Failed to focus REPL input')
+      }
+    },
+    async shouldHaveKernel(expectedKernel: string) {
+      try {
+        const kernelLabel = page.locator('.kernel-action-view-item .kernel-label')
+        await expect(kernelLabel).toHaveText(expectedKernel, { timeout: 30_000 })
+      } catch (error) {
+        throw new VError(error, `Failed to verify notebook kernel ${expectedKernel}`)
       }
     },
     async shouldHaveOutput(expectedOutput: string) {

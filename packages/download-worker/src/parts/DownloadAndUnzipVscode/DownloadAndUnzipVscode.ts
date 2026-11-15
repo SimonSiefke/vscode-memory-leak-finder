@@ -14,9 +14,14 @@ import * as VscodeTestCachePath from '../VscodeTestCachePath/VscodeTestCachePath
 
 const automaticallyDownloadSourceMaps = false
 const maxDownloadRetries = 3
+const transientDownloadErrorCodes = new Set([ErrorCodes.ECONNRESET, 'ETIMEDOUT', 'EAI_AGAIN', 'ECONNREFUSED', 'EPIPE'])
+const transientDownloadErrorMessages = ['Failed to get VS Code archive location']
 
 interface DownloadVSCodeOptions {
+  readonly arch: string
   readonly cachePath: string
+  readonly downloadPlatform: string
+  readonly platform: string
   readonly version: string
 }
 
@@ -32,22 +37,110 @@ const isObject = (value: unknown): value is Record<string, unknown> => {
   return typeof value === 'object' && value !== null
 }
 
-const isEconnresetError = (error: unknown): boolean => {
-  if (!isObject(error)) {
-    return false
+const getNestedErrors = (error: unknown, seen = new Set<unknown>()): unknown[] => {
+  if (error === null || error === undefined) {
+    return []
   }
-  return error.code === ErrorCodes.ECONNRESET || (typeof error.message === 'string' && error.message.includes(ErrorCodes.ECONNRESET))
+  if (!isObject(error)) {
+    return [error]
+  }
+  if (seen.has(error)) {
+    return []
+  }
+  seen.add(error)
+  const nested: unknown[] = []
+  if (Array.isArray(error.errors)) {
+    nested.push(...error.errors)
+  }
+  if (error.cause !== undefined) {
+    nested.push(error.cause)
+  }
+  return [error, ...nested.flatMap((item) => getNestedErrors(item, seen))]
+}
+
+const isTransientDownloadError = (error: unknown): boolean => {
+  return getNestedErrors(error).some((item) => {
+    if (typeof item === 'string') {
+      return transientDownloadErrorMessages.some((message) => item.includes(message))
+    }
+    if (!isObject(item)) {
+      return false
+    }
+    if (typeof item.code === 'string' && transientDownloadErrorCodes.has(item.code)) {
+      return true
+    }
+    const message = item.message
+    return (
+      typeof message === 'string' &&
+      ([...transientDownloadErrorCodes].some((code) => message.includes(code)) ||
+        transientDownloadErrorMessages.some((transientMessage) => message.includes(transientMessage)))
+    )
+  })
+}
+
+const getErrorDetails = (error: unknown): string => {
+  const details = getNestedErrors(error).map((item) => {
+    if (item instanceof Error) {
+      const code = isObject(item) && typeof item.code === 'string' ? ` (${item.code})` : ''
+      return `${item.name}: ${item.message}${code}`
+    }
+    return String(item)
+  })
+  return [...new Set(details)].join('; ') || String(error)
+}
+
+const getDownloadPlatform = (platform: string, arch: string): string => {
+  if (platform === 'win32') {
+    return arch === 'arm64' ? 'win32-arm64-archive' : 'win32-x64-archive'
+  }
+  if (platform === 'darwin') {
+    return arch === 'arm64' ? 'darwin-arm64' : 'darwin'
+  }
+  if (platform === 'linux') {
+    if (arch === 'arm64') {
+      return 'linux-arm64'
+    }
+    if (arch === 'arm') {
+      return 'linux-armhf'
+    }
+    return 'linux-x64'
+  }
+  return platform
 }
 
 const downloadAndUnzipVSCodeWithRetries = async (options: DownloadVSCodeOptions): Promise<string> => {
-  const { downloadAndUnzipVSCode } = await import('@vscode/test-electron')
+  const { downloadAndUnzipVSCode, makeConsoleReporter } = await import('@vscode/test-electron')
   for (let attempt = 0; ; attempt++) {
+    let reportedError: unknown
+    const consoleReporter = await makeConsoleReporter()
     try {
-      return await downloadAndUnzipVSCode(options)
+      return await downloadAndUnzipVSCode({
+        cachePath: options.cachePath,
+        platform: options.downloadPlatform,
+        version: options.version,
+        reporter: {
+          report(report) {
+            if ('error' in report) {
+              reportedError = report.error
+            }
+            consoleReporter.report(report)
+          },
+          error(error) {
+            reportedError ??= error
+            consoleReporter.error(error)
+          },
+        },
+      })
     } catch (error) {
-      if (!isEconnresetError(error) || attempt >= maxDownloadRetries) {
-        throw error
+      const attempts = attempt + 1
+      const failure = reportedError === undefined ? error : new AggregateError([error, reportedError], 'VS Code download failed')
+      if (!isTransientDownloadError(failure) || attempt >= maxDownloadRetries) {
+        throw new Error(
+          `VS Code ${options.version} download for ${options.platform}/${options.arch} failed after ${attempts} attempt(s): ${getErrorDetails(failure)}`,
+          { cause: failure },
+        )
       }
+      await new Promise((resolve) => setTimeout(resolve, 100 * 2 ** attempt))
     }
   }
 }
@@ -79,7 +172,10 @@ export const downloadAndUnzipVscode = async (options: DownloadAndUnzipVscodeOpti
       return cachedPath
     }
     const path = await downloadAndUnzipVSCodeWithRetries({
+      arch,
       cachePath: VscodeTestCachePath.vscodeTestCachePath,
+      downloadPlatform: getDownloadPlatform(platform, arch),
+      platform,
       version: vscodeVersion,
     })
     try {

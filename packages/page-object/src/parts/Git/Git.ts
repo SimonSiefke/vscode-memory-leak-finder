@@ -7,8 +7,8 @@ import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as Root from '../Root/Root.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
-  const workspace = join(Root.root, '.vscode-test-workspace')
+export const create = ({ electronApp, expect, ideVersion, page, platform, VError, workspacePath }: CreateParams) => {
+  const workspace = workspacePath ?? join(Root.root, '.vscode-test-workspace')
 
   return {
     async add() {

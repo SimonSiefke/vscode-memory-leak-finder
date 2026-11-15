@@ -1,0 +1,26 @@
+{
+  "name": "visible-status-bar-item-disposal",
+  "displayName": "Visible Status Bar Item Disposal",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "visible-status-bar-item-disposal.setup",
+        "title": "Visible Status Bar Item Disposal: Setup"
+      },
+      {
+        "command": "visible-status-bar-item-disposal.run",
+        "title": "Visible Status Bar Item Disposal: Run"
+      },
+      {
+        "command": "visible-status-bar-item-disposal.cleanup",
+        "title": "Visible Status Bar Item Disposal: Cleanup"
+      }
+    ]
+  }
+}

@@ -103,8 +103,8 @@ export interface ExternalRuntimeInfo {
   readonly serverPort: number
 }
 
-const workspacePath = join(Root.root, '.vscode-test-workspace')
-const projectCachePath = join(Root.root, '.vscode-project-cache')
+const defaultWorkspacePath = join(Root.root, '.vscode-test-workspace')
+const defaultProjectCachePath = join(Root.root, '.vscode-project-cache')
 const memoryLeakWorkerUrl = join(Root.root, 'packages', 'memory-leak-finder', 'bin', 'memory-leak-worker.ts')
 const connectDevtoolsCommand = 'ConnectDevtools.connectDevtools'
 const getHeapSnapshotForConnectionCommand = 'GetHeapSnapshotForConnection.getHeapSnapshotForConnection'
@@ -394,6 +394,8 @@ const populateProjectSetup = async ({
 }
 
 const prepareProjectSetup = async ({
+  workspacePath,
+  projectCachePath,
   entryFile,
   entrySource,
   env,
@@ -403,6 +405,8 @@ const prepareProjectSetup = async ({
   stderr,
   stdout,
 }: {
+  readonly workspacePath: string
+  readonly projectCachePath: string
   readonly entryFile: string | undefined
   readonly entrySource: string | undefined
   readonly env: Record<string, string>
@@ -610,7 +614,9 @@ const connectToInspector = async (runtimeName: RuntimeName, inspectPort: number)
   return createRpc(webSocket)
 }
 
-export const create = ({ externalInspectPort, subprocessRuntime = 'node' }: CreateParams) => {
+export const create = ({ externalInspectPort, subprocessRuntime = 'node', workspacePath: sampleWorkspacePath }: CreateParams) => {
+  const workspacePath = sampleWorkspacePath ?? defaultWorkspacePath
+  const projectCachePath = sampleWorkspacePath ? join(sampleWorkspacePath, '..', 'project-cache') : defaultProjectCachePath
   let activeRuntime: ExternalRuntimeHandle | undefined
 
   const getActiveRuntime = (): ExternalRuntimeHandle => {
@@ -694,6 +700,8 @@ export const create = ({ externalInspectPort, subprocessRuntime = 'node' }: Crea
       }
 
       await prepareProjectSetup({
+        workspacePath,
+        projectCachePath,
         entryFile,
         entrySource,
         env: runtimeEnv,

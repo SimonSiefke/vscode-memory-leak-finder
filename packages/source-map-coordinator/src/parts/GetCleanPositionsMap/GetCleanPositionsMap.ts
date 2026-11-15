@@ -21,6 +21,7 @@ export const getCleanPositionsMap = async (
   constructorNames = false,
 ): Promise<CleanPositionMap> => {
   await using sourceMapWorker = await launchSourceMapWorker()
+  await using sourceMapLoader = await LoadSourceMap.createSourceMapLoader()
   const cleanPositionMap: CleanPositionMap = Object.create(null)
   for (const [key, value] of Object.entries(sourceMapUrlMap)) {
     if (!key) {
@@ -29,7 +30,7 @@ export const getCleanPositionsMap = async (
     }
     try {
       const hash = Hash.hash(key)
-      const sourceMap = await LoadSourceMap.loadSourceMap(key, hash)
+      const sourceMap = await sourceMapLoader.loadSourceMap(key, hash)
       const originalPositions = await sourceMapWorker.invoke(
         'SourceMap.getCleanPositionsMap2',
         sourceMap,

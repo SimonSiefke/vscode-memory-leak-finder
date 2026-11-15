@@ -1,15 +1,7 @@
 import * as Assert from '../Assert/Assert.ts'
 import * as ImportTest from '../ImportTest/ImportTest.ts'
 import * as TestStage from '../TestStage/TestStage.ts'
-
-const hasChatTestFileName = (file: string): boolean => {
-  return (
-    file.includes('/chat-') ||
-    file.includes('\\chat-') ||
-    file.includes('/terminal-inline-chat-') ||
-    file.includes('\\terminal-inline-chat-')
-  )
-}
+import { testExclusionReason } from '../TestEligibility/TestEligibility.ts'
 
 // @ts-ignore
 export const setupTestWithCallback = async (pageObject, file, forceRun, isGithubActions, allowCopilotAuthInCi, runNetworkTestsAnyway) => {
@@ -21,15 +13,7 @@ export const setupTestWithCallback = async (pageObject, file, forceRun, isGithub
   // Assert.boolean(allowCopilotAuthInCi)
   const module = await ImportTest.importTest(file)
   const wasOriginallySkipped = Boolean(module.skip)
-  const isCi = isGithubActions
-  const requiresCopilotAuth = Boolean(module.requiresCopilotAuth) || hasChatTestFileName(file)
-  if (requiresCopilotAuth && isCi && !allowCopilotAuthInCi) {
-    return { error: null, skipped: true, wasOriginallySkipped }
-  }
-  if (module.requiresNetwork && isCi && !runNetworkTestsAnyway) {
-    return { error: null, skipped: true, wasOriginallySkipped }
-  }
-  if (module.skip && !forceRun) {
+  if (testExclusionReason(module, file, { isGithubActions, forceRun, allowCopilotAuthInCi, runNetworkTestsAnyway })) {
     return { error: null, skipped: true, wasOriginallySkipped }
   }
   try {

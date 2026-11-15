@@ -29,7 +29,12 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed clear filter output`)
       }
     },
-    async filter(filterValue: string) {
+    async shouldHaveText(text: RegExp, timeout = 30_000): Promise<void> {
+      const output = page.locator('.pane-body.output-view .view-lines')
+      await expect(output).toBeVisible()
+      await expect(output).toHaveText(text, { timeout })
+    },
+    async filter(filterValue: string, options: { timeout?: number } = {}) {
       try {
         await page.waitForIdle()
         const outputView = page.locator('.pane-body.output-view')
@@ -54,7 +59,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
             hasText: filterValue,
           })
           .first()
-        await expect(findMatch).toBeVisible()
+        await expect(findMatch).toBeVisible(options)
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to filter output`)

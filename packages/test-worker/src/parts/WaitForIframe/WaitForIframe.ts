@@ -104,6 +104,7 @@ export const waitForPage = async ({
   // Similar to waitForIframe but for a new page instead of an iframe
 
   const pageRpc = createSessionRpcConnection(browserRpc, sessionId)
+  await pageRpc.invoke('Runtime.runIfWaitingForDebugger', {})
 
   let pageUtilityContext = undefined
 
@@ -115,7 +116,6 @@ export const waitForPage = async ({
     const mainFrameId = frameTreeResult.frameTree.frame.id
     pageUtilityContext = await addUtilityExecutionContext(pageRpc, utilityExecutionContextName, mainFrameId)
   }
-  await pageRpc.invoke('Runtime.runIfWaitingForDebugger', {})
 
   const page = createPage({
     browserRpc,

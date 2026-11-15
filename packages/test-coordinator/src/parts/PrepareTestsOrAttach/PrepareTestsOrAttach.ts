@@ -22,6 +22,7 @@ export interface PrepareTestsAndAttachOptions {
   readonly downloadUserDataZipFileUrl: string
   readonly enableExtensions: boolean
   readonly enableProxy: boolean
+  readonly launchAgentWindow?: boolean | undefined
   readonly headlessMode: boolean
   readonly ide: string
   readonly ideVersion: string
@@ -67,6 +68,7 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
     downloadUserDataZipFileUrl,
     enableExtensions,
     enableProxy,
+    launchAgentWindow,
     headlessMode,
     ide,
     ideVersion,
@@ -111,6 +113,7 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
       downloadUserDataZipFileUrl,
       enableExtensions,
       enableProxy,
+      launchAgentWindow,
       headlessMode,
       ide,
       ideVersion,

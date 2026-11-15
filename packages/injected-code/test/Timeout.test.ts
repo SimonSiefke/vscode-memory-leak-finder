@@ -60,6 +60,21 @@ test('waitForMutation waits for the timeout when the target is unavailable', asy
   expect(jest.getTimerCount()).toBe(0)
 })
 
+test('waitForMutation runs in historical Chromium without Promise.withResolvers', async () => {
+  jest.useFakeTimers()
+  const descriptor = Object.getOwnPropertyDescriptor(Promise, 'withResolvers')!
+  Object.defineProperty(Promise, 'withResolvers', { value: undefined, configurable: true })
+  try {
+    globalThis.MutationObserver = FakeMutationObserver as unknown as typeof MutationObserver
+    const promise = Timeout.waitForMutation(document.body, 100)
+    FakeMutationObserver.instances[0].trigger()
+    await expect(promise).resolves.toBeUndefined()
+    expect(jest.getTimerCount()).toBe(0)
+  } finally {
+    Object.defineProperty(Promise, 'withResolvers', descriptor)
+  }
+})
+
 test('waitForMutation disconnects when mutation wins', async () => {
   jest.useFakeTimers()
   globalThis.MutationObserver = FakeMutationObserver as unknown as typeof MutationObserver

@@ -5,7 +5,8 @@
   "type": "module",
   "main": "src/main.ts",
   "scripts": {
-    "dev": "node src/main.ts"
+    "dev": "node src/main.ts",
+    "test": "node --experimental-vm-modules ../../node_modules/jest/bin/jest.js --config jest.config.js --runInBand --coverage=false"
   },
   "jest": {
     "testMatch": [
@@ -27,9 +28,10 @@
   },
   "dependencies": {
     "@babel/code-frame": "^7.29.7",
-    "@lvce-editor/rpc": "^6.22.0",
+    "@lvce-editor/rpc": "^6.23.0",
     "escape-html": "^1.0.3",
-    "pretty-bytes": "^7.2.0"
+    "pretty-bytes": "^7.2.0",
+    "source-map": "^0.6.1"
   },
   "devDependencies": {
     "@types/babel__code-frame": "^7.27.0",

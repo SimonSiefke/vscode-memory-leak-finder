@@ -1,0 +1,22 @@
+{
+  "name": "test-run-profile-disposal-sample",
+  "displayName": "test-run-profile-disposal-sample",
+  "publisher": "vscode-memory-leak-finder",
+  "version": "0.0.0",
+  "engines": {
+    "vscode": "^1.96.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "test_run_profile_disposal.run",
+        "title": "Test Run Profile: Run"
+      },
+      {
+        "command": "test_run_profile_disposal.cleanup",
+        "title": "Test Run Profile: Cleanup"
+      }
+    ]
+  }
+}

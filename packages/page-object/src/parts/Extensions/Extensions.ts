@@ -18,7 +18,7 @@ const nonBreakingSpace = String.fromCharCode(160)
 
 import type { CreateParams } from '../CreateParams/CreateParams.ts'
 
-export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
+export const create = ({ electronApp, expect, ideVersion, page, platform, VError, extensionsPath }: CreateParams) => {
   return {
     async add({ expectedName, path }: { path: string; expectedName: string }) {
       try {
@@ -27,7 +27,7 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         // TODO could create symlink also
         const absolutePath = join(Root.root, path)
         const base = basename(absolutePath)
-        const destination = join(Root.root, '.vscode-extensions', base)
+        const destination = join(extensionsPath ?? join(Root.root, '.vscode-extensions'), base)
         await cp(absolutePath, destination, { force: true, recursive: true })
         await page.waitForIdle()
         await this.show()
@@ -491,11 +491,11 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to show extensions view`)
       }
     },
-    async waitForProgressToBeHidden() {
+    async waitForProgressToBeHidden({ timeout = 30_000 }: { timeout?: number } = {}) {
       try {
         await page.waitForIdle()
         const progress = page.locator('.sidebar .monaco-progress-container')
-        await expect(progress).toBeHidden({ timeout: 30_000 })
+        await expect(progress).toBeHidden({ timeout })
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to hide progress`)

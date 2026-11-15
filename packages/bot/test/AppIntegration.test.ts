@@ -597,7 +597,7 @@ test('app reruns the latest authorized measure command when a pull request branc
   }
 })
 
-test('app posts a helpful error comment when no user data snapshot was uploaded yet', async () => {
+test.each([9003, 9003n])('app posts a helpful error comment with status ID %s when no snapshot was uploaded', async (statusCommentId) => {
   const storagePath = await mkdtemp(join(tmpdir(), 'bot-user-data-'))
   const env: BotEnv = {
     allMockDataR2ObjectKey: 'all-mock-data.zip',
@@ -632,7 +632,7 @@ test('app posts a helpful error comment when no user data snapshot was uploaded 
         createComment: async () => {
           return {
             data: {
-              id: 9003,
+              id: statusCommentId,
             },
           }
         },

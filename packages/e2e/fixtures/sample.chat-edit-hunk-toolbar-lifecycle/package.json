@@ -1,0 +1,61 @@
+{
+  "name": "chat-edit-hunk-toolbar-lifecycle",
+  "displayName": "Chat Edit Hunk Toolbar Lifecycle",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "enabledApiProposals": [
+    "chatParticipantAdditions",
+    "defaultChatParticipant"
+  ],
+  "contributes": {
+    "languageModelChatProviders": [
+      {
+        "vendor": "hunk-fixture",
+        "displayName": "Mock hunk model"
+      }
+    ],
+    "chatParticipants": [
+      {
+        "id": "chat-edit-hunk-toolbar-lifecycle.participant",
+        "name": "hunkfixture",
+        "fullName": "Mock hunk edits",
+        "description": "Deterministic local chat edit backend",
+        "isDefault": true,
+        "locations": [
+          "panel"
+        ],
+        "modes": [
+          "ask",
+          "edit",
+          "agent"
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "command": "chat-edit-hunk-toolbar-lifecycle.setup",
+        "title": "Chat Edit Hunk Toolbar Lifecycle: Setup"
+      },
+      {
+        "command": "chat-edit-hunk-toolbar-lifecycle.start",
+        "title": "Chat Edit Hunk Toolbar Lifecycle: Start"
+      },
+      {
+        "command": "chat-edit-hunk-toolbar-lifecycle.verify",
+        "title": "Chat Edit Hunk Toolbar Lifecycle: Verify"
+      },
+      {
+        "command": "chat-edit-hunk-toolbar-lifecycle.finish",
+        "title": "Chat Edit Hunk Toolbar Lifecycle: Finish"
+      },
+      {
+        "command": "chat-edit-hunk-toolbar-lifecycle.cleanup",
+        "title": "Chat Edit Hunk Toolbar Lifecycle: Cleanup"
+      }
+    ]
+  }
+}

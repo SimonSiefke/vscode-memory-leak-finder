@@ -4,6 +4,15 @@ import * as MeasureId from '../MeasureId/MeasureId.ts'
 // better to store before and after data on disk, and when comparing, read it from disk
 // comparison could also happen in another worker
 export const combine = (...measures: Dynamic[]) => {
+  const prepare = async () => {
+    let prepared = false
+    for (const measure of measures) {
+      if (measure.prepare) {
+        prepared = (await measure.prepare()) || prepared
+      }
+    }
+    return prepared
+  }
   const start = async () => {
     const beforeMap = Object.create(null)
     for (const measure of measures) {
@@ -47,6 +56,7 @@ export const combine = (...measures: Dynamic[]) => {
   return {
     compare,
     id: MeasureId.Combined,
+    prepare,
     releaseResources,
     runCompletion,
     start,

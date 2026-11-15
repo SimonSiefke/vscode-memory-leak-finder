@@ -189,23 +189,29 @@ export const typeAndWaitFor = async ({ locator, text, timeout = maxTimeout, wait
   Assert.object(locator)
   Assert.string(text)
   Assert.object(waitFor)
-  const exponentialFactor = 2
+  const queryRefreshInterval = 500
   const startTime = Time.getTimeStamp()
   const endTime = startTime + timeout
   let currentTime = startTime
   const toBeVisible = SingleElementConditionMap.getFunction('toBeVisible')
-  let current = 1
   const fn = ElementAction['setValue']
+  let typedElement: Element | undefined
+  let lastTypedAt = -Infinity
   while (currentTime < endTime) {
     const waitForElement = QuerySelector.querySelector(waitFor.selector)
     if (waitForElement && toBeVisible(waitForElement, {} as any)) {
       return
     }
     const element = QuerySelector.querySelector(locator.selector) as any
-    fn(element, { text: '' })
-    fn(element, { text })
-    current *= exponentialFactor
-    await Timeout.waitForMutation(document.body, current)
+    // Give debounced searches time to finish, but refresh empty/stale results
+    // after workspace changes or asynchronous provider initialization.
+    if (element && (typedElement !== element || element.value !== text || currentTime - lastTypedAt >= queryRefreshInterval)) {
+      fn(element, { text: '' })
+      fn(element, { text })
+      typedElement = element
+      lastTypedAt = currentTime
+    }
+    await Timeout.waitForMutation(document.body, Math.min(100, endTime - currentTime))
     currentTime = Time.getTimeStamp()
   }
   const message = `expected locator "${waitFor.selector}" to be visible within ${timeout}ms when typing "${text}"`

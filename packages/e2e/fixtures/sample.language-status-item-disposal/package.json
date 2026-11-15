@@ -1,0 +1,26 @@
+{
+  "name": "language-status-item-disposal",
+  "displayName": "Language Status Item Disposal",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "language-status-item-disposal.setup",
+        "title": "Language Status Item Disposal: Setup"
+      },
+      {
+        "command": "language-status-item-disposal.run",
+        "title": "Language Status Item Disposal: Run"
+      },
+      {
+        "command": "language-status-item-disposal.cleanup",
+        "title": "Language Status Item Disposal: Cleanup"
+      }
+    ]
+  }
+}
