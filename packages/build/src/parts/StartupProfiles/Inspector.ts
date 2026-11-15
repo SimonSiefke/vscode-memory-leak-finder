@@ -4,10 +4,15 @@ export class Inspector {
   private nextId = 0
   private pending = new Map<number, { resolve: (value: any) => void; reject: (error: Error) => void; timer: NodeJS.Timeout }>()
   private socket: WebSocket
+  private readonly eventListeners = new Map<string, Set<(params: any) => void>>()
   private constructor(socket: WebSocket) {
     this.socket = socket
     socket.on('message', (data) => {
       const message = JSON.parse(data.toString())
+      if (message.method) {
+        for (const listener of this.eventListeners.get(message.method) || []) listener(message.params)
+        return
+      }
       const request = this.pending.get(message.id)
       if (!request) return
       clearTimeout(request.timer)
@@ -44,6 +49,18 @@ export class Inspector {
       this.pending.set(id, { resolve, reject, timer })
       this.socket.send(JSON.stringify({ id, method, params }))
     })
+  }
+  on(method: string, listener: (params: any) => void): void {
+    const listeners = this.eventListeners.get(method) || new Set()
+    listeners.add(listener)
+    this.eventListeners.set(method, listeners)
+  }
+  async startProfiling(): Promise<void> {
+    await this.invoke('Debugger.enable')
+    // Collect scriptParsed events without stopping inspect-brk processes at their first statement.
+    await this.invoke('Debugger.setSkipAllPauses', { skip: true })
+    await this.invoke('Profiler.enable')
+    await this.invoke('Profiler.start')
   }
   dispose(): void {
     this.rejectPending(new Error('Inspector disposed'))

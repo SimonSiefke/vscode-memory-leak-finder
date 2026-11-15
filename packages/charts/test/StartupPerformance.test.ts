@@ -2,6 +2,8 @@ import { expect, test } from '@jest/globals'
 import { mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import { pathToFileURL } from 'node:url'
+import { SourceMapGenerator } from 'source-map'
 import { aggregate, profileCosts, sampleDurations, type Profile } from '../src/parts/StartupPerformance/Aggregate.ts'
 import { generateStartupPerformance } from '../src/parts/StartupPerformance/StartupPerformance.ts'
 import { applySiteLayout } from '../src/parts/ApplySiteLayout/ApplySiteLayout.ts'
@@ -80,6 +82,7 @@ test('startup report publishes four processes, raw evidence, failures and naviga
     expect(html).toContain('capture &lt;failed&gt;')
     expect(html).not.toContain('<script>')
     expect(html).toContain('&lt;script&gt;')
+    expect(html).toContain('<pre>(root)\n&lt;script&gt; (work.js:3:4)</pre>')
     expect(html).toContain('not an averaged timeline')
     for (const name of Object.keys(profiles)) {
       expect(html).toContain(`id="${name}"`)
@@ -100,6 +103,63 @@ test('empty results still provide an honest startup navigation destination', asy
     const html = await readFile(join(root, 'report', 'index.html'), 'utf8')
     expect(html.match(/No startup profiles have been collected/g)).toHaveLength(4)
     expect(html).not.toContain('src="./main.svg"')
+  } finally {
+    await rm(root, { recursive: true, force: true })
+  }
+})
+
+test('startup report uses source-mapped stack frame locations and keeps raw profiles unchanged', async () => {
+  const root = await mkdtemp(join(tmpdir(), 'startup-source-map-'))
+  try {
+    const results = join(root, 'results')
+    const output = join(root, 'report')
+    await mkdir(join(results, 'run-1'), { recursive: true })
+    const bundle = join(root, 'workbench.js')
+    const sourceMapPath = `${bundle}.map`
+    await writeFile(bundle, '')
+    const generator = new SourceMapGenerator({ file: 'workbench.js' })
+    generator.addMapping({ generated: { line: 3, column: 4 }, original: { line: 17, column: 8 }, source: 'src/workbench.ts' })
+    await writeFile(sourceMapPath, generator.toString())
+    const scriptMap = { '1': { url: pathToFileURL(bundle).toString(), sourceMapUrl: 'workbench.js.map' } }
+    const mappedProfile: Profile = {
+      nodes: [
+        { id: 1, callFrame: { functionName: '(root)', url: '', lineNumber: -1, columnNumber: -1 }, children: [2] },
+        { id: 2, callFrame: { functionName: 'startup', url: scriptMap['1'].url, lineNumber: 2, columnNumber: 3 } },
+      ],
+      samples: [2],
+      timeDeltas: [1000],
+    }
+    const profiles = Object.fromEntries(
+      ['renderer', 'main', 'shared-process', 'extension-host'].map((name) => [
+        name,
+        { file: `run-1/${name}.cpuprofile`, scriptMap: `run-1/${name}-script-map.json` },
+      ]),
+    )
+    for (const name of Object.keys(profiles)) {
+      await writeFile(join(results, profiles[name].file), JSON.stringify(mappedProfile))
+      await writeFile(join(results, profiles[name].scriptMap), JSON.stringify(scriptMap))
+    }
+    await writeFile(
+      join(results, 'manifest.json'),
+      JSON.stringify({
+        samples: 1,
+        generatedAt: 'test',
+        environment: {},
+        version: 'test',
+        workload: 'test',
+        cachePolicy: 'test',
+        boundary: 'test',
+        overhead: 'test',
+        runs: [{ run: 1, profiles }],
+      }),
+    )
+
+    await generateStartupPerformance(results, output)
+
+    const html = await readFile(join(output, 'index.html'), 'utf8')
+    expect(html).toContain('startup (src/workbench.ts:17:9)')
+    expect(await readFile(join(output, profiles.renderer.file), 'utf8')).toBe(JSON.stringify(mappedProfile))
+    expect(JSON.parse(await readFile(join(output, profiles.renderer.scriptMap), 'utf8'))).toEqual(scriptMap)
   } finally {
     await rm(root, { recursive: true, force: true })
   }
