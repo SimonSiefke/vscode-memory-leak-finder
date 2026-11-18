@@ -30,6 +30,7 @@ const isStackLine = (line: string): boolean => {
 
 interface ReadableStreamLike {
   on(event: 'data', listener: (data: string) => void): unknown
+  resume?(): unknown
 }
 
 export const getElectronErrorMessage = async (firstData: string, stream?: ReadableStreamLike, signal?: AbortSignal): Promise<Error> => {
@@ -43,7 +44,9 @@ export const getElectronErrorMessage = async (firstData: string, stream?: Readab
     if (!stream) {
       throw new Error('Stream is required when App threw an error during load')
     }
-    const dataEvents = await once(stream as NodeJS.ReadableStream, 'data', signal ? { signal } : {})
+    const nextData = once(stream as NodeJS.ReadableStream, 'data', signal ? { signal } : {})
+    stream.resume?.()
+    const dataEvents = await nextData
     const secondData = dataEvents[0] as string
     const lines = secondData.trim().split('\n')
     if (RE_ES_MODULES_NOT_SUPPORTED.test(secondData)) {

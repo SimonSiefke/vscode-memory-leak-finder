@@ -60,3 +60,49 @@ test('partial startup error shares the output deadline and cleans up its listene
   expect(stream.eventNames()).toEqual([])
   expect(jest.getTimerCount()).toBe(0)
 })
+
+test('buffered stderr keeps the DevTools endpoint while an ignored warning is checked', async () => {
+  jest.useFakeTimers()
+  const { PassThrough } = await import('node:stream')
+  const { waitForDevtoolsListening } = await import('../src/parts/WaitForDevtoolsListening/WaitForDevtoolsListening.ts')
+  const stream = new PassThrough({ objectMode: true })
+  stream.write('Debugger attached.')
+  stream.write('DevTools listening on ws://localhost:9222/devtools/browser/test\n')
+  const result = waitForDevtoolsListening(stream)
+  const settled = result.then(
+    (value) => value,
+    (error: Error) => error.message,
+  )
+  await jest.advanceTimersByTimeAsync(300000)
+  expect(await settled).toBe('ws://localhost:9222/devtools/browser/test')
+  expect(stream.listenerCount('data')).toBe(0)
+  expect(jest.getTimerCount()).toBe(0)
+  stream.destroy()
+})
+
+test('buffered stderr survives the handoff from the debugger reader to the DevTools reader', async () => {
+  jest.useFakeTimers()
+  const { PassThrough } = await import('node:stream')
+  const { waitForDebuggerListening } = await import('../src/parts/WaitForDebuggerListening/WaitForDebuggerListening.ts')
+  const { waitForDevtoolsListening } = await import('../src/parts/WaitForDevtoolsListening/WaitForDevtoolsListening.ts')
+  const stream = new PassThrough({ objectMode: true })
+  stream.write('Debugger listening on ws://localhost:1234\n')
+  stream.write('DevTools listening on ws://localhost:9222/devtools/browser/test\n')
+  expect(await waitForDebuggerListening(stream)).toBe('ws://localhost:1234')
+  const settled = waitForDevtoolsListening(stream).catch((error: Error) => error.message)
+  await jest.advanceTimersByTimeAsync(300000)
+  expect(await settled).toBe('ws://localhost:9222/devtools/browser/test')
+  expect(stream.listenerCount('data')).toBe(0)
+  stream.destroy()
+})
+
+test('buffered startup errors still read the following stack after pausing stderr', async () => {
+  const { PassThrough } = await import('node:stream')
+  const { waitForDevtoolsListening } = await import('../src/parts/WaitForDevtoolsListening/WaitForDevtoolsListening.ts')
+  const stream = new PassThrough({ objectMode: true })
+  stream.write('App threw an error during load\n')
+  stream.write('ReferenceError: startup failed\n    at main.js:1:1\n')
+  await expect(waitForDevtoolsListening(stream)).rejects.toThrow('App threw an error during load: ReferenceError: startup failed')
+  expect(stream.listenerCount('data')).toBe(0)
+  stream.destroy()
+})
