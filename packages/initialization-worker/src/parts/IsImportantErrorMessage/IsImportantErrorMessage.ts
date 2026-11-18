@@ -1,7 +1,13 @@
 const RE_LIB_GIO_PROXY_ERROR = /Failed to load module: .*libgiolibproxy.so/
 const RE_LIB_PROXY_NOT_FOUND = /not found \(required by .*libproxy.so/
 
+const RE_INACTIVE_COMPILE_CACHE = /^The packaged Node\.js compile cache for \S+ is not active \(status: [^\r\n]+\)\.$/
+
 export const isImportantErrorMessage = (data: string): boolean => {
+  const lines = data.trim().split(/\r?\n/)
+  if (lines.every((line) => RE_INACTIVE_COMPILE_CACHE.test(line))) {
+    return false
+  }
   if (data.includes('libva error')) {
     return false
   }

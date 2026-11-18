@@ -22,6 +22,52 @@ const getError = async (fn: any): Promise<any> => {
 const crashReportWarning =
   '(electron) Sending uncompressed crash reports is deprecated and will be removed in a future version of Electron. Set { compress: true } to opt-in to the new behavior. Crash reports will be uploaded gzipped, which most crash reporting servers support.\n'
 
+const compileCacheWarning =
+  'The packaged Node.js compile cache for main is not active (status: disabled, configured: /test/resources/app/node-compile-cache/main, active: none).\n'
+
+test('waitForDevtoolsListening - ignores the packaged compile cache warning', async () => {
+  const stream = new EventEmitter()
+  const webSocketUrl = 'ws://127.0.0.1:43293/devtools/browser/test'
+  const result = WaitForDevtoolsListening.waitForDevtoolsListening(stream)
+
+  setImmediate(() => {
+    stream.emit('data', compileCacheWarning)
+    setImmediate(() => {
+      stream.emit('data', `DevTools listening on ${webSocketUrl}\n`)
+    })
+  })
+
+  await expect(result).resolves.toBe(webSocketUrl)
+  expect(stream.eventNames()).toEqual([])
+})
+
+test('waitForDevtoolsListening - reports launch errors after the packaged compile cache warning', async () => {
+  const stream = new EventEmitter()
+  const result = WaitForDevtoolsListening.waitForDevtoolsListening(stream)
+
+  setImmediate(() => {
+    stream.emit('data', compileCacheWarning)
+    setImmediate(() => {
+      stream.emit('data', 'Error launching app\nUnable to find Electron app at /test/not-found\n')
+    })
+  })
+
+  await expect(result).rejects.toThrow('Error launching app: Unable to find Electron app at /test/not-found')
+  expect(stream.eventNames()).toEqual([])
+})
+
+test('waitForDevtoolsListening - reports errors sharing a chunk with the packaged compile cache warning', async () => {
+  const stream = new EventEmitter()
+  const result = WaitForDevtoolsListening.waitForDevtoolsListening(stream)
+
+  setImmediate(() => {
+    stream.emit('data', `${compileCacheWarning}Error launching app\nUnable to find Electron app at /test/not-found\n`)
+  })
+
+  await expect(result).rejects.toThrow('Unable to find Electron app at /test/not-found')
+  expect(stream.eventNames()).toEqual([])
+})
+
 test('waitForDevtoolsListening - ignores the uncompressed crash report deprecation warning', async () => {
   const stream = new EventEmitter()
   const webSocketUrl = 'ws://127.0.0.1:43293/devtools/browser/01f4838d-0a5e-43dd-8404-f8a1ba2e4ace'
