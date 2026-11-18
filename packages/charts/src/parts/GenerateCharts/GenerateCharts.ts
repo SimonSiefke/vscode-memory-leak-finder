@@ -54,7 +54,7 @@ const getComparisonDataByFilename = (comparisonData: readonly any[]): Map<string
 }
 
 export const getMapAndSetSizeChartPath = (processType: string, chartName: string, filename: string): string => {
-  return join(Root.root, '.vscode-charts', `${processType}-${chartName}-${filename}.svg`)
+  return join(Root.root, '.vscode-charts', 'map-and-set-size', `${processType}-${chartName}-${filename}.svg`)
 }
 
 export const cleanMapAndSetSizeCharts = async (chartsRoot: string): Promise<void> => {
