@@ -167,6 +167,17 @@ export const getExtensionHostOverviewHtml = (charts: readonly { folder: string; 
   )
 }
 
+export const getOverviewHtml = (dirents: string[], hasMapAndSetSizeCharts: boolean, hasExtensionHost: boolean): string => {
+  let middleHtml = getMiddleHtml(dirents)
+  if (hasMapAndSetSizeCharts) {
+    middleHtml += '\n<p><a href="./map-and-set-size/index.html">Map and Set size charts</a></p>'
+  }
+  if (hasExtensionHost) {
+    middleHtml += '\n<p><a href="./extension-host/index.html">Extension host charts</a></p>'
+  }
+  return getBaseStructure('VSCode Memory Leak Finder Charts').replace('CONTENT', middleHtml)
+}
+
 const generateExtensionHostOverview = async (chartsPath: string): Promise<boolean> => {
   const extensionHostPath = join(chartsPath, 'extension-host')
   if (!existsSync(extensionHostPath)) {
@@ -207,11 +218,9 @@ export const generateIndexHtml = async (): Promise<void> => {
   await CopyAssetsToFolder.copyAssetsToFolder(svgPath)
 
   const dirents = await readdir(svgPath)
-  let middleHtml = getMiddleHtml(dirents)
-  if (await generateExtensionHostOverview(svgPath)) {
-    middleHtml += '\n<p><a href="./extension-host/index.html">Extension host charts</a></p>'
-  }
-  const html = getBaseStructure('VSCode Memory Leak Finder Charts').replace('CONTENT', middleHtml)
+  const hasMapAndSetSizeCharts = existsSync(join(svgPath, 'map-and-set-size'))
+  const hasExtensionHost = await generateExtensionHostOverview(svgPath)
+  const html = getOverviewHtml(dirents, hasMapAndSetSizeCharts, hasExtensionHost)
   await writeFile(outPath, html)
 
   // Generate index.html for subfolders that contain multiple SVG files
