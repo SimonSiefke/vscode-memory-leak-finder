@@ -178,12 +178,13 @@ export const getOverviewHtml = (dirents: string[], hasMapAndSetSizeCharts: boole
   return getBaseStructure('VSCode Memory Leak Finder Charts').replace('CONTENT', middleHtml)
 }
 
-const generateExtensionHostOverview = async (chartsPath: string): Promise<boolean> => {
+export const generateExtensionHostOverview = async (chartsPath: string): Promise<boolean> => {
   const extensionHostPath = join(chartsPath, 'extension-host')
   if (!existsSync(extensionHostPath)) {
     return false
   }
   const entries = await readdir(extensionHostPath, { withFileTypes: true })
+  const hasRootLevelCharts = entries.some((entry) => entry.isFile() && entry.name.endsWith('.svg'))
   const charts: { folder: string; files: string[] }[] = []
   for (const entry of entries) {
     if (!entry.isDirectory()) {
@@ -197,7 +198,9 @@ const generateExtensionHostOverview = async (chartsPath: string): Promise<boolea
     }
   }
   if (charts.length === 0) {
-    return false
+    // The recursive index generator creates extension-host/index.html for SVGs
+    // stored directly in this directory, so the root overview must link to it.
+    return hasRootLevelCharts
   }
   await CopyAssetsToFolder.copyAssetsToFolder(extensionHostPath)
   await writeFile(join(extensionHostPath, 'index.html'), getExtensionHostOverviewHtml(charts))
