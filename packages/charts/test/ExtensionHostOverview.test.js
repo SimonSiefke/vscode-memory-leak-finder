@@ -1,5 +1,28 @@
 import { expect, test } from '@jest/globals'
-import { getExtensionHostOverviewHtml } from '../src/parts/GenerateIndexHtml/GenerateIndexHtml.ts'
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+import {
+  generateExtensionHostOverview,
+  getExtensionHostOverviewHtml,
+  getOverviewHtml,
+} from '../src/parts/GenerateIndexHtml/GenerateIndexHtml.ts'
+
+test('extension-host root charts are linked from the process overview', async () => {
+  const chartsRoot = await mkdtemp(join(tmpdir(), 'extension-host-overview-'))
+  try {
+    const extensionHostPath = join(chartsRoot, 'extension-host')
+    await mkdir(extensionHostPath)
+    await writeFile(join(extensionHostPath, 'array-count.svg'), '')
+
+    const hasExtensionHostOverview = await generateExtensionHostOverview(chartsRoot)
+    const html = getOverviewHtml(['heap-size.svg'], false, hasExtensionHostOverview)
+
+    expect(html).toContain('<a href="./extension-host/index.html">Extension host charts</a>')
+  } finally {
+    await rm(chartsRoot, { recursive: true, force: true })
+  }
+})
 
 test('extension-host overview links only to generated measure chart folders', () => {
   const html = getExtensionHostOverviewHtml([
