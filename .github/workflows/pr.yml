@@ -52,7 +52,7 @@ jobs:
       - run: npm run lint
       - run: npm run build
       - run: npm test
-      - name: Prepare short Inbox runtime directory
+      - name: Prepare short VS Code runtime directory
         if: runner.os == 'Linux'
         shell: bash
         run: |
@@ -76,6 +76,11 @@ jobs:
         uses: coactions/setup-xvfb@v1
         with:
           run: node packages/cli/bin/test.js --only tree-view-refresh-lifecycle-churn --enable-extensions --run-skipped-tests-anyway --runs 2 --vscode-version 1.145.0
+      - name: Run HTML completion language server regression
+        if: matrix.os == 'ubuntu-24.04'
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: node packages/cli/bin/test.js --only html-completion --run-skipped-tests-anyway --enable-extensions --inspect-process htmlServerMain --measure named-function-count3 --check-leaks --measure-after --runs 2 --workers 1
       - name: Run headless test (with videos)
         if: matrix.os != 'macos-26'
         uses: coactions/setup-xvfb@v1
