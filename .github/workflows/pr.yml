@@ -73,9 +73,14 @@ jobs:
       - name: Run tree view refresh lifecycle regression
         if: matrix.os == 'ubuntu-24.04'
         timeout-minutes: 10
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: node packages/cli/bin/test.js --only tree-view-refresh-lifecycle-churn --enable-extensions --run-skipped-tests-anyway --runs 2 --vscode-version 1.145.0
+        shell: bash
+        run: |
+          FORCE_COLOR=0 xvfb-run --auto-servernum node packages/cli/bin/test.js \
+            --only tree-view-refresh-lifecycle-churn --enable-extensions \
+            --run-skipped-tests-anyway --runs 2 --vscode-version 1.145.0 \
+            | tee "$RUNNER_TEMP/tree-view-refresh-lifecycle.log"
+          # The opt-in scenario can report a skipped failure with exit status zero.
+          grep -Fx 'Test Suites: 1 passed, 1 total' "$RUNNER_TEMP/tree-view-refresh-lifecycle.log"
       - name: Run HTML completion language server regression
         if: matrix.os == 'ubuntu-24.04'
         uses: coactions/setup-xvfb@v1

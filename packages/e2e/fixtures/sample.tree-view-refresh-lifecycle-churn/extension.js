@@ -24,6 +24,11 @@ class RefreshingTreeProvider {
     return this.items
   }
 
+  getParent() {
+    // Every row is a root, but TreeView.reveal still requires this method.
+    return undefined
+  }
+
   getTreeItem(element) {
     return new vscode.TreeItem(element.label, vscode.TreeItemCollapsibleState.None)
   }
