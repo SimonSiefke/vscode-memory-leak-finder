@@ -19,16 +19,8 @@ export const create = ({ expect, platform, page, VError, electronApp, ideVersion
     await page.waitForIdle()
     const contextMenu = ContextMenu.create({ electronApp, expect, ideVersion, page, platform, VError })
     await contextMenu.open(titleBar.locator('.titlebar-container'))
-    await contextMenu.selectAndClose(text)
+    await contextMenu.select(text)
     await page.waitForIdle()
-  }
-
-  const toggleAccountsWidget = async () => {
-    const manage = page.locator('.part.titlebar .action-label[aria-label^="Manage"]')
-    await expect(manage).toBeVisible()
-    const contextMenu = ContextMenu.create({ electronApp, expect, ideVersion, page, platform, VError })
-    await contextMenu.open(manage)
-    await contextMenu.selectAndClose('Accounts')
   }
 
   return {
@@ -54,19 +46,6 @@ export const create = ({ expect, platform, page, VError, electronApp, ideVersion
         throw new VError(error, `Failed to ensure title bar layout controls are visible`)
       }
     },
-    async ensureAccountsWidgetVisible() {
-      try {
-        // The layout command can return before the title bar activity actions render.
-        await expect(page.locator('.part.titlebar .action-label[aria-label^="Manage"]')).toBeVisible()
-        const accountsWidget = page.locator('.part.titlebar .action-label[aria-label^="Accounts"]')
-        if (!(await accountsWidget.isVisible())) {
-          await toggleAccountsWidget()
-        }
-        await expect(accountsWidget).toBeVisible()
-      } catch (error) {
-        throw new VError(error, `Failed to ensure title bar accounts widget is visible`)
-      }
-    },
     async hideCommandCenter() {
       try {
         const commandCenter = page.locator('.part.titlebar .command-center')
@@ -85,17 +64,6 @@ export const create = ({ expect, platform, page, VError, electronApp, ideVersion
         await expect(layoutControl).toBeHidden()
       } catch (error) {
         throw new VError(error, `Failed to hide title bar layout controls`)
-      }
-    },
-    async hideAccountsWidget() {
-      try {
-        const accountsWidget = page.locator('.part.titlebar .action-label[aria-label^="Accounts"]')
-        await expect(accountsWidget).toBeVisible()
-        await toggleAccountsWidget()
-        await page.waitForIdle()
-        await expect(accountsWidget).toBeHidden()
-      } catch (error) {
-        throw new VError(error, `Failed to hide title bar accounts widget`)
       }
     },
     async toggleMenuBar() {
@@ -157,16 +125,6 @@ export const create = ({ expect, platform, page, VError, electronApp, ideVersion
         await expect(layoutControl).toBeVisible()
       } catch (error) {
         throw new VError(error, `Failed to show title bar layout controls`)
-      }
-    },
-    async showAccountsWidget() {
-      try {
-        const accountsWidget = page.locator('.part.titlebar .action-label[aria-label^="Accounts"]')
-        await expect(accountsWidget).toBeHidden()
-        await toggleAccountsWidget()
-        await expect(accountsWidget).toBeVisible()
-      } catch (error) {
-        throw new VError(error, `Failed to show title bar accounts widget`)
       }
     },
     async hideMenu(text: string) {

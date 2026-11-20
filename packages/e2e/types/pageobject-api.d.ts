@@ -66,6 +66,7 @@ export interface AgentsWindow {
   archiveChat(title: string): Promise<void>
   selectNoWorkspace(): Promise<void>
   shouldBeVisible(): Promise<void>
+  shouldHaveTitleBarAccountWidgetVisibility(visible: boolean): Promise<void>
   newChat(): Promise<void>
   shouldHaveNewChat(): Promise<void>
   typeDraft(message: string): Promise<void>

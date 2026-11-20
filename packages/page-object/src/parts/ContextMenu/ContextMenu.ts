@@ -116,17 +116,17 @@ export const create = ({ expect, page, VError }: CreateParams) => {
       const contextMenu = page.locator('.context-view.monaco-menu-container .actions-container')
       await expect(contextMenu).toBeVisible()
       await expect(contextMenu).toBeFocused()
-      const contextMenuItem = contextMenu.locator('.action-menu-item', {
+      const contextMenuItem = contextMenu.locator('.action-item', {
         hasText: option,
       })
-      await expect(contextMenuItem).toBeVisible()
-      // Wait on the renderer's clock so its delayed menu mouse handler is installed first.
-      await page.evaluate({ expression: 'new Promise(resolve => setTimeout(resolve, 150))', awaitPromise: true })
-      await contextMenuItem.click()
-      // Menu mouse-up handlers queue the action in the renderer's next timer turn.
-      await page.evaluate({ expression: 'new Promise(resolve => setTimeout(resolve, 0))', awaitPromise: true })
-      await page.waitForIdle()
-      if (await contextMenu.isVisible()) {
+      try {
+        await contextMenuItem.clickExponential({
+          waitForHidden: contextMenu,
+        })
+      } catch (error) {
+        if (!(await contextMenu.isVisible())) {
+          throw error
+        }
         await page.keyboard.press('Escape')
       }
       await expect(contextMenu).toBeHidden()
