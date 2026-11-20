@@ -91,6 +91,14 @@ export const create = (params: CreateParams) => {
     async shouldBeVisible() {
       await expect(page.locator(workbench)).toBeVisible({ timeout: 60_000 })
     },
+    async shouldHaveTitleBarAccountWidgetVisibility(visible: boolean) {
+      const widget = page.locator(`${workbench} .part.titlebar .sessions-account-titlebar-widget`)
+      if (visible) {
+        await expect(widget).toBeVisible()
+      } else {
+        await expect(widget).toBeHidden()
+      }
+    },
     async newChat() {
       const button = page.locator(`${workbench} [aria-label^="New Session"]`).first()
       await expect(button).toBeVisible({ timeout: 60_000 })
