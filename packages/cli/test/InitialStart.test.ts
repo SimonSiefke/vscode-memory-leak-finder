@@ -622,7 +622,11 @@ test('initialStart - resolve vscode commit hash', async () => {
 test('cli run - create all mock data zip flag', async () => {
   const Cli = await import('../src/parts/Cli/Cli.ts')
   const CreateAllMockDataZip = await import('../src/parts/CreateAllMockDataZip/CreateAllMockDataZip.ts')
+  const StartRunning = await import('../src/parts/StartRunning/StartRunning.ts')
+  const StdoutWorker = await import('../src/parts/StdoutWorker/StdoutWorker.ts')
 
+  // Install the fake on the module instance loaded after jest.resetModules().
+  StdoutWorker.set(mockRpc)
   await Cli.run('linux', 'x64', ['--create-all-mock-data-zip'], {})
 
   expect(CreateAllMockDataZip.createAllMockDataZip).toHaveBeenCalledTimes(1)
