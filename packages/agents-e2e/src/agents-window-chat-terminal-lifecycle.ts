@@ -139,6 +139,8 @@ const cycle = async (context: TestContext, end: 'delete' | 'archive' | 'reload')
     child = await Workbench.openChatWindow()
     await child.shouldBeVisible()
     await focusChild()
+    // The auxiliary surface can render before extension command contributions arrive.
+    await child.QuickPick.waitForCommand('Chat Window Terminal Probe: Create', 30_000)
     await child.QuickPick.executeCommand('Chat Window Terminal Probe: Create')
     await waitFor(async () => Boolean(await readJson(journal)), 'two real editor terminal shells')
     const records = await readJson(journal)
