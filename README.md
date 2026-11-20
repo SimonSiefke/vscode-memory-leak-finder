@@ -38,7 +38,15 @@ collected while the edited document remains open.
 
 ## Language-server processes
 
-On Linux, `--inspect-process` can measure a Node child of the VS Code instance under test, including its JSON language server:
+On Linux, `--inspect-process` can measure a Node child of the VS Code instance under test. The HTML completion scenario verifies that the HTML language server provides the `span` completion and then measures its heap. The Linux PR job runs this command:
+
+```sh
+node packages/cli/bin/test.js --only html-completion --run-skipped-tests-anyway --enable-extensions --inspect-process htmlServerMain --measure named-function-count3 --check-leaks --measure-after --runs 2 --workers 1
+```
+
+HTML results are written under `.vscode-memory-leak-finder-results/process/htmlServerMain/`. If a long checkout path prevents VS Code from opening its Linux IPC socket, set `XDG_RUNTIME_DIR` to a short, private directory before running the command.
+
+For the JSON language server, run:
 
 ```sh
 node packages/cli/bin/test.js --only json-hover --run-skipped-tests-anyway --inspect-process jsonServerMain --measure named-function-count3 --check-leaks --measure-after --runs 37
