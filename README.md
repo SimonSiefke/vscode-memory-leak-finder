@@ -199,6 +199,14 @@ npm run build-charts
 
 The generated process and allocator charts are written to `.vscode-charts/chromium-memory-dump-processes` and `.vscode-charts/chromium-memory-dump-allocators`.
 
+To catch transient peaks between the two endpoints, set `CHROMIUM_MEMORY_DUMP_PERIODIC_INTERVAL_MS` to an integer from 250 to 60000. Chromium then also records light MemoryInfra dumps at that interval. The two detailed dumps are still the only comparison endpoints, and light allocators are never compared with detailed ones. When both detailed dumps exist, the result gains a `periodic` object with `requestedIntervalMs`, `sampleCount`, `medianIntervalMs`, `outsideEndpointWindowCount` (light dumps before the first or after the last detailed dump, which are excluded), the per-sample total private footprint of the process tree, and, per process, sampled `privateFootprintBytes` (`first`, `last`, `min`, `max`) and `peakResidentSetBytes` (`max`, `resettable`).
+
+```sh
+CHROMIUM_MEMORY_DUMP_PERIODIC_INTERVAL_MS=500 node packages/cli/bin/test.js --cwd packages/e2e --measure-after --measure chromium-memory-dump --only base
+```
+
+Sampled private footprint can miss spikes shorter than the interval. Chromium resets the kernel peak RSS after each dump, so `peakResidentSetBytes.max` is a true per-process high-water mark for the window only when `resettable` is `true`; otherwise it is the peak since the process started. Peak RSS values belong to different instants and must not be added across processes or to private footprint. Each light dump of a typical VS Code window adds about 1 MiB to the trace, and the trace is still limited to 256 MiB. Choose an interval that gives roughly 100 samples or fewer for the scenario. Without the variable, the trace configuration and the result are unchanged.
+
 ### StringsWithLocations
 
 Reports positive growth in live string objects, grouped by string text and the closest available retaining source location. `count` is the added object count (`afterCount - beforeCount`); results sort by descending `count`, with stable tie ordering. Equal text at different locations remains separate, and multiple references to one string do not inflate the count.

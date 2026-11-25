@@ -66,6 +66,40 @@ export interface ChromiumMemoryAllocatorComparison {
   readonly selectedBeforeBytes: number | null
 }
 
+export interface ChromiumMemoryPeriodicProcess {
+  readonly displayName: string
+  readonly name: string
+  readonly peakResidentSetBytes: {
+    readonly max: number | null
+    readonly resettable: boolean
+  }
+  readonly pid: number
+  readonly privateFootprintBytes: {
+    readonly first: number | null
+    readonly last: number | null
+    readonly max: number | null
+    readonly min: number | null
+  }
+  readonly sampleCount: number
+}
+
+export interface ChromiumMemoryPeriodicSample {
+  readonly offsetMs: number
+  readonly processCount: number
+  readonly totalPrivateFootprintBytes: number | null
+}
+
+export interface ChromiumMemoryPeriodicResult {
+  readonly levelOfDetail: 'light'
+  readonly maxTotalPrivateFootprintBytes: number | null
+  readonly medianIntervalMs: number | null
+  readonly outsideEndpointWindowCount: number
+  readonly processes: readonly ChromiumMemoryPeriodicProcess[]
+  readonly requestedIntervalMs: number
+  readonly sampleCount: number
+  readonly samples: readonly ChromiumMemoryPeriodicSample[]
+}
+
 export interface ChromiumMemoryDumpResult {
   readonly allocatorCount: number
   readonly allocators: readonly ChromiumMemoryAllocatorComparison[]
@@ -78,6 +112,7 @@ export interface ChromiumMemoryDumpResult {
     readonly after: readonly ChromiumMemoryOwnershipEdge[]
     readonly before: readonly ChromiumMemoryOwnershipEdge[]
   }
+  readonly periodic?: ChromiumMemoryPeriodicResult
   readonly processCount: number
   readonly processes: readonly ChromiumMemoryProcessComparison[]
   readonly supported: boolean
@@ -120,6 +155,18 @@ interface MutableProcessSnapshot {
 interface MutableDumpSnapshot {
   id: string
   processes: Map<number, MutableProcessSnapshot>
+  timestamp: number
+}
+
+interface DumpTotals {
+  peakResidentSetBytes: number | null
+  peakResidentSetResettable: boolean
+  privateFootprintBytes: number | null
+}
+
+interface DumpTotalsSnapshot {
+  readonly id: string
+  readonly processes: Map<number, DumpTotals>
   timestamp: number
 }
 
@@ -436,6 +483,135 @@ const compareAllocators = (
     )
 }
 
+const getDumpTotalsSnapshots = (traceEvents: readonly Dynamic[], levelOfDetail: 'detailed' | 'light'): readonly DumpTotalsSnapshot[] => {
+  const dumps = new Map<string, DumpTotalsSnapshot>()
+  for (let index = 0; index < traceEvents.length; index++) {
+    const event = traceEvents[index]
+    const rawDump = event?.args?.dumps
+    if (!rawDump || rawDump.level_of_detail !== levelOfDetail || !Number.isFinite(event?.pid)) {
+      continue
+    }
+    const id = getDumpId(event, index)
+    const timestamp = Number.isFinite(event?.ts) ? event.ts : index
+    let dump = dumps.get(id)
+    if (dump) {
+      dump.timestamp = Math.min(dump.timestamp, timestamp)
+    } else {
+      dump = { id, processes: new Map(), timestamp }
+      dumps.set(id, dump)
+    }
+    const rawTotals = rawDump.process_totals
+    if (!rawTotals || typeof rawTotals !== 'object') {
+      continue
+    }
+    const totals = dump.processes.get(event.pid) || {
+      peakResidentSetBytes: null,
+      peakResidentSetResettable: false,
+      privateFootprintBytes: null,
+    }
+    totals.peakResidentSetBytes = toNumber(rawTotals.peak_resident_set_size) ?? totals.peakResidentSetBytes
+    totals.peakResidentSetResettable = rawTotals.is_peak_rss_resettable === true || totals.peakResidentSetResettable
+    totals.privateFootprintBytes = toNumber(rawTotals.private_footprint_bytes) ?? totals.privateFootprintBytes
+    dump.processes.set(event.pid, totals)
+  }
+  return [...dumps.values()].toSorted((left, right) => left.timestamp - right.timestamp || left.id.localeCompare(right.id))
+}
+
+const toMilliseconds = (microseconds: number): number => Math.round(microseconds / 1000)
+
+const getMedian = (values: readonly number[]): number | null => {
+  if (values.length === 0) {
+    return null
+  }
+  const sorted = values.toSorted((left, right) => left - right)
+  const middle = Math.floor(sorted.length / 2)
+  return sorted.length % 2 === 1 ? sorted[middle] : (sorted[middle - 1] + sorted[middle]) / 2
+}
+
+const getMax = (values: readonly number[]): number | null => (values.length === 0 ? null : Math.max(...values))
+
+const getMin = (values: readonly number[]): number | null => (values.length === 0 ? null : Math.min(...values))
+
+const createPeriodicProcess = (
+  pid: number,
+  lightSamples: readonly DumpTotals[],
+  endpoint: DumpTotals | undefined,
+  processNames: ReadonlyMap<number, string>,
+  inspectedPid: number | undefined,
+): ChromiumMemoryPeriodicProcess => {
+  const name = processNames.get(pid) || `Process ${pid}`
+  const footprints = lightSamples.map((sample) => sample.privateFootprintBytes).filter((value) => value !== null)
+  // Chromium resets the kernel peak RSS after each dump, so every light sample and the final detailed
+  // dump each report the peak since the previous dump. Their maximum is the high-water mark of the window.
+  const peakSamples = [...lightSamples, ...(endpoint ? [endpoint] : [])].filter((sample) => sample.peakResidentSetBytes !== null)
+  return {
+    displayName: `${name} (PID ${pid})${pid === inspectedPid ? ' — inspected' : ''}`,
+    name,
+    peakResidentSetBytes: {
+      max: getMax(peakSamples.map((sample) => sample.peakResidentSetBytes!)),
+      resettable: peakSamples.length > 0 && peakSamples.every((sample) => sample.peakResidentSetResettable),
+    },
+    pid,
+    privateFootprintBytes: {
+      first: footprints.at(0) ?? null,
+      last: footprints.at(-1) ?? null,
+      max: getMax(footprints),
+      min: getMin(footprints),
+    },
+    sampleCount: lightSamples.length,
+  }
+}
+
+const createPeriodicResult = (
+  traceEvents: readonly Dynamic[],
+  before: ChromiumMemoryDumpSnapshot,
+  after: ChromiumMemoryDumpSnapshot,
+  requestedIntervalMs: number,
+  inspectedPid: number | undefined,
+): ChromiumMemoryPeriodicResult => {
+  const lightDumps = getDumpTotalsSnapshots(traceEvents, 'light')
+  const insideWindow = lightDumps.filter((dump) => dump.timestamp >= before.timestamp && dump.timestamp <= after.timestamp)
+  const endpoint = getDumpTotalsSnapshots(traceEvents, 'detailed').find((dump) => dump.id === after.id)
+  const processNames = getProcessNameMap(traceEvents)
+  const pids = new Set(insideWindow.flatMap((dump) => [...dump.processes.keys()]))
+  const processes = [...pids]
+    .map((pid) =>
+      createPeriodicProcess(
+        pid,
+        insideWindow.flatMap((dump) => dump.processes.get(pid) || []),
+        endpoint?.processes.get(pid),
+        processNames,
+        inspectedPid,
+      ),
+    )
+    .toSorted(
+      (left, right) =>
+        (right.privateFootprintBytes.max || 0) - (left.privateFootprintBytes.max || 0) || left.displayName.localeCompare(right.displayName),
+    )
+  // Private footprint values within one global dump are taken at the same instant and do not overlap, so they
+  // can be added. Peak RSS values are per-process high-water marks at different instants and are never added.
+  const samples = insideWindow.map((dump) => {
+    const footprints = [...dump.processes.values()].map((totals) => totals.privateFootprintBytes).filter((value) => value !== null)
+    return {
+      offsetMs: toMilliseconds(dump.timestamp - before.timestamp),
+      processCount: dump.processes.size,
+      totalPrivateFootprintBytes: footprints.length === 0 ? null : footprints.reduce((total, value) => total + value, 0),
+    }
+  })
+  const intervals = insideWindow.slice(1).map((dump, index) => (dump.timestamp - insideWindow[index].timestamp) / 1000)
+  const median = getMedian(intervals)
+  return {
+    levelOfDetail: 'light',
+    maxTotalPrivateFootprintBytes: getMax(samples.flatMap((sample) => sample.totalPrivateFootprintBytes ?? [])),
+    medianIntervalMs: median === null ? null : Math.round(median),
+    outsideEndpointWindowCount: lightDumps.length - insideWindow.length,
+    processes,
+    requestedIntervalMs,
+    sampleCount: insideWindow.length,
+    samples,
+  }
+}
+
 const emptyResult = (overrides: Partial<ChromiumMemoryDumpResult> = {}): ChromiumMemoryDumpResult => ({
   allocatorCount: 0,
   allocators: [],
@@ -477,6 +653,7 @@ export const createChromiumMemoryDumpResult = (
   traceEvents: readonly Dynamic[],
   dataLossOccurred: boolean,
   inspectedPid?: number,
+  periodicIntervalMs?: number,
 ): ChromiumMemoryDumpResult => {
   const dumps = getDetailedDumpSnapshots(traceEvents)
   if (dumps.length < 2) {
@@ -522,6 +699,9 @@ export const createChromiumMemoryDumpResult = (
       after: after.ownershipEdges,
       before: before.ownershipEdges,
     },
+    ...(periodicIntervalMs === undefined
+      ? {}
+      : { periodic: createPeriodicResult(traceEvents, before, after, periodicIntervalMs, inspectedPid) }),
     processCount: after.processes.length,
     processes,
     supported: true,

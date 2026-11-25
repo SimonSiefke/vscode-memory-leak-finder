@@ -152,6 +152,55 @@ test('measure captures two deterministic detailed dumps through the root browser
     ['IO.read', { handle: 'owned-trace', size: 256 * 1024 }],
     ['IO.close', { handle: 'owned-trace' }],
   ])
+  expect((calls[0] as any)[1].traceConfig).not.toHaveProperty('memoryDumpConfig')
+  expect(result).not.toHaveProperty('periodic')
+})
+
+test('periodic light dumps are requested only through the environment opt-in', async () => {
+  process.env.CHROMIUM_MEMORY_DUMP_PERIODIC_INTERVAL_MS = '500'
+  const { calls, session } = createSession()
+  const args = MeasureChromiumMemoryDump.create(session)
+
+  const before = await MeasureChromiumMemoryDump.start(...args)
+  const after = await MeasureChromiumMemoryDump.stop(...args)
+  const result = await MeasureChromiumMemoryDump.compare(before, after)
+  await MeasureChromiumMemoryDump.releaseResources(...args)
+
+  expect(calls[0]).toEqual([
+    'Tracing.start',
+    {
+      traceConfig: {
+        excludedCategories: ['*'],
+        includedCategories: ['disabled-by-default-memory-infra'],
+        memoryDumpConfig: { triggers: [{ mode: 'light', periodicIntervalMs: 500 }] },
+        recordMode: 'recordAsMuchAsPossible',
+      },
+      transferMode: 'ReturnAsStream',
+    },
+  ])
+  expect(calls.filter((call: any) => call[0] === 'Tracing.requestMemoryDump')).toEqual([
+    ['Tracing.requestMemoryDump', { deterministic: true, levelOfDetail: 'detailed' }],
+    ['Tracing.requestMemoryDump', { deterministic: true, levelOfDetail: 'detailed' }],
+  ])
+  expect(result).toMatchObject({ complete: true, dumpCount: 2, periodic: { requestedIntervalMs: 500, sampleCount: 0 } })
+  expect(MeasureChromiumMemoryDump.summary(result)).toContain('Periodic light dumps: 0 (requested every 500 ms')
+})
+
+test.each(['249', '60001', '1.5', '1e3', ' 500', 'fast', '-500'])('invalid periodic interval %p is rejected before tracing', (value) => {
+  process.env.CHROMIUM_MEMORY_DUMP_PERIODIC_INTERVAL_MS = value
+  const { calls, session } = createSession()
+
+  expect(() => MeasureChromiumMemoryDump.create(session)).toThrow(
+    `CHROMIUM_MEMORY_DUMP_PERIODIC_INTERVAL_MS must be an integer from 250 to 60000 milliseconds, received ${JSON.stringify(value)}`,
+  )
+  expect({ calls, listeners: session.listeners }).toEqual({ calls: [], listeners: {} })
+})
+
+test.each(['250', '60000'])('periodic interval bound %p is accepted', (value) => {
+  process.env.CHROMIUM_MEMORY_DUMP_PERIODIC_INTERVAL_MS = value
+  const { session } = createSession()
+
+  expect(MeasureChromiumMemoryDump.create(session)[1].periodicIntervalMs).toBe(Number(value))
 })
 
 test('measure reports trace data loss as incomplete', async () => {
@@ -248,6 +297,7 @@ test('release ends an active trace and removes listeners', async () => {
 
 afterEach(() => {
   jest.useRealTimers()
+  delete process.env.CHROMIUM_MEMORY_DUMP_PERIODIC_INTERVAL_MS
 })
 
 test.each([
