@@ -56,6 +56,7 @@ export const run = async ({ Explorer, Workspace }: TestContext): Promise<void> =
   await Explorer.refresh()
 
   // Verify file moved from source to destination
+  await Explorer.collapse('destination-folder')
   await Explorer.expand('source-folder')
   await Explorer.not.toHaveItem('file-in-source.txt')
   await Explorer.shouldHaveItem('nested-file.txt') // Other file should remain
@@ -74,7 +75,6 @@ export const run = async ({ Explorer, Workspace }: TestContext): Promise<void> =
   await Explorer.refresh()
 
   // Verify folder structure change
-  await Explorer.collapse('source-folder')
   await Explorer.not.toHaveItem('source-folder')
 
   await Explorer.expand('another-folder')
