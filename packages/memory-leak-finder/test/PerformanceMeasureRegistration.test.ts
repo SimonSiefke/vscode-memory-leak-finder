@@ -19,6 +19,8 @@ test('registers performance measures with kebab-case and camelCase names', () =>
   expect(getMeasure(module, 'eventLoopDelay').id).toBe('eventLoopDelay')
   expect(getMeasure(module, 'long-renderer-tasks').id).toBe('longRendererTasks')
   expect(getMeasure(module, 'longRendererTasks').id).toBe('longRendererTasks')
+  expect(getMeasure(module, 'long-animation-frames').id).toBe('longAnimationFrames')
+  expect(getMeasure(module, 'longAnimationFrames').id).toBe('longAnimationFrames')
   expect(getMeasure(module, 'synchronous-dom-read-count').id).toBe('synchronousDomReadCount')
   expect(getMeasure(module, 'synchronousDomReadCount').id).toBe('synchronousDomReadCount')
 })
