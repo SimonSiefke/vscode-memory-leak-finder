@@ -50,7 +50,6 @@ export const run = async ({ Explorer, Workspace }: TestContext): Promise<void> =
   await Workspace.remove('nested-folder/')
   await Explorer.refresh()
 
-  await Explorer.collapse('nested-folder')
   await Explorer.not.toHaveItem('nested-folder')
 
   await Workspace.remove('empty-folder/')
