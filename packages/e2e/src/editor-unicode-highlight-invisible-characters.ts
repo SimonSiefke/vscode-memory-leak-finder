@@ -19,7 +19,7 @@ export const setup = async ({ Editor, Explorer, Workspace, SideBar }: TestContex
       name: '.vscode/settings.json',
     },
     {
-      content: `before\u{200B}after
+      content: `before\u{202E}after
 `,
       name: 'file.txt',
     },
