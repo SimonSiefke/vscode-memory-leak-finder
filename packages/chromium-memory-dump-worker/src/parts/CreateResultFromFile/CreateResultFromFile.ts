@@ -4,6 +4,7 @@ import { createChromiumMemoryDumpResult, type ChromiumMemoryDumpResult } from '.
 interface ChromiumMemoryDumpCapture {
   readonly dataLossOccurred: boolean
   readonly inspectedPid?: number
+  readonly periodicIntervalMs?: number
   readonly trace?: { readonly traceEvents: readonly unknown[] }
   readonly traceEvents?: readonly unknown[]
 }
@@ -15,5 +16,6 @@ export async function createResultFromFile(path: string): Promise<ChromiumMemory
     capture.trace?.traceEvents ?? capture.traceEvents ?? [],
     capture.dataLossOccurred,
     capture.inspectedPid,
+    Number.isSafeInteger(capture.periodicIntervalMs) ? capture.periodicIntervalMs : undefined,
   )
 }
