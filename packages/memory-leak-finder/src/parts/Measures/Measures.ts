@@ -82,6 +82,7 @@ export * as MeasureGrowingArrays from '../MeasureGrowingArrays/MeasureGrowingArr
 export * as MeasureGrowingArrays2 from '../MeasureGrowingArrays2/MeasureGrowingArrays2.ts'
 export * as MeasureGrowingDisposableStores from '../MeasureGrowingDisposableStores/MeasureGrowingDisposableStores.ts'
 export * as MeasureHeapUsage from '../MeasureHeapUsage/MeasureHeapUsage.ts'
+export * as MeasureIdleCpuAfterScenario from '../MeasureIdleCpuAfterScenario/MeasureIdleCpuAfterScenario.ts'
 export * as MeasureIframeCount from '../MeasureIframeCount/MeasureIframeCount.ts'
 export * as MeasureImageBitmapCount from '../MeasureImageBitmapCount/MeasureImageBitmapCount.ts'
 export * as MeasureInstanceCounts from '../MeasureInstanceCounts/MeasureInstanceCounts.ts'
