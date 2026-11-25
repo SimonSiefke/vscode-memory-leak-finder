@@ -6,6 +6,7 @@ These entries identify what a collector measures, not a promise that every metri
 
 ## Detailed guides
 
+- [Event latency](./event-latency)
 - [Event loop delay](./event-loop-delay)
 - [Forced layout count](./forced-layout-count)
 - [Idle CPU after scenario](./idle-cpu-after-scenario)
