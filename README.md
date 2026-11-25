@@ -975,6 +975,14 @@ At least 64 KiB PSS growth in any process signals a suspected leak. Caching, all
 
 Reading smaps requires procfs access to the application processes. An unreadable descendant is recorded as a snapshot error and suppresses automatic leak classification; the summary marks the result incomplete. Failure to read the root process fails the measure. Kernel slab memory is outside this measure's scope.
 
+### Linux process limits
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --measure-after --measure linux-process-limits --only explorer-expand-and-collapse
+```
+
+This Linux-only measure tracks resources that can be exhausted without resident-memory growth: threads, inotify watches and instances, and virtual address space. See the [measure guide](packages/docs/site/measures/linux-process-limits.md) for fields and limitations. It always reports `isLeak: false`.
+
 ### Linux cgroup memory
 
 `--measure linux-cgroup-memory` reads cgroup v2 `memory.current`, `memory.stat`, and optional `memory.swap.current`. It measures charged memory across the application's cgroup and descendant cgroups, including anonymous memory, file cache, and accounted kernel memory. Fields in `memory.stat` retain their kernel-defined units: some are bytes and others are event counts, and overlapping categories must not be summed.
