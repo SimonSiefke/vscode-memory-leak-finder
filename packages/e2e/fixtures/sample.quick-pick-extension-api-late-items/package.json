@@ -1,0 +1,26 @@
+{
+  "name": "quick-pick-extension-api-late-items",
+  "displayName": "Quick Pick Late Items",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "quick-pick-extension-api-late-items.open",
+        "title": "Quick Pick Late Items: Open"
+      },
+      {
+        "command": "quick-pick-extension-api-late-items.release",
+        "title": "Quick Pick Late Items: Release"
+      },
+      {
+        "command": "quick-pick-extension-api-late-items.cleanup",
+        "title": "Quick Pick Late Items: Cleanup"
+      }
+    ]
+  }
+}
