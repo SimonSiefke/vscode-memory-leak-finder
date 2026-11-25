@@ -1,7 +1,7 @@
 # Mocha bulk test runs
 
 Three opt-in e2e scenarios exercise the real `coderline.mocha-vscode` extension
-with Mocha 11.7.5 and 5,000 fast tests:
+with the Mocha version pinned in `package.json` and 5,000 fast tests:
 
 - `mocha-run-many-tests`: 5,000 passing tests.
 - `mocha-run-many-tests-mixed-results`: 4,990 passing, five failing, and five
@@ -24,7 +24,8 @@ it does not claim that the extension's run handler has returned. The fixture use
 one suite containing 5,000 test cases and emits progress output every 100 cases.
 
 Use a dedicated driver worktree and the repository's `.nvmrc` Node version.
-Install dependencies and Mocha for VS Code 1.4.0 before launching the harness:
+Install the workspace and fixture dependencies, then install version 1.4.0 of
+the Mocha VS Code extension before launching the harness:
 
 ```sh
 npm ci
