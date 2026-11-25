@@ -16,6 +16,9 @@ export const HeapProfilerDisable = 'HeapProfiler.disable'
 
 export const HeapProfilerCollectGarbage = 'HeapProfiler.collectGarbage'
 export const HeapProfilerGetHeapObjectId = 'HeapProfiler.getHeapObjectId'
+export const HeapProfilerGetSamplingProfile = 'HeapProfiler.getSamplingProfile'
+export const HeapProfilerStartSampling = 'HeapProfiler.startSampling'
+export const HeapProfilerStopSampling = 'HeapProfiler.stopSampling'
 
 export const RuntimeEvaluate = 'Runtime.evaluate'
 

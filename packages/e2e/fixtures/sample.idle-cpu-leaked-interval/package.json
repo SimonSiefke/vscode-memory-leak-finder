@@ -1,0 +1,22 @@
+{
+  "name": "idle-cpu-leaked-interval",
+  "displayName": "Idle CPU Leaked Interval",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "idle-cpu-leaked-interval.run",
+        "title": "Idle CPU Leaked Interval: Run"
+      },
+      {
+        "command": "idle-cpu-leaked-interval.cleanup",
+        "title": "Idle CPU Leaked Interval: Cleanup"
+      }
+    ]
+  }
+}
