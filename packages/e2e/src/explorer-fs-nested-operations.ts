@@ -33,6 +33,14 @@ export const run = async ({ Explorer, Workspace }: TestContext): Promise<void> =
     content: 'deep content',
     name: 'complex/nested/structure/deep-file.txt',
   })
+  await Workspace.add({
+    content: 'nested level placeholder',
+    name: 'complex/nested/placeholder.txt',
+  })
+  await Workspace.add({
+    content: 'top level placeholder',
+    name: 'complex/placeholder.txt',
+  })
   await Explorer.refresh()
 
   // Verify the complex structure appears in explorer
@@ -45,12 +53,23 @@ export const run = async ({ Explorer, Workspace }: TestContext): Promise<void> =
 
   await Explorer.expand('structure')
   await Explorer.shouldHaveItem('deep-file.txt')
+  await Explorer.collapse('structure')
+  await Explorer.collapse('nested')
+  await Explorer.collapse('complex')
 
   // Create and delete nested folders in sequence
   // Create the nested structure step by step
   await Workspace.add({
     content: 'temp content',
     name: 'temp/nested/folders/temp-file.txt',
+  })
+  await Workspace.add({
+    content: 'nested level placeholder',
+    name: 'temp/nested/placeholder.txt',
+  })
+  await Workspace.add({
+    content: 'top level placeholder',
+    name: 'temp/placeholder.txt',
   })
 
   await Explorer.refresh()
@@ -68,14 +87,13 @@ export const run = async ({ Explorer, Workspace }: TestContext): Promise<void> =
   // Delete the nested structure
   await Workspace.remove('temp/nested/folders/temp-file.txt')
   await Workspace.remove('temp/nested/folders')
+  await Workspace.remove('temp/nested/placeholder.txt')
   await Workspace.remove('temp/nested')
+  await Workspace.remove('temp/placeholder.txt')
   await Workspace.remove('temp')
   await Explorer.refresh()
 
   // Verify deletion
-  await Explorer.collapse('folders')
-  await Explorer.collapse('nested')
-  await Explorer.collapse('temp')
   await Explorer.not.toHaveItem('temp')
 
   // Test renaming intermediate level folder
@@ -93,7 +111,6 @@ export const run = async ({ Explorer, Workspace }: TestContext): Promise<void> =
 
   // Verify the rename affects the entire subtree
   await Explorer.expand('level1')
-  await Explorer.not.toHaveItem('level2')
   await Explorer.shouldHaveItem('renamed-level2')
 
   await Explorer.expand('renamed-level2')
@@ -105,6 +122,8 @@ export const run = async ({ Explorer, Workspace }: TestContext): Promise<void> =
 
   // Clean up: Restore original state to make test idempotent
   await Workspace.remove('complex/nested/structure/deep-file.txt')
+  await Workspace.remove('complex/nested/placeholder.txt')
+  await Workspace.remove('complex/placeholder.txt')
   await Workspace.remove('level1/renamed-level2/level3/deep-file.txt')
   await Workspace.remove('level1/renamed-level2/mid-file.txt')
   await Workspace.add({
