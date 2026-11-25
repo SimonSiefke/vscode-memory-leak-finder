@@ -477,6 +477,14 @@ Measures the event listeners.
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure event-listeners --only base
 ```
 
+### Event latency
+
+Measures slow (16 ms or more) trusted input events in the workbench, split into input delay, handler time and time to next paint. See [the event-latency measure](packages/docs/site/measures/event-latency.md) for coverage, result fields, and limitations.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure event-latency --only ^performance-type.ts --run-skipped-tests-anyway
+```
+
 ### Event loop delay
 
 See [the event-loop-delay measure](packages/docs/site/measures/event-loop-delay.md) for coverage, result fields, and limitations.

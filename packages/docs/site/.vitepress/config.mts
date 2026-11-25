@@ -37,6 +37,7 @@ export default defineConfig({
           text: 'Measure catalog',
           items: [
             { text: 'All measures', link: '/measures/' },
+            { text: 'Event latency', link: '/measures/event-latency' },
             { text: 'Event loop delay', link: '/measures/event-loop-delay' },
             { text: 'Forced layout count', link: '/measures/forced-layout-count' },
             { text: 'Long renderer tasks', link: '/measures/long-renderer-tasks' },
