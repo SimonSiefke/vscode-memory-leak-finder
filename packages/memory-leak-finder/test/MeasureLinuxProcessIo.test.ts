@@ -97,13 +97,14 @@ test('compares a fixture tree: running deltas, started lifetime values, exited a
 
 test('an unreadable descendant becomes a snapshot error instead of a zero', async () => {
   const procRoot = await mkdtemp(join(tmpdir(), 'linux-process-io-'))
+  const canTestPermissions = typeof process.getuid === 'function' && process.getuid() !== 0
   try {
     await writeProcess(procRoot, 100, 1, 10, ioText(1))
     await writeProcess(procRoot, 101, 100, 11, null)
     await writeProcess(procRoot, 102, 100, 12, null)
     // A directory in place of the counter file fails deterministically, even when tests run as root.
     await mkdir(join(procRoot, '101', 'io'))
-    if (process.getuid?.() !== 0) {
+    if (canTestPermissions) {
       await writeProcess(procRoot, 103, 100, 13, ioText(1))
       await chmod(join(procRoot, '103', 'io'), 0o000)
     }
@@ -112,7 +113,7 @@ test('an unreadable descendant becomes a snapshot error instead of a zero', asyn
     const codes = Object.fromEntries(snapshot.errors.map((error) => [error.pid, error.code]))
     expect(codes[101]).toBe('EISDIR')
     expect(codes[102]).toBe('ENOENT')
-    if (process.getuid?.() !== 0) expect(codes[103]).toBe('EACCES')
+    if (canTestPermissions) expect(codes[103]).toBe('EACCES')
     const result = Measure.compare(snapshot, snapshot)
     expect(result.complete).toBe(false)
     expect(result.errors.map((error) => error.snapshot)).toContain('after')
