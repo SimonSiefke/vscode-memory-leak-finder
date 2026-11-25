@@ -12,6 +12,7 @@ These entries identify what a collector measures, not a promise that every metri
 - [Module resolution](./module-resolution)
 - [Module resolution lookups](./module-resolution-lookups)
 - [Named function count 3](./named-function-count3)
+- [Sampled allocation churn](./sampled-allocation-churn)
 - [Script compilation and evaluation](./script-compilation-evaluation)
 - [Synchronous DOM read count](./synchronous-dom-read-count)
 - [Synchronous DOM read count with stack traces](./synchronous-dom-read-count-with-stack-traces)
@@ -171,6 +172,7 @@ These entries identify what a collector measures, not a promise that every metri
 | `retained-bytes-by-source`                              | [RetainedBytesBySource](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureRetainedBytesBySource/MeasureRetainedBytesBySource.ts)                                                                            |
 | `retained-substrings`                                   | [RetainedSubstrings](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureRetainedSubstrings/MeasureRetainedSubstrings.ts)                                                                                     |
 | `retainer-river`                                        | [RetainerRiver](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureRetainerRiver/MeasureRetainerRiver.ts)                                                                                                    |
+| `sampled-allocation-churn`                              | [SampledAllocationChurn](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureSampledAllocationChurn/MeasureSampledAllocationChurn.ts)                                                                         |
 | `scope-count`                                           | [ScopeCount](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureScopeCount/MeasureScopeCount.ts)                                                                                                             |
 | `scope-count2`                                          | [ScopeCount2](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureScopeCount2/MeasureScopeCount2.ts)                                                                                                          |
 | `scopes`                                                | [Scopes](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureScopes/MeasureScopes.ts)                                                                                                                         |

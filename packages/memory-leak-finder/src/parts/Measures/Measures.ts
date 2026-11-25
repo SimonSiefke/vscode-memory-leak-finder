@@ -149,6 +149,7 @@ export * as MeasureResizeObserversWithStackTraces from '../MeasureResizeObserver
 export * as MeasureRetainedBytesBySource from '../MeasureRetainedBytesBySource/MeasureRetainedBytesBySource.ts'
 export * as MeasureRetainedSubstrings from '../MeasureRetainedSubstrings/MeasureRetainedSubstrings.ts'
 export * as MeasureRetainerRiver from '../MeasureRetainerRiver/MeasureRetainerRiver.ts'
+export * as MeasureSampledAllocationChurn from '../MeasureSampledAllocationChurn/MeasureSampledAllocationChurn.ts'
 export * as MeasureScopeCount from '../MeasureScopeCount/MeasureScopeCount.ts'
 export * as MeasureScopeCount2 from '../MeasureScopeCount2/MeasureScopeCount2.ts'
 export * as MeasureScopes from '../MeasureScopes/MeasureScopes.ts'

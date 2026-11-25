@@ -33,3 +33,20 @@ export const startTrackingHeapObjects = (session, options) => {
 export const stopTrackingHeapObjects = (session, options) => {
   return Invoke.invoke(session, DevtoolsCommandType.HeapProfilerStopTrackingHeapObjects, options)
 }
+
+/**
+ *
+ * @param {{samplingInterval?:number, includeObjectsCollectedByMajorGC?:boolean, includeObjectsCollectedByMinorGC?:boolean}} options
+ * @returns
+ */
+export const startSampling = (session, options) => {
+  return Invoke.invoke(session, DevtoolsCommandType.HeapProfilerStartSampling, options)
+}
+
+export const getSamplingProfile = (session) => {
+  return Invoke.invoke(session, DevtoolsCommandType.HeapProfilerGetSamplingProfile, {})
+}
+
+export const stopSampling = (session) => {
+  return Invoke.invoke(session, DevtoolsCommandType.HeapProfilerStopSampling, {})
+}
