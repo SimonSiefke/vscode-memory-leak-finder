@@ -292,6 +292,7 @@ export interface Editor {
   renameWithPreview(newText: any): Promise<void>
   replaceActiveLineAndSave(options: { replacement: string }): Promise<void>
   replaceText(options: any): Promise<void>
+  revertAndClose(): Promise<void>
   save(options: any): Promise<void>
   saveAll(): Promise<void>
   scrollDown(options?: { viaKeyBoard?: boolean }): Promise<void>
@@ -310,6 +311,7 @@ export interface Editor {
   shouldHaveCodeLens(options: any): Promise<void>
   shouldHaveCodeLensWithVersion(options: any): Promise<void>
   shouldHaveCursor(estimate: any): Promise<void>
+  shouldHaveDirtyTabs(names: readonly string[]): Promise<void>
   shouldHaveEmptySelection(): Promise<void>
   shouldHaveError(fileName: any): Promise<void>
   shouldHaveExceptionWidget(): Promise<void>

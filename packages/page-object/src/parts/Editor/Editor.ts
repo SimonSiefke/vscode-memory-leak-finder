@@ -1064,6 +1064,19 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to replace and save the active editor line`)
       }
     },
+    async revertAndClose() {
+      try {
+        await page.waitForIdle()
+        const tabs = page.locator('[role="main"] [role="tab"]')
+        const currentCount = await tabs.count()
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+        await quickPick.executeCommand(WellKnownCommands.ViewRevertAndCloseEditor)
+        await expect(tabs).toHaveCount(currentCount - 1)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to revert and close editor`)
+      }
+    },
     async save(options?: { viaKeyBoard: boolean }) {
       try {
         if (options?.viaKeyBoard) {
@@ -1355,6 +1368,19 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to verify Unicode highlighting`)
+      }
+    },
+    async shouldHaveDirtyTabs(names: readonly string[]) {
+      try {
+        await page.waitForIdle()
+        const main = page.locator('[role="main"]')
+        await expect(main.locator('[role="tab"]')).toHaveCount(names.length)
+        await expect(main.locator('[role="tab"].dirty')).toHaveCount(names.length)
+        for (const name of names) {
+          await expect(main.locator(`[role="tab"].dirty[data-resource-name=${JSON.stringify(name)}]`)).toBeVisible()
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to verify dirty tabs ${names.join(', ')}`)
       }
     },
     async shouldHaveCursor(estimate: string) {
