@@ -610,6 +610,12 @@ export interface Notification {
   closeAll(options?: { force?: boolean }): Promise<void>
   shouldHaveItem(expectedMessage: any): Promise<void>
 }
+export interface Outline {
+  focus(): Promise<void>
+  select(name: string): Promise<void>
+  shouldHaveMessage(message: string): Promise<void>
+  shouldHaveSymbols(names: readonly string[]): Promise<void>
+}
 export interface Output {
   shouldHaveText(text: RegExp, timeout?: number): Promise<void>
   clearFilter(): Promise<void>
@@ -1058,6 +1064,7 @@ export interface PageObjectApi {
   readonly Notebook: Notebook
   readonly NotebookInlineChat: NotebookInlineChat
   readonly Notification: Notification
+  readonly Outline: Outline
   readonly Output: Output
   readonly Panel: Panel
   readonly PortsView: PortsView
