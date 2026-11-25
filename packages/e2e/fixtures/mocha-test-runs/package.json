@@ -16,6 +16,6 @@
     ]
   },
   "dependencies": {
-    "mocha": "12.0.3"
+    "mocha": "11.8.0"
   }
 }
