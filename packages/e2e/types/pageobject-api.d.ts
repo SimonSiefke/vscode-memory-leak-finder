@@ -580,6 +580,16 @@ export interface MCP {
   removeServer(serverName: any): Promise<void>
   selectCommand(text: any, stayVisible?: any): Promise<void>
 }
+export interface MergeEditor {
+  acceptAllIncoming(): Promise<void>
+  completeMerge(): Promise<void>
+  openFromSourceControl(fileName: string): Promise<void>
+  shouldBeClosed(): Promise<void>
+  shouldBeVisible(): Promise<void>
+  shouldHaveNoMergeChanges(): Promise<void>
+  shouldHaveRemainingConflicts(count: number): Promise<void>
+  shouldHaveResultContaining(text: string): Promise<void>
+}
 export interface MultiDiffEditor {
   close(): Promise<void>
   open(options: any): Promise<void>
@@ -1054,6 +1064,7 @@ export interface PageObjectApi {
   readonly LanguageModelEditor: LanguageModelEditor
   readonly MarkdownPreview: MarkdownPreview
   readonly MCP: MCP
+  readonly MergeEditor: MergeEditor
   readonly MultiDiffEditor: MultiDiffEditor
   readonly Notebook: Notebook
   readonly NotebookInlineChat: NotebookInlineChat
