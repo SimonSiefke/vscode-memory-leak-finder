@@ -353,6 +353,14 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to check unstaged file`)
       }
     },
+    async shouldNotHaveUnstagedFile(name: string) {
+      try {
+        const file = page.locator(`[role="treeitem"][aria-label^="${name}"]`)
+        await expect(file).toBeHidden({ timeout: 15_000 })
+      } catch (error) {
+        throw new VError(error, `Failed to check that ${name} is not an unstaged file`)
+      }
+    },
     async shouldNotHaveHistoryItem(name: string) {
       try {
         const history = page.locator('[aria-label="Source Control History"]')

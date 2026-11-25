@@ -586,6 +586,9 @@ export interface MultiDiffEditor {
   openSourceControlChanges(): Promise<void>
   shouldHaveFileCount(count: number): Promise<void>
   shouldBeVisible(): Promise<void>
+  shouldBeClosed(): Promise<void>
+  shouldHaveEntry(index: number, options: { fileName: string; modifiedText: string; originalText: string }): Promise<void>
+  shouldUseWebAssemblyDiff(options?: { timeout?: number }): Promise<void>
 }
 export interface Notebook {
   focusReplInput(): Promise<void>
@@ -848,6 +851,7 @@ export interface SourceControl {
   shouldHaveRepository(name: any): Promise<void>
   shouldHaveRepositoryCount(count: any): Promise<void>
   shouldHaveUnstagedFile(name: any): Promise<void>
+  shouldNotHaveUnstagedFile(name: string): Promise<void>
   shouldNotHaveHistoryItem(name: any): Promise<void>
   shouldNotHaveRepository(name: any): Promise<void>
   showBranchPicker(): Promise<void>
