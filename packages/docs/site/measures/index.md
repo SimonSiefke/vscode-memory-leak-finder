@@ -8,6 +8,7 @@ These entries identify what a collector measures, not a promise that every metri
 
 - [Event loop delay](./event-loop-delay)
 - [Forced layout count](./forced-layout-count)
+- [Idle CPU after scenario](./idle-cpu-after-scenario)
 - [Long renderer tasks](./long-renderer-tasks)
 - [Module resolution](./module-resolution)
 - [Module resolution lookups](./module-resolution-lookups)
