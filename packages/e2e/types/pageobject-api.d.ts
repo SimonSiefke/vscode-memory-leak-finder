@@ -526,10 +526,14 @@ export interface Git {
   closeRepository(relativePath?: any): Promise<void>
   commit(message: any): Promise<void>
   createBranch(branchName: any): Promise<void>
+  getHeadCommit(): Promise<string>
   init(): Promise<void>
   initRepository(relativePath: any): Promise<void>
   openRepository(relativePath: any): Promise<void>
   reopenClosedRepository(relativePath: any): Promise<void>
+  shouldHaveCommitCount(count: number): Promise<void>
+  shouldHaveHeadCommit(commit: string): Promise<void>
+  shouldHaveLastCommitMessage(message: string): Promise<void>
   shouldHaveNoStagedDiff(fileName: any): Promise<void>
   shouldHaveStagedDiffContaining(fileName: any, text: any): Promise<void>
   shouldHaveWorkingTreeDiffContaining(fileName: any, text: any): Promise<void>
@@ -834,7 +838,9 @@ export interface SingleIframeWebView {
 }
 export interface SourceControl {
   checkoutBranch(branchName: any): Promise<void>
+  clearCommitMessage(): Promise<void>
   closeRepository(name: any): Promise<void>
+  commitFromInput(): Promise<void>
   disableInlineBlame(): Promise<void>
   doMoreAction(name: any): Promise<void>
   enableInlineBlame(options: any): Promise<void>
@@ -844,15 +850,18 @@ export interface SourceControl {
   selectBranch(branchName: any): Promise<void>
   openChange(name: any): Promise<void>
   show(): Promise<void>
-  shouldHaveHistoryItem(name: any): Promise<void>
+  shouldHaveCommitMessage(message: string): Promise<void>
+  shouldHaveHistoryItem(name: any, options?: { timeout?: number }): Promise<void>
   shouldHaveRepository(name: any): Promise<void>
   shouldHaveRepositoryCount(count: any): Promise<void>
   shouldHaveUnstagedFile(name: any): Promise<void>
-  shouldNotHaveHistoryItem(name: any): Promise<void>
+  shouldNotHaveChange(name: string): Promise<void>
+  shouldNotHaveHistoryItem(name: any, options?: { timeout?: number }): Promise<void>
   shouldNotHaveRepository(name: any): Promise<void>
   showBranchPicker(): Promise<void>
   showGraph(): Promise<void>
   stageFile(name: any, parentFolder?: any): Promise<void>
+  typeCommitMessage(message: string): Promise<void>
   undoLastCommit(): Promise<void>
   unstageAllChanges(): Promise<void>
   unstageFile(name: any): Promise<void>
