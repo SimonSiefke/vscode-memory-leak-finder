@@ -39,6 +39,7 @@ export default defineConfig({
             { text: 'All measures', link: '/measures/' },
             { text: 'Event loop delay', link: '/measures/event-loop-delay' },
             { text: 'Forced layout count', link: '/measures/forced-layout-count' },
+            { text: 'libuv handle census', link: '/measures/libuv-handle-census' },
             { text: 'Long renderer tasks', link: '/measures/long-renderer-tasks' },
             { text: 'Module resolution', link: '/measures/module-resolution' },
             { text: 'Module resolution lookups', link: '/measures/module-resolution-lookups' },

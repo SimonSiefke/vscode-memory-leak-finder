@@ -94,6 +94,7 @@ export * as MeasureIntersectionObserversWithStackTraces from '../MeasureIntersec
 export * as MeasureIpcMessageCount from '../MeasureIpcMessageCount/MeasureIpcMessageCount.ts'
 export * as MeasureIpcMessagesFromStart from '../MeasureIpcMessagesFromStart/MeasureIpcMessagesFromStart.ts'
 export * as MeasureJavascriptExecutionTime from '../MeasureJavascriptExecutionTime/MeasureJavascriptExecutionTime.ts'
+export * as MeasureLibuvHandleCensus from '../MeasureLibuvHandleCensus/MeasureLibuvHandleCensus.ts'
 export * as MeasureLargestArrayCount from '../MeasureLargestArrayCount/MeasureLargestArrayCount.ts'
 export * as MeasureLinuxAllocationStacks from '../MeasureLinuxAllocationStacks/MeasureLinuxAllocationStacks.ts'
 export * as MeasureLinuxCgroupMemory from '../MeasureLinuxCgroupMemory/MeasureLinuxCgroupMemory.ts'
