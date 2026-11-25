@@ -132,6 +132,7 @@ export * as MeasureObjectShapeDifference from '../MeasureObjectShapeDifference/M
 export * as MeasureObjectUrlCount from '../MeasureObjectUrlCount/MeasureObjectUrlCount.ts'
 export * as MeasureOffscreenCanvasCount from '../MeasureOffscreenCanvasCount/MeasureOffscreenCanvasCount.ts'
 export * as MeasurePaintEvents from '../MeasurePaintEvents/MeasurePaintEvents.ts'
+export * as MeasurePeakMemoryHighWater from '../MeasurePeakMemoryHighWater/MeasurePeakMemoryHighWater.ts'
 export * as MeasurePendingPromiseCount from '../MeasurePendingPromiseCount/MeasurePendingPromiseCount.ts'
 export * as MeasurePendingPromisesWithRetainers from '../MeasurePendingPromisesWithRetainers/MeasurePendingPromisesWithRetainers.ts'
 export * as MeasurePerformanceMarkBytes from '../MeasurePerformanceMarkBytes/MeasurePerformanceMarkBytes.ts'

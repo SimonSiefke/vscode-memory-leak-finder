@@ -43,6 +43,7 @@ export default defineConfig({
             { text: 'Module resolution', link: '/measures/module-resolution' },
             { text: 'Module resolution lookups', link: '/measures/module-resolution-lookups' },
             { text: 'Named function count 3', link: '/measures/named-function-count3' },
+            { text: 'Peak memory high-water', link: '/measures/peak-memory-high-water' },
             { text: 'Synchronous DOM read count', link: '/measures/synchronous-dom-read-count' },
             { text: 'Synchronous DOM read count with stack traces', link: '/measures/synchronous-dom-read-count-with-stack-traces' },
             { text: 'Synchronous file system', link: '/measures/synchronous-file-system' },

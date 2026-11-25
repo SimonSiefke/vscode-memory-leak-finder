@@ -12,6 +12,7 @@ These entries identify what a collector measures, not a promise that every metri
 - [Module resolution](./module-resolution)
 - [Module resolution lookups](./module-resolution-lookups)
 - [Named function count 3](./named-function-count3)
+- [Peak memory high-water](./peak-memory-high-water)
 - [Script compilation and evaluation](./script-compilation-evaluation)
 - [Synchronous DOM read count](./synchronous-dom-read-count)
 - [Synchronous DOM read count with stack traces](./synchronous-dom-read-count-with-stack-traces)

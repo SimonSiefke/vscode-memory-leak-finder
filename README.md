@@ -990,6 +990,14 @@ When this variable is set, the Electron launcher joins that cgroup before execut
 
 Results retain before/after counters and their deltas. At least 64 KiB growth in `memory.current` signals a suspected leak; repeat warmed-up scenarios to distinguish retention from cache population. Accounting is not an individual-allocation trace or complete GPU-memory census. Shared-memory charging follows cgroup ownership rather than PSS, swap is separate, and kernel counters are read sequentially rather than atomically.
 
+### Peak memory high-water
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --measure-after --measure peak-memory-high-water --only base
+```
+
+This Linux-only measure resets each application process's kernel RSS high-water mark at start and reads it at stop, so short spikes between the boundaries are not missed. With `LINUX_CGROUP_PATH` it also reports the cgroup `memory.peak` since start. See [the peak-memory-high-water measure](packages/docs/site/measures/peak-memory-high-water.md) for result fields and limitations.
+
 ## Forced layout count
 
 See [the forced-layout-count measure](packages/docs/site/measures/forced-layout-count.md) for coverage, result fields, and limitations.
