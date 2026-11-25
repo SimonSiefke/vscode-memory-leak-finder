@@ -192,6 +192,19 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, 'Failed to focus REPL input')
       }
     },
+    async shouldHaveCellExecutionState({ index, state }: { index: number; state: 'error' | 'success' }) {
+      try {
+        const notebook = page.locator('.notebook-editor')
+        await expect(notebook).toBeVisible()
+        const cell = notebook.locator('.code-cell-row').nth(index)
+        await expect(cell).toBeVisible()
+        const stateIcon = cell.locator(`.cell-statusbar-container .codicon-notebook-state-${state}`)
+        await expect(stateIcon).toBeVisible()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to verify notebook cell ${index} execution state ${state}`)
+      }
+    },
     async shouldHaveKernel(expectedKernel: string) {
       try {
         const kernelLabel = page.locator('.kernel-action-view-item .kernel-label')
@@ -284,6 +297,27 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await expect(cells).toHaveCount(expectedCellCount, { timeout: 10_000 })
       } catch (error) {
         throw new VError(error, `Failed to split notebook cell at index ${cellIndex}`)
+      }
+    },
+    async stopCellExecution(index: number) {
+      try {
+        await page.waitForIdle()
+        const notebook = page.locator('.notebook-editor')
+        await expect(notebook).toBeVisible()
+        const cell = notebook.locator('.cell.code').nth(index)
+        await expect(cell).toBeVisible()
+        // The stop button replaces the run button only while the cell is executing.
+        const stopButton = cell.locator('[role="button"][aria-label^="Stop Cell Execution"]')
+        await expect(stopButton).toBeVisible()
+        await page.waitForIdle()
+        await stopButton.click()
+        await page.waitForIdle()
+        const runButton = cell.locator('[role="button"][aria-label^="Execute Cell"]')
+        await expect(runButton).toBeVisible({ timeout: 15_000 })
+        await expect(stopButton).toBeHidden()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to stop notebook cell execution at index ${index}`)
       }
     },
   }
