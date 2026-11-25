@@ -545,6 +545,10 @@ Measures heap usage.
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure heap-usage --only base
 ```
 
+Besides the formatted `usedBefore`, `usedAfter`, `totalBefore` and `totalAfter` values, the result has a `bytes` object. It holds numeric `before`, `after` and `delta` values for `usedSize`, `totalSize`, `embedderHeapUsedSize` (the Blink/Oilpan heap in renderers), `backingStorageSize` (ArrayBuffer and external string storage) and `unusedCommittedBytes` (`totalSize - usedSize`). A value is `null` when the runtime does not report it. `isLeak` still compares the formatted strings, so check `bytes.usedSize.delta` for the numeric change.
+
+On Node.js targets, for example with `--inspect-extensions`, `node.before` and `node.after` hold selected `v8.getHeapStatistics()` fields, including `number_of_detached_contexts` and `malloced_memory`, plus per-space `v8.getHeapSpaceStatistics()` sizes. `peak_malloced_memory` is a lifetime peak of the process, not a peak for the measured interval. `node` is `null` for renderer targets and whenever these statistics are unavailable.
+
 ### InstanceCounts
 
 Measures the number of instances of each class.
