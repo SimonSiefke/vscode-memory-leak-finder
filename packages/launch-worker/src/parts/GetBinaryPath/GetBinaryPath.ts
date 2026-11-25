@@ -4,6 +4,9 @@ import * as DownloadAndUnzipVscode from '../DownloadAndUnzipVscode/DownloadAndUn
 import * as Env from '../Env/Env.ts'
 import * as Root from '../Root/Root.ts'
 
+const disableVscodeNodeModulesCacheEnvVar = 'VSCODE_MEMORY_LEAK_FINDER_DISABLE_VSCODE_NODE_MODULES_CACHE'
+const useStableVscodeRepoPathEnvVar = 'VSCODE_MEMORY_LEAK_FINDER_USE_STABLE_VSCODE_REPO_PATH'
+
 export const getBinaryPath = async (
   platform: string,
   arch: string,
@@ -12,7 +15,7 @@ export const getBinaryPath = async (
   commit: string,
   insidersCommit: string,
   updateUrl: string,
-  buildVscodeMinified: boolean,
+  buildVscodeMinified: boolean = false,
 ): Promise<string> => {
   if (vscodePath) {
     return vscodePath
@@ -29,7 +32,9 @@ export const getBinaryPath = async (
   if (commit && typeof commit === 'string' && commit !== '') {
     const repoUrl = 'https://github.com/microsoft/vscode.git'
     const reposDir = join(Root.root, '.vscode-repos')
-    const nodeModulesCacheDir = join(Root.root, '.vscode-node-modules-cache')
+    const nodeModulesCacheDir =
+      process.env[disableVscodeNodeModulesCacheEnvVar] === '1' ? '' : join(Root.root, '.vscode-node-modules-cache')
+    const repoFolderName = process.env[useStableVscodeRepoPathEnvVar] === '1' ? 'default' : ''
     const useNice = platform === 'linux'
     return await DownloadAndBuildVscodeFromCommit.downloadAndBuildVscodeFromCommit(
       platform,
@@ -40,6 +45,7 @@ export const getBinaryPath = async (
       nodeModulesCacheDir,
       useNice,
       buildVscodeMinified,
+      repoFolderName,
     )
   }
   if (insidersCommit) {
