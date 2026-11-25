@@ -692,13 +692,17 @@ export interface ReleaseNotes {
   show(): Promise<void>
 }
 export interface RunAndDebug {
+  addWatchExpression(expression: string): Promise<void>
   continue(): Promise<void>
   pause(): Promise<void>
   removeAllBreakpoints(): Promise<void>
+  removeAllWatchExpressions(): Promise<void>
   runAndWaitForDebugConsoleOutput(options: any): Promise<void>
   runAndWaitForPaused(options: any): Promise<void>
   setPauseOnExceptions(options: any): Promise<void>
   setValue(options?: any): Promise<void>
+  shouldHaveNoWatchExpressions(): Promise<void>
+  shouldHaveWatchExpression(options: { expression: string; value: string }): Promise<void>
   startRunAndDebug(options?: any): Promise<void>
   step(options?: any): Promise<void>
   stepInto(options: any): Promise<void>
