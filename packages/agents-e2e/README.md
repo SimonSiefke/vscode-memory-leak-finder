@@ -56,6 +56,24 @@ pass the readiness assertions rather than silently skipping unsupported paths.
 CI keeps this scenario pinned to 1.145.0 because VS Code 1.146 changes the Inbox
 UI and no longer exposes the notification list this scenario exercises.
 
+## Inbox mode triage
+
+`agents-window-inbox-mode-triage.ts` requires VS Code 1.148 or later and fails
+on older builds rather than skipping. The launcher enables the experimental
+`sessions.list.inboxEnabled` setting and the "Mark as Done" archive wording only
+for this scenario, before any session exists. Each cycle starts outside Inbox
+mode with an empty Inbox and creates two mocked sessions. It acknowledges one
+and returns it to the Inbox, puts the other on hold and returns it, then marks
+the first as done. Every move asserts the row's section and the section counts. Cleanup deletes both sessions, requires an
+empty Inbox and leaves Inbox mode.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/agents-e2e \
+  --launch-agent-window --enable-extensions --use-proxy-mock \
+  --only agents-window-inbox-mode-triage.ts \
+  --vscode-version 1.148.0 --runs 3
+```
+
 ## Sensitivity validation
 
 On Linux with the pinned Node version and VS Code 1.145.0, all three pairs pass.

@@ -54,6 +54,9 @@ export interface PageObjectWindowHandle extends NewWindowHandle {
   shouldBeVisible(): Promise<void>
 }
 
+export type AgentsWindowInboxSection = 'Inbox' | 'Working' | 'On hold' | 'Acknowledged' | 'Done'
+export type AgentsWindowInboxTriageAction = 'Acknowledge' | 'Put on Hold' | 'Return to Inbox' | 'Mark as Done'
+
 export interface AgentsWindow {
   armCanvasObserver(): Promise<void>
   keepCanvasObserver(title: string): Promise<void>
@@ -63,6 +66,12 @@ export interface AgentsWindow {
   hideInboxCanvas(): Promise<void>
   closeInboxEvidence(): Promise<void>
   selectWorkspace(path: string, readinessDirectory: string): Promise<void>
+  toggleInbox(): Promise<void>
+  shouldBeInInboxMode(enabled: boolean): Promise<void>
+  expandSection(section: AgentsWindowInboxSection): Promise<void>
+  shouldHaveSessionInSection(title: string, section: AgentsWindowInboxSection): Promise<void>
+  shouldHaveSectionCount(section: AgentsWindowInboxSection, count: number): Promise<void>
+  triageSession(title: string, action: AgentsWindowInboxTriageAction): Promise<void>
   archiveChat(title: string): Promise<void>
   selectNoWorkspace(): Promise<void>
   shouldBeVisible(): Promise<void>
