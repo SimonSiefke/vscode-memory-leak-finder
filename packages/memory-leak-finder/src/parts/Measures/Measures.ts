@@ -96,6 +96,7 @@ export * as MeasureIpcMessagesFromStart from '../MeasureIpcMessagesFromStart/Mea
 export * as MeasureJavascriptExecutionTime from '../MeasureJavascriptExecutionTime/MeasureJavascriptExecutionTime.ts'
 export * as MeasureLargestArrayCount from '../MeasureLargestArrayCount/MeasureLargestArrayCount.ts'
 export * as MeasureLinuxAllocationStacks from '../MeasureLinuxAllocationStacks/MeasureLinuxAllocationStacks.ts'
+export * as MeasureLinuxProcessIo from '../MeasureLinuxProcessIo/MeasureLinuxProcessIo.ts'
 export * as MeasureLinuxCgroupMemory from '../MeasureLinuxCgroupMemory/MeasureLinuxCgroupMemory.ts'
 export * as MeasureLinuxProcessMemory from '../MeasureLinuxProcessMemory/MeasureLinuxProcessMemory.ts'
 export * as MeasureLinuxProcessTreeResources from '../MeasureLinuxProcessTreeResources/MeasureLinuxProcessTreeResources.ts'

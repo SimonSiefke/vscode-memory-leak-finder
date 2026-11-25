@@ -975,6 +975,14 @@ At least 64 KiB PSS growth in any process signals a suspected leak. Caching, all
 
 Reading smaps requires procfs access to the application processes. An unreadable descendant is recorded as a snapshot error and suppresses automatic leak classification; the summary marks the result incomplete. Failure to read the root process fails the measure. Kernel slab memory is outside this measure's scope.
 
+### Linux process I/O
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --measure-after --measure linux-process-io --only ^base.ts
+```
+
+This Linux-only measure reads `/proc/<pid>/io` for the root application and its current descendants before and after the scenario, and reports per-process deltas of syscall-level bytes (`rchar`/`wchar`, including pipes and sockets) and storage-level bytes (`readBytes`/`writeBytes`). The two layers describe the same I/O and must not be added together. Processes are matched by PID plus start time; tree totals cover processes running in both snapshots, and any started, exited, or unreadable process marks the result incomplete. The kernel adds the counters of a reaped child to its parent, so short-lived commands show up in their parent's delta (for example the terminal shell). The main process's syscall bytes can include the harness's DevTools traffic. The measure is a diagnostic (`isLeak: false`); see the [guide](packages/docs/site/measures/linux-process-io.md) for field semantics.
+
 ### Linux cgroup memory
 
 `--measure linux-cgroup-memory` reads cgroup v2 `memory.current`, `memory.stat`, and optional `memory.swap.current`. It measures charged memory across the application's cgroup and descendant cgroups, including anonymous memory, file cache, and accounted kernel memory. Fields in `memory.stat` retain their kernel-defined units: some are bytes and others are event counts, and overlapping categories must not be summed.
