@@ -1,0 +1,46 @@
+{
+  "name": "explorer-rename-will-rename-participant",
+  "displayName": "Explorer Rename Participant",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "explorer-rename-will-rename-participant.setup",
+        "title": "Explorer Rename Participant: Setup"
+      },
+      {
+        "command": "explorer-rename-will-rename-participant.armApply",
+        "title": "Explorer Rename Participant: Arm Apply"
+      },
+      {
+        "command": "explorer-rename-will-rename-participant.verifyApplied",
+        "title": "Explorer Rename Participant: Verify Applied"
+      },
+      {
+        "command": "explorer-rename-will-rename-participant.armHold",
+        "title": "Explorer Rename Participant: Arm Hold"
+      },
+      {
+        "command": "explorer-rename-will-rename-participant.release",
+        "title": "Explorer Rename Participant: Release"
+      },
+      {
+        "command": "explorer-rename-will-rename-participant.verifyUnchanged",
+        "title": "Explorer Rename Participant: Verify Unchanged"
+      },
+      {
+        "command": "explorer-rename-will-rename-participant.cleanup",
+        "title": "Explorer Rename Participant: Cleanup"
+      },
+      {
+        "command": "explorer-rename-will-rename-participant.verifyDisposed",
+        "title": "Explorer Rename Participant: Verify Disposed"
+      }
+    ]
+  }
+}
