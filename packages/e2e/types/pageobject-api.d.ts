@@ -932,8 +932,15 @@ export interface TerminalInlineChat {
 export interface Testing {
   shouldHaveSummary(text: string | RegExp, timeout?: number): Promise<void>
   clearAllResults(): Promise<void>
+  closeCoverage(): Promise<void>
   focusOnTestExplorerView(): Promise<void>
+  openCoverage(): Promise<void>
   runAllTests(options: any): Promise<void>
+  runAllTestsWithCoverage(): Promise<void>
+  shouldHaveCoverageDecorations(options: { hit: number; miss: number }): Promise<void>
+  shouldHaveCoverageRows(expectedRows: readonly { file: string; percent: string }[]): Promise<void>
+  shouldHaveNoCoverage(): Promise<void>
+  toggleInlineCoverage(options: { enabled: boolean }): Promise<void>
   runTask(taskName: any): Promise<void>
   shouldHaveTestFailure(): Promise<void>
   shouldHaveTestSuccess(): Promise<void>
