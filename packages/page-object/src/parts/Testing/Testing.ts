@@ -73,6 +73,89 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, 'Failed to run all tests')
       }
     },
+    async runAllTestsWithCoverage(): Promise<void> {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+        await quickPick.executeCommand(WellKnownCommands.RunAllTestsWithCoverage)
+        await page.waitForIdle()
+        const testExplorer = page.locator('.test-explorer')
+        await expect(testExplorer).toBeVisible()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, 'Failed to run all tests with coverage')
+      }
+    },
+    async openCoverage(): Promise<void> {
+      try {
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+        await quickPick.executeCommand(WellKnownCommands.OpenTestCoverage)
+        await page.waitForIdle()
+        const rows = page.locator('.test-coverage-list-item')
+        await expect(rows.first()).toBeVisible({ timeout: 10_000 })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, 'Failed to open test coverage')
+      }
+    },
+    async shouldHaveCoverageRows(expectedRows: readonly { file: string; percent: string }[]): Promise<void> {
+      try {
+        const rows = page.locator('.test-coverage-list-item')
+        await expect(rows).toHaveCount(expectedRows.length)
+        for (let i = 0; i < expectedRows.length; i++) {
+          const { file, percent } = expectedRows[i]
+          const row = rows.nth(i)
+          await expect(row.locator('.label-name')).toHaveText(file)
+          await expect(row.locator('.test-coverage-bars .tpc')).toHaveText(percent)
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to verify coverage rows`)
+      }
+    },
+    async shouldHaveCoverageDecorations({ hit, miss }: { hit: number; miss: number }): Promise<void> {
+      try {
+        const editor = page.locator('.part.editor .monaco-editor')
+        await expect(editor).toBeVisible()
+        await expect(editor.locator('.coverage-deco-gutter.coverage-deco-hit')).toHaveCount(hit, { timeout: 15_000 })
+        await expect(editor.locator('.coverage-deco-gutter.coverage-deco-miss')).toHaveCount(miss, { timeout: 15_000 })
+      } catch (error) {
+        throw new VError(error, `Failed to verify coverage decorations`)
+      }
+    },
+    async toggleInlineCoverage({ enabled }: { enabled: boolean }): Promise<void> {
+      try {
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+        await quickPick.executeCommand(WellKnownCommands.ToggleInlineCoverage)
+        await page.waitForIdle()
+        const inline = page.locator('.part.editor .monaco-editor .coverage-deco-inline')
+        if (enabled) {
+          await expect(inline.first()).toBeVisible({ timeout: 10_000 })
+        } else {
+          await expect(inline).toHaveCount(0, { timeout: 10_000 })
+        }
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to toggle inline coverage`)
+      }
+    },
+    async closeCoverage(): Promise<void> {
+      try {
+        const quickPick = QuickPick.create({ electronApp, expect, ideVersion, page, platform, VError })
+        await quickPick.executeCommand(WellKnownCommands.ClearTestCoverage)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to clear test coverage`)
+      }
+    },
+    async shouldHaveNoCoverage(): Promise<void> {
+      try {
+        await expect(page.locator('.coverage-deco-gutter')).toHaveCount(0, { timeout: 10_000 })
+        await expect(page.locator('.coverage-deco-inline')).toHaveCount(0)
+        await expect(page.locator('.test-coverage-list-item')).toHaveCount(0)
+      } catch (error) {
+        throw new VError(error, `Failed to verify that no test coverage is shown`)
+      }
+    },
     async shouldHaveSummary(text: string | RegExp, timeout = 30_000): Promise<void> {
       const summary = page.locator('.test-explorer .result-summary')
       await expect(summary).toBeVisible()
