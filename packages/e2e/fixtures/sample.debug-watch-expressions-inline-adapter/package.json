@@ -1,0 +1,35 @@
+{
+  "name": "debug-watch-expressions-inline-adapter",
+  "displayName": "Debug Watch Expressions Inline Adapter",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "debuggers": [
+      {
+        "type": "watch-inline",
+        "label": "Watch Inline",
+        "languages": [
+          "javascript"
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "command": "debug-watch-expressions-inline-adapter.setup",
+        "title": "Debug Watch Expressions Inline Adapter: Setup"
+      },
+      {
+        "command": "debug-watch-expressions-inline-adapter.verify",
+        "title": "Debug Watch Expressions Inline Adapter: Verify Session"
+      },
+      {
+        "command": "debug-watch-expressions-inline-adapter.cleanup",
+        "title": "Debug Watch Expressions Inline Adapter: Cleanup"
+      }
+    ]
+  }
+}
