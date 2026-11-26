@@ -55,3 +55,67 @@ test('show retries when the quick pick input is not ready', async () => {
   expect(press).toHaveBeenNthCalledWith(2, 'Escape')
   expect(press).toHaveBeenNthCalledWith(3, 'Control+Shift+P')
 })
+
+test('shouldBeHidden checks the widget again after the renderer is idle', async () => {
+  const calls: string[] = []
+  const quickPick = {}
+  const page = {
+    locator: jest.fn((_selector: string) => quickPick),
+    waitForIdle: jest.fn(async () => {
+      calls.push('idle')
+    }),
+  }
+  const expectElement = jest.fn((element: unknown) => {
+    return {
+      toBeHidden: jest.fn(async () => {
+        expect(element).toBe(quickPick)
+        calls.push('hidden')
+      }),
+    }
+  })
+  const quickPickPageObject = QuickPick.create({
+    electronApp: {},
+    expect: expectElement,
+    ideVersion: {
+      major: 1,
+      minor: 147,
+      patch: 0,
+    },
+    page,
+    platform: 'linux',
+    VError: TestError,
+  })
+
+  await quickPickPageObject.shouldBeHidden()
+
+  expect(page.locator).toHaveBeenCalledWith('.quick-input-widget')
+  expect(calls).toEqual(['hidden', 'idle', 'hidden'])
+})
+
+test('shouldBeHidden reports a visible quick pick', async () => {
+  const page = {
+    locator: jest.fn(() => ({})),
+    waitForIdle: jest.fn(async () => {}),
+  }
+  const expectElement = jest.fn(() => {
+    return {
+      toBeHidden: jest.fn(async () => {
+        throw new Error('element is visible')
+      }),
+    }
+  })
+  const quickPickPageObject = QuickPick.create({
+    electronApp: {},
+    expect: expectElement,
+    ideVersion: {
+      major: 1,
+      minor: 147,
+      patch: 0,
+    },
+    page,
+    platform: 'linux',
+    VError: TestError,
+  })
+
+  await expect(quickPickPageObject.shouldBeHidden()).rejects.toThrow('Failed to verify that quick pick is hidden')
+})
