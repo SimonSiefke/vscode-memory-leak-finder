@@ -978,8 +978,11 @@ export interface Testing {
 }
 export interface Timeline {
   open(fileName: any): Promise<void>
+  runItemAction(name: string, action: string): Promise<void>
   shouldBeVisible(): Promise<void>
   shouldHaveItem(name: any): Promise<void>
+  shouldHaveItemCount(count: number): Promise<void>
+  shouldNotHaveItem(name: string): Promise<void>
 }
 export interface Timeout {
   waitMinutes(minutes: any): Promise<void>
