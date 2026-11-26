@@ -1,6 +1,7 @@
 import { Parser, type Node as AcornNode, type Position } from 'acorn'
 import { createHash } from 'node:crypto'
 import { analyze, type Scope, type Variable } from 'eslint-scope'
+import type { Node as EstreeNode, Program } from 'estree'
 import type { FileAnalysis, FunctionFingerprint, SourceMapReference } from '../DuplicateCode/DuplicateCode.ts'
 
 // Acorn's base type omits the fields specific to each ESTree node kind.
@@ -91,7 +92,7 @@ const resolveBindings = (ast: Node, sourceType: 'script' | 'module') => {
     const region = node.type === 'Program' ? node : { type: 'Program', body: [node], sourceType, range: [node.start, node.end] }
     let manager: ReturnType<typeof analyze>
     try {
-      manager = analyze(region, { ecmaVersion: 2024, sourceType, optimistic: true, impliedStrict: strict })
+      manager = analyze(region as unknown as Program, { ecmaVersion: 2024, sourceType, optimistic: true, impliedStrict: strict })
     } finally {
       for (const saved of nested) {
         saved.node.body = saved.body
@@ -134,11 +135,11 @@ const resolveBindings = (ast: Node, sourceType: 'script' | 'module') => {
       }
     }
     if (isFunction(node)) {
-      const scope = manager.acquire(node, true)!
+      const scope = manager.acquire(node as unknown as EstreeNode, true)!
       modes.set(node, { strict: scope.isStrict, dynamic: environments.get(scope)!.dynamic })
     }
     for (const saved of nested) {
-      let scope = manager.acquire(saved.node, true)!
+      let scope = manager.acquire(saved.node as unknown as EstreeNode, true)!
       const strict = scope.isStrict
       // Skip placeholder scopes belonging to the function itself (including its name scope).
       while (scope.upper && scope.block === saved.node) scope = scope.upper

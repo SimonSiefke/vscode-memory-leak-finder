@@ -1,0 +1,75 @@
+{
+  "name": "webview-view-visibility-churn",
+  "displayName": "Webview View Visibility Churn",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "webview-view-visibility-churn.setup",
+        "title": "Webview View Visibility Churn: Setup"
+      },
+      {
+        "command": "webview-view-visibility-churn.expectReady",
+        "title": "Webview View Visibility Churn: Expect Ready"
+      },
+      {
+        "command": "webview-view-visibility-churn.expectHidden",
+        "title": "Webview View Visibility Churn: Expect Hidden"
+      },
+      {
+        "command": "webview-view-visibility-churn.moveToPanel",
+        "title": "Webview View Visibility Churn: Move To Panel"
+      },
+      {
+        "command": "webview-view-visibility-churn.moveBack",
+        "title": "Webview View Visibility Churn: Move Back"
+      },
+      {
+        "command": "webview-view-visibility-churn.cleanup",
+        "title": "Webview View Visibility Churn: Cleanup"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "webviewViewVisibilityChurn",
+          "title": "Webview View Churn",
+          "icon": "media/icon.svg"
+        }
+      ],
+      "panel": [
+        {
+          "id": "webviewViewVisibilityChurnDock",
+          "title": "Churn Dock",
+          "icon": "media/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "webviewViewVisibilityChurn": [
+        {
+          "type": "webview",
+          "id": "webviewViewVisibilityChurn.view",
+          "name": "Churn Webview"
+        }
+      ],
+      "webviewViewVisibilityChurnDock": [
+        {
+          "id": "webviewViewVisibilityChurnDock.placeholder",
+          "name": "Churn Placeholder"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "webviewViewVisibilityChurnDock.placeholder",
+        "contents": "Placeholder that keeps the Churn Dock panel container registered."
+      }
+    ]
+  }
+}

@@ -199,6 +199,14 @@ npm run build-charts
 
 The generated process and allocator charts are written to `.vscode-charts/chromium-memory-dump-processes` and `.vscode-charts/chromium-memory-dump-allocators`.
 
+To catch transient peaks between the two endpoints, set `CHROMIUM_MEMORY_DUMP_PERIODIC_INTERVAL_MS` to an integer from 250 to 60000. Chromium then also records light MemoryInfra dumps at that interval. The two detailed dumps are still the only comparison endpoints, and light allocators are never compared with detailed ones. When both detailed dumps exist, the result gains a `periodic` object with `requestedIntervalMs`, `sampleCount`, `medianIntervalMs`, `outsideEndpointWindowCount` (light dumps before the first or after the last detailed dump, which are excluded), the per-sample total private footprint of the process tree, and, per process, sampled `privateFootprintBytes` (`first`, `last`, `min`, `max`) and `peakResidentSetBytes` (`max`, `resettable`).
+
+```sh
+CHROMIUM_MEMORY_DUMP_PERIODIC_INTERVAL_MS=500 node packages/cli/bin/test.js --cwd packages/e2e --measure-after --measure chromium-memory-dump --only base
+```
+
+Sampled private footprint can miss spikes shorter than the interval. Chromium resets the kernel peak RSS after each dump, so `peakResidentSetBytes.max` is a true per-process high-water mark for the window only when `resettable` is `true`; otherwise it is the peak since the process started. Peak RSS values belong to different instants and must not be added across processes or to private footprint. Each light dump of a typical VS Code window adds about 1 MiB to the trace, and the trace is still limited to 256 MiB. Choose an interval that gives roughly 100 samples or fewer for the scenario. Without the variable, the trace configuration and the result are unchanged.
+
 ### StringsWithLocations
 
 Reports positive growth in live string objects, grouped by string text and the closest available retaining source location. `count` is the added object count (`afterCount - beforeCount`); results sort by descending `count`, with stable tie ordering. Equal text at different locations remains separate, and multiple references to one string do not inflate the count.
@@ -986,6 +994,14 @@ This Linux-only measure snapshots `/proc/<pid>/smaps_rollup` for the root applic
 At least 64 KiB PSS growth in any process signals a suspected leak. Caching, allocator retention, and changes in page sharing can also change PSS. Compare repeated warmed-up scenarios. These are resident-memory snapshots, not an allocation census: growth within existing resident arenas may be invisible. Processes that exit between snapshots, or descendants reparented outside the tree, may be missed.
 
 Reading smaps requires procfs access to the application processes. An unreadable descendant is recorded as a snapshot error and suppresses automatic leak classification; the summary marks the result incomplete. Failure to read the root process fails the measure. Kernel slab memory is outside this measure's scope.
+
+### Linux process limits
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --measure-after --measure linux-process-limits --only explorer-expand-and-collapse
+```
+
+This Linux-only measure tracks resources that can be exhausted without resident-memory growth: threads, inotify watches and instances, and virtual address space. See the [measure guide](packages/docs/site/measures/linux-process-limits.md) for fields and limitations. It always reports `isLeak: false`.
 
 ### Linux cgroup memory
 
