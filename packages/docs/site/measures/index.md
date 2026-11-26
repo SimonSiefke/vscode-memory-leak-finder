@@ -10,6 +10,7 @@ These entries identify what a collector measures, not a promise that every metri
 - [Event loop delay](./event-loop-delay)
 - [Forced layout count](./forced-layout-count)
 - [Linux process limits](./linux-process-limits)
+- [Long animation frames](./long-animation-frames)
 - [Idle CPU after scenario](./idle-cpu-after-scenario)
 - [Long renderer tasks](./long-renderer-tasks)
 - [Module resolution](./module-resolution)
@@ -132,6 +133,7 @@ These entries identify what a collector measures, not a promise that every metri
 | `linux-process-tree-resources`                          | [LinuxProcessTreeResources](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureLinuxProcessTreeResources/MeasureLinuxProcessTreeResources.ts)                                                                |
 | `linux-process-tree-resources-from-start`               | [LinuxProcessTreeResourcesFromStart](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureLinuxProcessTreeResourcesFromStart/MeasureLinuxProcessTreeResourcesFromStart.ts)                                     |
 | `linux-slab-memory`                                     | [LinuxSlabMemory](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureLinuxSlabMemory/MeasureLinuxSlabMemory.ts)                                                                                              |
+| `long-animation-frames`                                 | [LongAnimationFrames](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureLongAnimationFrames/MeasureLongAnimationFrames.ts)                                                                                  |
 | `long-renderer-tasks`                                   | [LongRendererTasks](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureLongRendererTasks/MeasureLongRendererTasks.ts)                                                                                        |
 | `map-count`                                             | [MapCount](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureMapCount/MeasureMapCount.ts)                                                                                                                   |
 | `map-size`                                              | [MapSize](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureMapSize/MeasureMapSize.ts)                                                                                                                      |
