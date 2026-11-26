@@ -16,6 +16,7 @@ These entries identify what a collector measures, not a promise that every metri
 - [Module resolution](./module-resolution)
 - [Module resolution lookups](./module-resolution-lookups)
 - [Named function count 3](./named-function-count3)
+- [Peak memory high-water](./peak-memory-high-water)
 - [Sampled allocation churn](./sampled-allocation-churn)
 - [Script compilation and evaluation](./script-compilation-evaluation)
 - [Synchronous DOM read count](./synchronous-dom-read-count)
@@ -165,6 +166,7 @@ These entries identify what a collector measures, not a promise that every metri
 | `object-url-count`                                      | [ObjectUrlCount](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureObjectUrlCount/MeasureObjectUrlCount.ts)                                                                                                 |
 | `offscreen-canvas-count`                                | [OffscreenCanvasCount](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureOffscreenCanvasCount/MeasureOffscreenCanvasCount.ts)                                                                               |
 | `paint-events`                                          | [PaintEvents](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasurePaintEvents/MeasurePaintEvents.ts)                                                                                                          |
+| `peak-memory-high-water`                                | [PeakMemoryHighWater](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasurePeakMemoryHighWater/MeasurePeakMemoryHighWater.ts)                                                                                  |
 | `pending-promise-count`                                 | [PendingPromiseCount](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasurePendingPromiseCount/MeasurePendingPromiseCount.ts)                                                                                  |
 | `pending-promises-with-retainers`                       | [PendingPromisesWithRetainers](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasurePendingPromisesWithRetainers/MeasurePendingPromisesWithRetainers.ts)                                                       |
 | `performance-mark-bytes`                                | [PerformanceMarkBytes](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasurePerformanceMarkBytes/MeasurePerformanceMarkBytes.ts)                                                                               |
