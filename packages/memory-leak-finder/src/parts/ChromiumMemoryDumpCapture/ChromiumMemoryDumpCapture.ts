@@ -16,6 +16,10 @@ interface TraceState {
 const TraceTimeout = 10000
 const StreamChunkBytes = 256 * 1024
 const MaxTraceBytes = 256 * 1024 * 1024
+const MinPeriodicIntervalMs = 250
+const MaxPeriodicIntervalMs = 60000
+
+export const PeriodicIntervalEnvironmentVariable = 'CHROMIUM_MEMORY_DUMP_PERIODIC_INTERVAL_MS'
 
 export interface ChromiumMemoryDumpCaptureState {
   active: boolean
@@ -23,6 +27,7 @@ export interface ChromiumMemoryDumpCaptureState {
   readonly capturePath: string
   captured: boolean
   inspectedPid: number | undefined
+  readonly periodicIntervalMs: number | undefined
   supported: boolean
   readonly targetId: string
   readonly trace: TraceState
@@ -85,11 +90,26 @@ function createBrowserSession(session: Session): Session | null {
   }
 }
 
-function getTraceOptions() {
+export function parsePeriodicIntervalMs(value: string | undefined): number | undefined {
+  if (value === undefined || value === '') {
+    return undefined
+  }
+  const intervalMs = /^\d+$/.test(value) ? Number(value) : Number.NaN
+  if (!(intervalMs >= MinPeriodicIntervalMs && intervalMs <= MaxPeriodicIntervalMs)) {
+    throw new Error(
+      `${PeriodicIntervalEnvironmentVariable} must be an integer from ${MinPeriodicIntervalMs} to ${MaxPeriodicIntervalMs} milliseconds, received ${JSON.stringify(value)}`,
+    )
+  }
+  return intervalMs
+}
+
+function getTraceOptions(periodicIntervalMs: number | undefined) {
   return {
     traceConfig: {
       excludedCategories: ['*'],
       includedCategories: ['disabled-by-default-memory-infra'],
+      // Light dumps only carry process totals; the two explicit detailed dumps remain the comparison endpoints.
+      ...(periodicIntervalMs === undefined ? {} : { memoryDumpConfig: { triggers: [{ mode: 'light', periodicIntervalMs }] } }),
       recordMode: 'recordAsMuchAsPossible',
     },
     transferMode: 'ReturnAsStream',
@@ -184,7 +204,11 @@ async function writeStreamCapture(state: ChromiumMemoryDumpCaptureState): Promis
     await mkdir(dirname(state.capturePath), { recursive: true })
     const output = await open(state.capturePath, 'w')
     try {
-      const metadata = JSON.stringify({ dataLossOccurred: state.trace.dataLossOccurred, inspectedPid: state.inspectedPid })
+      const metadata = JSON.stringify({
+        dataLossOccurred: state.trace.dataLossOccurred,
+        inspectedPid: state.inspectedPid,
+        periodicIntervalMs: state.periodicIntervalMs,
+      })
       await output.writeFile(`${metadata.slice(0, -1)},"trace":`)
       let bytes = 0
       while (true) {
@@ -227,7 +251,7 @@ async function resolveInspectedPid(state: ChromiumMemoryDumpCaptureState): Promi
   }
 }
 
-export function create(session: Session, capturePath: string): ChromiumMemoryDumpCaptureState {
+export function create(session: Session, capturePath: string, periodicIntervalMs?: number): ChromiumMemoryDumpCaptureState {
   const dynamicSession = session as Dynamic
   const state: ChromiumMemoryDumpCaptureState = {
     active: false,
@@ -236,6 +260,7 @@ export function create(session: Session, capturePath: string): ChromiumMemoryDum
     captured: false,
     electronWebSocketUrl: typeof dynamicSession.electronWebSocketUrl === 'string' ? dynamicSession.electronWebSocketUrl : '',
     inspectedPid: undefined,
+    periodicIntervalMs,
     supported: true,
     targetId: typeof dynamicSession.targetId === 'string' ? dynamicSession.targetId : '',
     trace: createTraceState(session),
@@ -253,7 +278,7 @@ export async function start(state: ChromiumMemoryDumpCaptureState): Promise<stri
   }
   await resolveInspectedPid(state)
   try {
-    await DevtoolsProtocolTracing.start(state.browserSession, getTraceOptions())
+    await DevtoolsProtocolTracing.start(state.browserSession, getTraceOptions(state.periodicIntervalMs))
     state.active = true
     await requestDetailedDump(state)
   } catch (error) {

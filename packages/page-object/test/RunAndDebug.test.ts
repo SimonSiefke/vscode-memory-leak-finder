@@ -94,3 +94,76 @@ test('stop clicks the toolbar stop action and waits for the debugger to stop', a
   await debuggerView.stop()
   expect(stopButtonClick).toHaveBeenCalledTimes(1)
 })
+
+const createWatch = ({ expanded = 'true', rows = 0 }: { expanded?: string; rows?: number } = {}) => {
+  const calls: string[] = []
+  const watchLocator = (selector: string): any => ({
+    selector,
+    locator: (child: string) => watchLocator(`${selector} ${child}`),
+    click: async () => {
+      calls.push(`click ${selector}`)
+      if (selector === '.pane-header[aria-label^="Watch Section"]') {
+        expanded = 'true'
+      }
+    },
+    focus: async () => calls.push(`focus ${selector}`),
+    getAttribute: async () => expanded,
+    type: async (text: string) => calls.push(`type ${text}`),
+  })
+  const debuggerView = RunAndDebug.create({
+    electronApp: {},
+    expect: (element: any) => ({
+      toBeFocused: async () => calls.push(`focused ${element.selector}`),
+      toBeHidden: async () => calls.push(`hidden ${element.selector}`),
+      toBeVisible: async () => calls.push(`visible ${element.selector}`),
+      toHaveAttribute: async (_name: string, value: string) => expect(expanded).toBe(value),
+      toHaveClass: async (name: string) => calls.push(`class ${name} ${element.selector}`),
+      toHaveCount: async (count: number) => expect(rows).toBe(count),
+    }),
+    ideVersion: { major: 1, minor: 147, patch: 0 },
+    page: {
+      keyboard: { press: async (key: string) => calls.push(`press ${key}`) },
+      locator: watchLocator,
+      waitForIdle: async () => {},
+    },
+    platform: 'linux',
+    VError: Error,
+  })
+  return { calls, debuggerView }
+}
+
+test('addWatchExpression uses the Watch header action and submits the input', async () => {
+  const { calls, debuggerView } = createWatch({ expanded: 'false' })
+  await debuggerView.addWatchExpression('counter')
+  expect(calls).toEqual([
+    'visible .pane-header[aria-label^="Watch Section"]',
+    'click .pane-header[aria-label^="Watch Section"]',
+    'focus .pane-header[aria-label^="Watch Section"]',
+    'class focused .pane-header[aria-label^="Watch Section"]',
+    'visible .pane-header[aria-label^="Watch Section"] [role="button"][aria-label^="Add Expression"]',
+    'click .pane-header[aria-label^="Watch Section"] [role="button"][aria-label^="Add Expression"]',
+    'visible .debug-watch input[aria-label="Type watch expression"]',
+    'focused .debug-watch input[aria-label="Type watch expression"]',
+    'type counter',
+    'press Enter',
+    'hidden .debug-watch input[aria-label="Type watch expression"]',
+    'visible .debug-watch .monaco-list-row[aria-label^="counter, value "]',
+  ])
+})
+
+test('shouldHaveWatchExpression matches the row name and value', async () => {
+  const { calls, debuggerView } = createWatch()
+  await debuggerView.shouldHaveWatchExpression({ expression: 'counter', value: 'not available' })
+  expect(calls.at(-1)).toBe('visible .debug-watch .monaco-list-row[aria-label="counter, value not available"]')
+})
+
+test('removeAllWatchExpressions uses the Watch header action', async () => {
+  const { calls, debuggerView } = createWatch()
+  await debuggerView.removeAllWatchExpressions()
+  expect(calls).toContain('click .pane-header[aria-label^="Watch Section"] [role="button"][aria-label^="Remove All Expressions"]')
+})
+
+test('shouldHaveNoWatchExpressions rejects remaining rows', async () => {
+  await createWatch().debuggerView.shouldHaveNoWatchExpressions()
+  await expect(createWatch({ rows: 1 }).debuggerView.shouldHaveNoWatchExpressions()).rejects.toThrow()
+})

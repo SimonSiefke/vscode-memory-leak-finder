@@ -38,3 +38,15 @@ test('streamed data-loss metadata is not silently accepted as a complete capture
     await rm(directory, { recursive: true, force: true })
   }
 })
+
+test('streamed capture forwards the requested periodic interval to the parser', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'chromium-capture-reader-'))
+  const path = join(directory, 'capture.json')
+  try {
+    await writeFile(path, JSON.stringify({ dataLossOccurred: false, periodicIntervalMs: 500, trace: { traceEvents } }))
+    expect(await createResultFromFile(path)).toEqual(createChromiumMemoryDumpResult(traceEvents, false, undefined, 500))
+    expect((await createResultFromFile(path)).periodic).toMatchObject({ requestedIntervalMs: 500, sampleCount: 0 })
+  } finally {
+    await rm(directory, { recursive: true, force: true })
+  }
+})

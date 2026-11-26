@@ -9,6 +9,7 @@ These entries identify what a collector measures, not a promise that every metri
 - [Event latency](./event-latency)
 - [Event loop delay](./event-loop-delay)
 - [Forced layout count](./forced-layout-count)
+- [Linux process limits](./linux-process-limits)
 - [Idle CPU after scenario](./idle-cpu-after-scenario)
 - [Long renderer tasks](./long-renderer-tasks)
 - [Module resolution](./module-resolution)
@@ -128,6 +129,7 @@ These entries identify what a collector measures, not a promise that every metri
 | `linux-allocation-stacks`                               | [LinuxAllocationStacks](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureLinuxAllocationStacks/MeasureLinuxAllocationStacks.ts)                                                                            |
 | `linux-cgroup-memory`                                   | [LinuxCgroupMemory](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureLinuxCgroupMemory/MeasureLinuxCgroupMemory.ts)                                                                                        |
 | `linux-process-memory`                                  | [LinuxProcessMemory](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureLinuxProcessMemory/MeasureLinuxProcessMemory.ts)                                                                                     |
+| `linux-process-limits`                                  | [LinuxProcessLimits](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureLinuxProcessLimits/MeasureLinuxProcessLimits.ts)                                                                                     |
 | `linux-process-tree-resources`                          | [LinuxProcessTreeResources](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureLinuxProcessTreeResources/MeasureLinuxProcessTreeResources.ts)                                                                |
 | `linux-process-tree-resources-from-start`               | [LinuxProcessTreeResourcesFromStart](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureLinuxProcessTreeResourcesFromStart/MeasureLinuxProcessTreeResourcesFromStart.ts)                                     |
 | `linux-slab-memory`                                     | [LinuxSlabMemory](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureLinuxSlabMemory/MeasureLinuxSlabMemory.ts)                                                                                              |
