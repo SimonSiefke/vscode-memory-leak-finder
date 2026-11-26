@@ -929,6 +929,8 @@ export interface Task {
   run(taskName: any, check?: any): Promise<void>
   runError(options: any): Promise<void>
   selectQuickPickItem(options: any): Promise<void>
+  shouldHaveNoRunningTasks(): Promise<void>
+  terminate(taskName: string): Promise<void>
   unpin(name: any): Promise<void>
 }
 export interface Terminal {
