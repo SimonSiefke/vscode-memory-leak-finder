@@ -199,6 +199,14 @@ npm run build-charts
 
 The generated process and allocator charts are written to `.vscode-charts/chromium-memory-dump-processes` and `.vscode-charts/chromium-memory-dump-allocators`.
 
+To catch transient peaks between the two endpoints, set `CHROMIUM_MEMORY_DUMP_PERIODIC_INTERVAL_MS` to an integer from 250 to 60000. Chromium then also records light MemoryInfra dumps at that interval. The two detailed dumps are still the only comparison endpoints, and light allocators are never compared with detailed ones. When both detailed dumps exist, the result gains a `periodic` object with `requestedIntervalMs`, `sampleCount`, `medianIntervalMs`, `outsideEndpointWindowCount` (light dumps before the first or after the last detailed dump, which are excluded), the per-sample total private footprint of the process tree, and, per process, sampled `privateFootprintBytes` (`first`, `last`, `min`, `max`) and `peakResidentSetBytes` (`max`, `resettable`).
+
+```sh
+CHROMIUM_MEMORY_DUMP_PERIODIC_INTERVAL_MS=500 node packages/cli/bin/test.js --cwd packages/e2e --measure-after --measure chromium-memory-dump --only base
+```
+
+Sampled private footprint can miss spikes shorter than the interval. Chromium resets the kernel peak RSS after each dump, so `peakResidentSetBytes.max` is a true per-process high-water mark for the window only when `resettable` is `true`; otherwise it is the peak since the process started. Peak RSS values belong to different instants and must not be added across processes or to private footprint. Each light dump of a typical VS Code window adds about 1 MiB to the trace, and the trace is still limited to 256 MiB. Choose an interval that gives roughly 100 samples or fewer for the scenario. Without the variable, the trace configuration and the result are unchanged.
+
 ### StringsWithLocations
 
 Reports positive growth in live string objects, grouped by string text and the closest available retaining source location. `count` is the added object count (`afterCount - beforeCount`); results sort by descending `count`, with stable tie ordering. Equal text at different locations remains separate, and multiple references to one string do not inflate the count.
@@ -994,6 +1002,14 @@ node packages/cli/bin/test.js --cwd packages/e2e --measure-after --measure linux
 ```
 
 This Linux-only measure reads `/proc/<pid>/io` for the root application and its current descendants before and after the scenario, and reports per-process deltas of syscall-level bytes (`rchar`/`wchar`, including pipes and sockets) and storage-level bytes (`readBytes`/`writeBytes`). The two layers describe the same I/O and must not be added together. Processes are matched by PID plus start time; tree totals cover processes running in both snapshots, and any started, exited, or unreadable process marks the result incomplete. The kernel adds the counters of a reaped child to its parent, so short-lived commands show up in their parent's delta (for example the terminal shell). The main process's syscall bytes can include the harness's DevTools traffic. The measure is a diagnostic (`isLeak: false`); see the [guide](packages/docs/site/measures/linux-process-io.md) for field semantics.
+
+### Linux process limits
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e --measure-after --measure linux-process-limits --only explorer-expand-and-collapse
+```
+
+This Linux-only measure tracks resources that can be exhausted without resident-memory growth: threads, inotify watches and instances, and virtual address space. See the [measure guide](packages/docs/site/measures/linux-process-limits.md) for fields and limitations. It always reports `isLeak: false`.
 
 ### Linux cgroup memory
 

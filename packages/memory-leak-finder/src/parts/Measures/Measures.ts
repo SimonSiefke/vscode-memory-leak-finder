@@ -101,6 +101,7 @@ export * as MeasureLinuxAllocationStacks from '../MeasureLinuxAllocationStacks/M
 export * as MeasureLinuxProcessIo from '../MeasureLinuxProcessIo/MeasureLinuxProcessIo.ts'
 export * as MeasureLinuxCgroupMemory from '../MeasureLinuxCgroupMemory/MeasureLinuxCgroupMemory.ts'
 export * as MeasureLinuxProcessMemory from '../MeasureLinuxProcessMemory/MeasureLinuxProcessMemory.ts'
+export * as MeasureLinuxProcessLimits from '../MeasureLinuxProcessLimits/MeasureLinuxProcessLimits.ts'
 export * as MeasureLinuxProcessTreeResources from '../MeasureLinuxProcessTreeResources/MeasureLinuxProcessTreeResources.ts'
 export * as MeasureLinuxProcessTreeResourcesFromStart from '../MeasureLinuxProcessTreeResourcesFromStart/MeasureLinuxProcessTreeResourcesFromStart.ts'
 export * as MeasureLinuxSlabMemory from '../MeasureLinuxSlabMemory/MeasureLinuxSlabMemory.ts'

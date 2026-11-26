@@ -41,6 +41,7 @@ export default defineConfig({
             { text: 'Event loop delay', link: '/measures/event-loop-delay' },
             { text: 'Forced layout count', link: '/measures/forced-layout-count' },
             { text: 'Linux process I/O', link: '/measures/linux-process-io' },
+            { text: 'Linux process limits', link: '/measures/linux-process-limits' },
             { text: 'Long renderer tasks', link: '/measures/long-renderer-tasks' },
             { text: 'Module resolution', link: '/measures/module-resolution' },
             { text: 'Module resolution lookups', link: '/measures/module-resolution-lookups' },

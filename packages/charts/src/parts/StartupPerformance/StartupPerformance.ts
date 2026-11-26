@@ -78,18 +78,22 @@ const withOriginalLocations = async (
     }
   }
   const originalPositions = new Map<string, { source: string; line: number; column: number }>()
-  for (const node of profile.nodes) {
-    const { url, lineNumber, columnNumber } = node.callFrame
-    if (!url) continue
-    const consumer = consumersByScriptUrl.get(url)
-    if (!consumer) continue
-    const original = consumer.originalPositionFor({ line: lineNumber + 1, column: columnNumber + 1 })
-    if (original.source && original.line !== null && original.column !== null)
-      originalPositions.set(`${url}:${lineNumber}:${columnNumber}`, {
-        source: original.source,
-        line: original.line,
-        column: original.column,
-      })
+  try {
+    for (const node of profile.nodes) {
+      const { url, lineNumber, columnNumber } = node.callFrame
+      if (!url) continue
+      const consumer = consumersByScriptUrl.get(url)
+      if (!consumer) continue
+      const original = consumer.originalPositionFor({ line: lineNumber + 1, column: columnNumber + 1 })
+      if (original.source && original.line !== null && original.column !== null)
+        originalPositions.set(`${url}:${lineNumber}:${columnNumber}`, {
+          source: original.source,
+          line: original.line,
+          column: original.column,
+        })
+    }
+  } finally {
+    for (const consumer of consumers.values()) consumer.destroy()
   }
   return {
     ...profile,
