@@ -61,6 +61,14 @@ export const create = ({ expect, page, VError }: CreateParams) => {
           if (isVisible) {
             break
           }
+          // The menu can render after the click resolves. Another right-click
+          // would close it again, so give it a moment before retrying.
+          try {
+            await expect(contextMenu).toBeVisible({ timeout: 1000 })
+            break
+          } catch {
+            // retry the right-click below
+          }
           await page.waitForIdle()
           if (tries++ === maxTries) {
             throw new Error(`failed to open`)
