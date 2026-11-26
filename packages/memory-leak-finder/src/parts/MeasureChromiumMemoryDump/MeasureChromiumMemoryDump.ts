@@ -18,8 +18,11 @@ export const id = MeasureId.ChromiumMemoryDump
 export const targets = [TargetId.Browser]
 
 export function create(session: Session) {
+  const periodicIntervalMs = ChromiumMemoryDumpCapture.parsePeriodicIntervalMs(
+    process.env[ChromiumMemoryDumpCapture.PeriodicIntervalEnvironmentVariable],
+  )
   const capturePath = join(Root.root, '.tmp', `chromium-memory-dump-${randomUUID()}.json`)
-  const state = ChromiumMemoryDumpCapture.create(session, capturePath)
+  const state = ChromiumMemoryDumpCapture.create(session, capturePath, periodicIntervalMs)
   process.once('exit', () => {
     rmSync(capturePath, { force: true })
   })
