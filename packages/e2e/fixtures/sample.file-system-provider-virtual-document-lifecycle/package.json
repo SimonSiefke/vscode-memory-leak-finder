@@ -1,0 +1,38 @@
+{
+  "name": "file-system-provider-virtual-document-lifecycle",
+  "displayName": "File System Provider Virtual Document Lifecycle",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "file-system-provider-virtual-document-lifecycle.setup",
+        "title": "File System Provider Virtual Document Lifecycle: Setup"
+      },
+      {
+        "command": "file-system-provider-virtual-document-lifecycle.open",
+        "title": "File System Provider Virtual Document Lifecycle: Open"
+      },
+      {
+        "command": "file-system-provider-virtual-document-lifecycle.verifySaved",
+        "title": "File System Provider Virtual Document Lifecycle: Verify Saved"
+      },
+      {
+        "command": "file-system-provider-virtual-document-lifecycle.externalChange",
+        "title": "File System Provider Virtual Document Lifecycle: External Change"
+      },
+      {
+        "command": "file-system-provider-virtual-document-lifecycle.unregister",
+        "title": "File System Provider Virtual Document Lifecycle: Unregister"
+      },
+      {
+        "command": "file-system-provider-virtual-document-lifecycle.cleanup",
+        "title": "File System Provider Virtual Document Lifecycle: Cleanup"
+      }
+    ]
+  }
+}

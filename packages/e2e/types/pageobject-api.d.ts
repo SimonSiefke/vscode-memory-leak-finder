@@ -528,10 +528,14 @@ export interface Git {
   closeRepository(relativePath?: any): Promise<void>
   commit(message: any): Promise<void>
   createBranch(branchName: any): Promise<void>
+  getHeadCommit(): Promise<string>
   init(): Promise<void>
   initRepository(relativePath: any): Promise<void>
   openRepository(relativePath: any): Promise<void>
   reopenClosedRepository(relativePath: any): Promise<void>
+  shouldHaveCommitCount(count: number): Promise<void>
+  shouldHaveHeadCommit(commit: string): Promise<void>
+  shouldHaveLastCommitMessage(message: string): Promise<void>
   shouldHaveNoStagedDiff(fileName: any): Promise<void>
   shouldHaveStagedDiffContaining(fileName: any, text: any): Promise<void>
   shouldHaveWorkingTreeDiffContaining(fileName: any, text: any): Promise<void>
@@ -582,6 +586,16 @@ export interface MCP {
   removeServer(serverName: any): Promise<void>
   selectCommand(text: any, stayVisible?: any): Promise<void>
 }
+export interface MergeEditor {
+  acceptAllIncoming(): Promise<void>
+  completeMerge(): Promise<void>
+  openFromSourceControl(fileName: string): Promise<void>
+  shouldBeClosed(): Promise<void>
+  shouldBeVisible(): Promise<void>
+  shouldHaveNoMergeChanges(): Promise<void>
+  shouldHaveRemainingConflicts(count: number): Promise<void>
+  shouldHaveResultContaining(text: string): Promise<void>
+}
 export interface MultiDiffEditor {
   close(): Promise<void>
   open(options: any): Promise<void>
@@ -599,9 +613,11 @@ export interface Notebook {
   removeMarkdownCell(): Promise<void>
   scrollDown(): Promise<void>
   scrollUp(): Promise<void>
+  shouldHaveCellExecutionState(options: { index: number; state: 'error' | 'success' }): Promise<void>
   shouldHaveKernel(expectedKernel: string): Promise<void>
   shouldHaveOutput(expectedOutput: string): Promise<void>
   splitCell(cellIndex?: any): Promise<void>
+  stopCellExecution(index: number): Promise<void>
 }
 export interface NotebookInlineChat {
   hide(): Promise<void>
@@ -611,6 +627,12 @@ export interface NotebookInlineChat {
 export interface Notification {
   closeAll(options?: { force?: boolean }): Promise<void>
   shouldHaveItem(expectedMessage: any): Promise<void>
+}
+export interface Outline {
+  focus(): Promise<void>
+  select(name: string): Promise<void>
+  shouldHaveMessage(message: string): Promise<void>
+  shouldHaveSymbols(names: readonly string[]): Promise<void>
 }
 export interface Output {
   shouldHaveText(text: RegExp, timeout?: number): Promise<void>
@@ -694,13 +716,17 @@ export interface ReleaseNotes {
   show(): Promise<void>
 }
 export interface RunAndDebug {
+  addWatchExpression(expression: string): Promise<void>
   continue(): Promise<void>
   pause(): Promise<void>
   removeAllBreakpoints(): Promise<void>
+  removeAllWatchExpressions(): Promise<void>
   runAndWaitForDebugConsoleOutput(options: any): Promise<void>
   runAndWaitForPaused(options: any): Promise<void>
   setPauseOnExceptions(options: any): Promise<void>
   setValue(options?: any): Promise<void>
+  shouldHaveNoWatchExpressions(): Promise<void>
+  shouldHaveWatchExpression(options: { expression: string; value: string }): Promise<void>
   startRunAndDebug(options?: any): Promise<void>
   step(options?: any): Promise<void>
   stepInto(options: any): Promise<void>
@@ -836,7 +862,9 @@ export interface SingleIframeWebView {
 }
 export interface SourceControl {
   checkoutBranch(branchName: any): Promise<void>
+  clearCommitMessage(): Promise<void>
   closeRepository(name: any): Promise<void>
+  commitFromInput(): Promise<void>
   disableInlineBlame(): Promise<void>
   doMoreAction(name: any): Promise<void>
   enableInlineBlame(options: any): Promise<void>
@@ -846,15 +874,18 @@ export interface SourceControl {
   selectBranch(branchName: any): Promise<void>
   openChange(name: any): Promise<void>
   show(): Promise<void>
-  shouldHaveHistoryItem(name: any): Promise<void>
+  shouldHaveCommitMessage(message: string): Promise<void>
+  shouldHaveHistoryItem(name: any, options?: { timeout?: number }): Promise<void>
   shouldHaveRepository(name: any): Promise<void>
   shouldHaveRepositoryCount(count: any): Promise<void>
   shouldHaveUnstagedFile(name: any): Promise<void>
-  shouldNotHaveHistoryItem(name: any): Promise<void>
+  shouldNotHaveChange(name: string): Promise<void>
+  shouldNotHaveHistoryItem(name: any, options?: { timeout?: number }): Promise<void>
   shouldNotHaveRepository(name: any): Promise<void>
   showBranchPicker(): Promise<void>
   showGraph(): Promise<void>
   stageFile(name: any, parentFolder?: any): Promise<void>
+  typeCommitMessage(message: string): Promise<void>
   undoLastCommit(): Promise<void>
   unstageAllChanges(): Promise<void>
   unstageFile(name: any): Promise<void>
@@ -934,16 +965,26 @@ export interface TerminalInlineChat {
 export interface Testing {
   shouldHaveSummary(text: string | RegExp, timeout?: number): Promise<void>
   clearAllResults(): Promise<void>
+  closeCoverage(): Promise<void>
   focusOnTestExplorerView(): Promise<void>
+  openCoverage(): Promise<void>
   runAllTests(options: any): Promise<void>
+  runAllTestsWithCoverage(): Promise<void>
+  shouldHaveCoverageDecorations(options: { hit: number; miss: number }): Promise<void>
+  shouldHaveCoverageRows(expectedRows: readonly { file: string; percent: string }[]): Promise<void>
+  shouldHaveNoCoverage(): Promise<void>
+  toggleInlineCoverage(options: { enabled: boolean }): Promise<void>
   runTask(taskName: any): Promise<void>
   shouldHaveTestFailure(): Promise<void>
   shouldHaveTestSuccess(): Promise<void>
 }
 export interface Timeline {
   open(fileName: any): Promise<void>
+  runItemAction(name: string, action: string): Promise<void>
   shouldBeVisible(): Promise<void>
   shouldHaveItem(name: any): Promise<void>
+  shouldHaveItemCount(count: number): Promise<void>
+  shouldNotHaveItem(name: string): Promise<void>
 }
 export interface Timeout {
   waitMinutes(minutes: any): Promise<void>
@@ -1056,10 +1097,12 @@ export interface PageObjectApi {
   readonly LanguageModelEditor: LanguageModelEditor
   readonly MarkdownPreview: MarkdownPreview
   readonly MCP: MCP
+  readonly MergeEditor: MergeEditor
   readonly MultiDiffEditor: MultiDiffEditor
   readonly Notebook: Notebook
   readonly NotebookInlineChat: NotebookInlineChat
   readonly Notification: Notification
+  readonly Outline: Outline
   readonly Output: Output
   readonly Panel: Panel
   readonly PortsView: PortsView
