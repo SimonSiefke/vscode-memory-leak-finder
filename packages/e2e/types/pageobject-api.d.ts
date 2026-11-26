@@ -687,6 +687,8 @@ export interface Profile {
 }
 export interface QuickPick {
   shouldHaveItem(text: string): Promise<void>
+  shouldNotHaveItem(text: string): Promise<void>
+  shouldBeHidden(): Promise<void>
   close(): Promise<void>
   executeCommand(command: any, options?: any): Promise<void>
   focusNext(): Promise<void>

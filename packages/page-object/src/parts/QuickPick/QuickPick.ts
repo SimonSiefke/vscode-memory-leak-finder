@@ -7,6 +7,24 @@ export const create = ({ expect, ideVersion, page, platform, VError }: CreatePar
     async shouldHaveItem(text: string) {
       await expect(page.locator('.quick-input-list .label-name', { hasExactText: text })).toBeVisible()
     },
+    async shouldNotHaveItem(text: string) {
+      try {
+        await expect(page.locator('.quick-input-list .label-name', { hasExactText: text })).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to verify that quick pick item "${text}" is not visible`)
+      }
+    },
+    async shouldBeHidden() {
+      try {
+        const quickPick = page.locator('.quick-input-widget')
+        await expect(quickPick).toBeHidden()
+        // Check again after pending renderer work settles so a delayed reopen is not missed.
+        await page.waitForIdle()
+        await expect(quickPick).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to verify that quick pick is hidden`)
+      }
+    },
     async close() {
       try {
         await this.hide()
