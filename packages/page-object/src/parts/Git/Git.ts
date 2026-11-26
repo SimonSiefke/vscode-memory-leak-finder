@@ -73,6 +73,14 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to create branch ${branchName}`)
       }
     },
+    async getHeadCommit(): Promise<string> {
+      try {
+        const result = await Exec.exec('git', ['rev-parse', 'HEAD'], { cwd: workspace, env: { ...process.env } })
+        return result.stdout.trim()
+      } catch (error) {
+        throw new VError(error, `Failed to get head commit`)
+      }
+    },
     async init() {
       try {
         await mkdir(workspace, { recursive: true })
@@ -123,6 +131,39 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to reopen repository at ${relativePath}`)
+      }
+    },
+    async shouldHaveCommitCount(count: number) {
+      try {
+        const result = await Exec.exec('git', ['rev-list', '--count', 'HEAD'], { cwd: workspace, env: { ...process.env } })
+        const actual = Number.parseInt(result.stdout.trim(), 10)
+        if (actual !== count) {
+          throw new Error(`expected ${count} commits but got ${result.stdout.trim()}`)
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to check commit count ${count}`)
+      }
+    },
+    async shouldHaveHeadCommit(commit: string) {
+      try {
+        const result = await Exec.exec('git', ['rev-parse', 'HEAD'], { cwd: workspace, env: { ...process.env } })
+        const actual = result.stdout.trim()
+        if (actual !== commit) {
+          throw new Error(`expected HEAD to be ${commit} but got ${actual}`)
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to check head commit`)
+      }
+    },
+    async shouldHaveLastCommitMessage(message: string) {
+      try {
+        const result = await Exec.exec('git', ['log', '-1', '--format=%s'], { cwd: workspace, env: { ...process.env } })
+        const actual = result.stdout.trim()
+        if (actual !== message) {
+          throw new Error(`expected last commit message to be "${message}" but got "${actual}"`)
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to check last commit message`)
       }
     },
     async shouldHaveNoStagedDiff(fileName: string) {

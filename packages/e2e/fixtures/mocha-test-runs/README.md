@@ -1,7 +1,7 @@
 # Mocha bulk test runs
 
 Three opt-in e2e scenarios exercise the real `coderline.mocha-vscode` extension
-with Mocha 11.7.5 and 5,000 fast tests:
+with the Mocha version pinned in `package.json` and 5,000 fast tests:
 
 - `mocha-run-many-tests`: 5,000 passing tests.
 - `mocha-run-many-tests-mixed-results`: 4,990 passing, five failing, and five
@@ -24,20 +24,31 @@ it does not claim that the extension's run handler has returned. The fixture use
 one suite containing 5,000 test cases and emits progress output every 100 cases.
 
 Use a dedicated driver worktree and the repository's `.nvmrc` Node version.
-Install dependencies and Mocha for VS Code 1.4.0 before launching the harness:
+Install the workspace and fixture dependencies, then install version 1.4.0 of
+the Mocha VS Code extension and the companion fixture VSIX before launching the
+harness. The extension loads `mocha/lib/cli/options.js`, which Mocha 12 removed.
 
 ```sh
 npm ci
-npm ci --ignore-scripts --prefix packages/e2e/fixtures/mocha-test-runs
-mkdir -p .vscode-extensions
-cp -R packages/e2e/fixtures/mocha-test-runs .vscode-extensions/mocha-test-runs-fixture
+fixture_dir=packages/e2e/fixtures/mocha-test-runs
+fixture_vsix="$(mktemp -d)/mocha-test-runs-fixture.vsix"
+npm ci --ignore-scripts --prefix "$fixture_dir"
+(
+  cd "$fixture_dir"
+  npm exec --yes --package @vscode/vsce -- vsce package \
+    --no-dependencies --allow-missing-repository --out "$fixture_vsix"
+)
 env -u VSCODE_IPC_HOOK_CLI /absolute/path/to/vscode/bin/code \
   --user-data-dir "$PWD/.vscode-user-data-dir" \
   --extensions-dir "$PWD/.vscode-extensions" \
   --install-extension coderline.mocha-vscode@1.4.0
+env -u VSCODE_IPC_HOOK_CLI /absolute/path/to/vscode/bin/code \
+  --user-data-dir "$PWD/.vscode-user-data-dir" \
+  --extensions-dir "$PWD/.vscode-extensions" \
+  --install-extension "$fixture_vsix"
 
 xvfb-run -a node packages/cli/bin/test.js \
-  --cwd packages/e2e --only mocha-run-many-tests \
+  --cwd packages/e2e --only mocha-run-many-tests.ts \
   --runs 1 --enable-extensions --run-skipped-tests-anyway \
   --vscode-path /absolute/path/to/vscode/code
 ```
