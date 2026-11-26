@@ -56,6 +56,31 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
     return page.locator('.sidebar .scm-provider :is(.label-name, .label > .name)', { hasExactText: name }).first()
   }
 
+  const commitInputSelector = ':is(.native-edit-context, .inputarea)'
+
+  const focusCommitInput = async () => {
+    const input = page.locator('.sidebar .scm-input')
+    await expect(input).toBeVisible()
+    await page.waitForIdle()
+    const editContext = input.locator(commitInputSelector).first()
+    await editContext.focus()
+    await expect(input).toBeFocused({ descendantSelector: commitInputSelector })
+    return input
+  }
+
+  const getCommitInputLines = () => {
+    return page.locator('.sidebar .scm-input .view-lines')
+  }
+
+  // Monaco renders spaces in view lines as non-breaking spaces.
+  const getCommitInputText = (message: string): string | RegExp => {
+    if (!message) {
+      return ''
+    }
+    const escaped = message.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`).replaceAll(' ', String.raw`[ \u00a0]`)
+    return new RegExp(`^${escaped}$`)
+  }
+
   return {
     async checkoutBranch(branchName: string) {
       try {
@@ -69,6 +94,17 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to checkout branch "${branchName}"`)
+      }
+    },
+    async clearCommitMessage() {
+      try {
+        await focusCommitInput()
+        await page.keyboard.press(platform === 'darwin' ? 'Meta+A' : 'Control+A')
+        await page.keyboard.press('Backspace')
+        await page.waitForIdle()
+        await expect(getCommitInputLines()).toHaveText('')
+      } catch (error) {
+        throw new VError(error, `Failed to clear commit message`)
       }
     },
     async closeRepository(name: string) {
@@ -89,6 +125,17 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to close repository "${name}"`)
+      }
+    },
+    async commitFromInput() {
+      try {
+        await focusCommitInput()
+        await page.keyboard.press(platform === 'darwin' ? 'Meta+Enter' : 'Control+Enter')
+        await page.waitForIdle()
+        // The git extension clears the input box only after the commit succeeded.
+        await expect(getCommitInputLines()).toHaveText('', { timeout: 15_000 })
+      } catch (error) {
+        throw new VError(error, `Failed to commit from input box`)
       }
     },
     async disableInlineBlame() {
@@ -263,12 +310,19 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to select branch "${branchName}"`)
       }
     },
-    async shouldHaveHistoryItem(name: string) {
+    async shouldHaveCommitMessage(message: string) {
+      try {
+        await expect(getCommitInputLines()).toHaveText(getCommitInputText(message))
+      } catch (error) {
+        throw new VError(error, `Failed to verify commit message "${message}"`)
+      }
+    },
+    async shouldHaveHistoryItem(name: string, { timeout }: { timeout?: number } = {}) {
       try {
         const history = page.locator('[aria-label="Source Control History"]')
-        await expect(history).toBeVisible()
+        await expect(history).toBeVisible({ timeout })
         const item = history.locator(`.monaco-list-row[aria-label^="${name}"]`)
-        await expect(item).toBeVisible()
+        await expect(item).toBeVisible({ timeout })
       } catch (error) {
         throw new VError(error, `Failed to verify history item`)
       }
@@ -353,12 +407,20 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to check unstaged file`)
       }
     },
-    async shouldNotHaveHistoryItem(name: string) {
+    async shouldNotHaveChange(name: string) {
+      try {
+        const file = page.locator(`.sidebar [role="treeitem"][aria-label^="${name},"]`)
+        await expect(file).toBeHidden({ timeout: 15_000 })
+      } catch (error) {
+        throw new VError(error, `Failed to verify that change "${name}" is hidden`)
+      }
+    },
+    async shouldNotHaveHistoryItem(name: string, { timeout }: { timeout?: number } = {}) {
       try {
         const history = page.locator('[aria-label="Source Control History"]')
         await expect(history).toBeVisible()
         const item = history.locator(`.monaco-list-row[aria-label^="${name}"]`)
-        await expect(item).toBeHidden()
+        await expect(item).toBeHidden({ timeout })
       } catch (error) {
         throw new VError(error, `Failed to verify that history item is hidden`)
       }
@@ -463,6 +525,16 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         }
       } catch (error) {
         throw new VError(error, `Failed to stage file`)
+      }
+    },
+    async typeCommitMessage(message: string) {
+      try {
+        await focusCommitInput()
+        await page.keyboard.typeCharacters(message)
+        await page.waitForIdle()
+        await expect(getCommitInputLines()).toHaveText(getCommitInputText(message))
+      } catch (error) {
+        throw new VError(error, `Failed to type commit message "${message}"`)
       }
     },
     async undoLastCommit() {

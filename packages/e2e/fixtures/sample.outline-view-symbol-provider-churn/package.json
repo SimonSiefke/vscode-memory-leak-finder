@@ -1,0 +1,26 @@
+{
+  "name": "outline-view-symbol-provider-churn",
+  "displayName": "Outline View Symbol Provider Churn",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "outline-view-symbol-provider-churn.register",
+        "title": "Outline View Symbol Provider Churn: Register Provider"
+      },
+      {
+        "command": "outline-view-symbol-provider-churn.dispose",
+        "title": "Outline View Symbol Provider Churn: Dispose Provider"
+      },
+      {
+        "command": "outline-view-symbol-provider-churn.cleanup",
+        "title": "Outline View Symbol Provider Churn: Cleanup"
+      }
+    ]
+  }
+}
