@@ -12,7 +12,47 @@ const getStackFrameLabelPattern = (file: string, line: number): RegExp => {
 }
 
 export const create = ({ electronApp, expect, ideVersion, page, platform, VError }: CreateParams) => {
+  const getWatchHeader = () => page.locator('.pane-header[aria-label^="Watch Section"]')
+  const getWatchRows = () => page.locator('.debug-watch .monaco-list-row')
+  const showWatch = async () => {
+    const header = getWatchHeader()
+    await expect(header).toBeVisible()
+    await page.waitForIdle()
+    if ((await header.getAttribute('aria-expanded')) === 'false') {
+      await header.click()
+      await page.waitForIdle()
+    }
+    await expect(header).toHaveAttribute('aria-expanded', 'true')
+    return header
+  }
+  const clickWatchAction = async (label: string) => {
+    const header = await showWatch()
+    // Pane header actions are only displayed while the header is hovered or focused.
+    await header.focus()
+    await expect(header).toHaveClass('focused')
+    await page.waitForIdle()
+    const action = header.locator(`[role="button"][aria-label^="${label}"]`)
+    await expect(action).toBeVisible()
+    await action.click()
+    await page.waitForIdle()
+  }
   return {
+    async addWatchExpression(expression: string) {
+      try {
+        await clickWatchAction('Add Expression')
+        const input = page.locator('.debug-watch input[aria-label="Type watch expression"]')
+        await expect(input).toBeVisible()
+        await expect(input).toBeFocused()
+        await input.type(expression)
+        await page.keyboard.press('Enter')
+        await expect(input).toBeHidden()
+        const row = page.locator(`.debug-watch .monaco-list-row[aria-label^="${expression}, value "]`)
+        await expect(row).toBeVisible()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to add watch expression ${expression}`)
+      }
+    },
     async continue() {
       try {
         const debugToolBar = page.locator('.debug-toolbar')
@@ -49,6 +89,15 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await expect(continueButton).toBeVisible()
       } catch (error) {
         throw new VError(error, `Failed to pause`)
+      }
+    },
+    async removeAllWatchExpressions() {
+      try {
+        await clickWatchAction('Remove All Expressions')
+        await expect(getWatchRows()).toHaveCount(0)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to remove all watch expressions`)
       }
     },
     async removeAllBreakpoints() {
@@ -218,6 +267,23 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         await expect(newVariableRow).toBeVisible()
       } catch (error) {
         throw new VError(error, `Failed to set variable value for ${variableName}`)
+      }
+    },
+    async shouldHaveNoWatchExpressions() {
+      try {
+        await showWatch()
+        await expect(getWatchRows()).toHaveCount(0)
+      } catch (error) {
+        throw new VError(error, `Failed to verify that there are no watch expressions`)
+      }
+    },
+    async shouldHaveWatchExpression({ expression, value }: { expression: string; value: string }) {
+      try {
+        await showWatch()
+        const row = page.locator(`.debug-watch .monaco-list-row[aria-label="${expression}, value ${value}"]`)
+        await expect(row).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to verify watch expression ${expression} with value ${value}`)
       }
     },
     async startRunAndDebug({ debugConfiguration = '', debugLabel = 'Node.js', viaIcon = false } = {}) {
