@@ -1,0 +1,37 @@
+{
+  "name": "notebook-controller-execution-interrupt",
+  "displayName": "Notebook Controller Execution Interrupt",
+  "publisher": "memory-leak-fixtures",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "main": "./extension.js",
+  "contributes": {
+    "notebooks": [
+      {
+        "type": "vmlf-interrupt-notebook",
+        "displayName": "Interrupt fixture notebook",
+        "selector": [
+          {
+            "filenamePattern": "*.vmlf-interrupt"
+          }
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "command": "notebook-controller-execution-interrupt.setup",
+        "title": "Notebook Controller Execution Interrupt: Setup"
+      },
+      {
+        "command": "notebook-controller-execution-interrupt.reset",
+        "title": "Notebook Controller Execution Interrupt: Reset"
+      },
+      {
+        "command": "notebook-controller-execution-interrupt.cleanup",
+        "title": "Notebook Controller Execution Interrupt: Cleanup"
+      }
+    ]
+  }
+}

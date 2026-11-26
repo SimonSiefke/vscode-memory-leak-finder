@@ -611,9 +611,11 @@ export interface Notebook {
   removeMarkdownCell(): Promise<void>
   scrollDown(): Promise<void>
   scrollUp(): Promise<void>
+  shouldHaveCellExecutionState(options: { index: number; state: 'error' | 'success' }): Promise<void>
   shouldHaveKernel(expectedKernel: string): Promise<void>
   shouldHaveOutput(expectedOutput: string): Promise<void>
   splitCell(cellIndex?: any): Promise<void>
+  stopCellExecution(index: number): Promise<void>
 }
 export interface NotebookInlineChat {
   hide(): Promise<void>
