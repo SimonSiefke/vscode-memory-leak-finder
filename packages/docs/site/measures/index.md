@@ -9,6 +9,7 @@ These entries identify what a collector measures, not a promise that every metri
 - [Event latency](./event-latency)
 - [Event loop delay](./event-loop-delay)
 - [Forced layout count](./forced-layout-count)
+- [libuv handle census](./libuv-handle-census)
 - [Linux process limits](./linux-process-limits)
 - [Long animation frames](./long-animation-frames)
 - [Idle CPU after scenario](./idle-cpu-after-scenario)
@@ -126,6 +127,7 @@ These entries identify what a collector measures, not a promise that every metri
 | `ipc-message-count`                                     | [IpcMessageCount](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureIpcMessageCount/MeasureIpcMessageCount.ts)                                                                                              |
 | `ipc-messages-from-start`                               | [IpcMessagesFromStart](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureIpcMessagesFromStart/MeasureIpcMessagesFromStart.ts)                                                                               |
 | `javascript-execution-time`                             | [JavascriptExecutionTime](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureJavascriptExecutionTime/MeasureJavascriptExecutionTime.ts)                                                                      |
+| `libuv-handle-census`                                   | [LibuvHandleCensus](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureLibuvHandleCensus/MeasureLibuvHandleCensus.ts)                                                                                        |
 | `largest-array-count`                                   | [LargestArrayCount](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureLargestArrayCount/MeasureLargestArrayCount.ts)                                                                                        |
 | `linux-allocation-stacks`                               | [LinuxAllocationStacks](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureLinuxAllocationStacks/MeasureLinuxAllocationStacks.ts)                                                                            |
 | `linux-cgroup-memory`                                   | [LinuxCgroupMemory](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureLinuxCgroupMemory/MeasureLinuxCgroupMemory.ts)                                                                                        |

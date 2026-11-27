@@ -101,6 +101,7 @@ export const IntersectionObserversWithStackTraces = 'intersectionObserversWithSt
 export const IpcMessageCount = 'ipcMessageCount'
 export const IpcMessagesFromStart = 'ipcMessagesFromStart'
 export const JavascriptExecutionTime = 'javascriptExecutionTime'
+export const LibuvHandleCensus = 'libuvHandleCensus'
 export const LargestArrayCount = 'largestArrayCount'
 export const LinuxAllocationStacks = 'linuxAllocationStacks'
 export const LinuxCgroupMemory = 'linuxCgroupMemory'
