@@ -335,6 +335,7 @@ export const launchVsCode = async ({
             userDataDir,
             proxyTestFolderName === 'agents-window-inbox-canvas-subscriptions',
             proxyTestFolderName === 'agents-window-chat-terminal-lifecycle',
+            proxyTestFolderName === 'agents-window-inbox-mode-triage',
           )
         : undefined
     if (agentMock) addDisposable(agentMock.dispose)

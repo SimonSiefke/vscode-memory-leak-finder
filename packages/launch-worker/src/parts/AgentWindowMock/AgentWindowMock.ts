@@ -64,7 +64,7 @@ const streamResponse = (res: ServerResponse) => {
 
 // Use the real agent host and SDK, replacing only their HTTP backend. Bind to
 // loopback and never forward requests or require real credentials.
-export const start = async (userDataDir: string, canvasFixture = false, terminalFixture = false) => {
+export const start = async (userDataDir: string, canvasFixture = false, terminalFixture = false, inboxMode = false) => {
   let fixture: Awaited<ReturnType<typeof AgentWindowCanvasFixture.install>> | undefined
   const savedSettings = new Map<string, string | undefined>()
   const server = createServer(async (req, res) => {
@@ -195,6 +195,15 @@ export const start = async (userDataDir: string, canvasFixture = false, terminal
             'chat.experimental.sessionArchiveActionWording': 'archive',
             'terminal.integrated.enablePersistentSessions': true,
             'terminal.integrated.defaultLocation': 'view',
+          }
+        : {}),
+      // Inbox attention tracking ignores history completed before it first starts,
+      // so the experimental list setting must be present before any session exists.
+      ...(inboxMode
+        ? {
+            'sessions.list.inboxEnabled': true,
+            'chat.experimental.sessionArchiveActionWording': 'done',
+            'sessions.markAsDoneConfetti': false,
           }
         : {}),
       'sessions.chat.unifiedWorkspacePicker.enabled': true,

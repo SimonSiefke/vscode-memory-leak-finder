@@ -7,6 +7,29 @@ const workbench = '.agent-sessions-workbench'
 const composer = `${workbench} .sessions-chat-widget .new-chat-widget-container`
 const activeSession = `${workbench} .session-view.is-active`
 const sessionRows = `${workbench} .sessions-list-control .monaco-list-row:has(.session-item)`
+const sessionsHeader = `${workbench} .agent-sessions-header-row`
+const sectionRows = `${workbench} .sessions-list-control .monaco-list-row.session-list-section-row`
+const sessionMenu = '.context-view.monaco-menu-container:not(.chat-response-selection-menu) .actions-container'
+
+// 'Done' is the archived section under the "done" archive wording.
+export type InboxSection = 'Inbox' | 'Working' | 'On hold' | 'Acknowledged' | 'Done'
+export type InboxTriageAction = 'Acknowledge' | 'Put on Hold' | 'Return to Inbox' | 'Mark as Done'
+
+// Read the tree parent of a session row in one renderer task. A row's section is
+// the closest preceding row with a lower aria-level; rows are ordered by index.
+const sessionSectionExpression = (title: string) => `(() => {
+  const rows = Array.from(document.querySelectorAll(${JSON.stringify(`${workbench} .sessions-list-control .monaco-list-row`)}))
+    .sort((a, b) => Number(a.getAttribute('data-index')) - Number(b.getAttribute('data-index')))
+  const index = rows.findIndex(row => row.querySelector('.session-item') && (row.getAttribute('aria-label') || '').startsWith(${JSON.stringify(`${title},`)}))
+  if (index === -1) return { found: false }
+  const level = Number(rows[index].getAttribute('aria-level'))
+  for (let i = index - 1; i >= 0; i--) {
+    if (Number(rows[i].getAttribute('aria-level')) < level) {
+      return { found: true, section: rows[i].classList.contains('session-list-section-row') ? rows[i].querySelector('.session-section-label')?.textContent ?? null : null }
+    }
+  }
+  return { found: true, section: null }
+})()`
 
 // Resolve and activate the live menu row in one renderer task. Workspace discovery
 // can replace the menu between separate locator readiness and click RPCs.
@@ -63,7 +86,7 @@ export const selectLocalEnvironment = async (page: any, expect: any): Promise<vo
 }
 
 export const create = (params: CreateParams) => {
-  const { expect, page, platform } = params
+  const { expect, ideVersion, page, platform } = params
   const canvasObserver = InboxCanvasObserver.create(page)
   const rowFor = (title: string) => page.locator(sessionRows, { hasText: title })
   const focusInput = async (input: any) => {
@@ -280,6 +303,87 @@ export const create = (params: CreateParams) => {
       await expect(close).toBeVisible()
       await close.click()
       await expect(page.locator('.inbox-evidence-canvases')).toHaveCount(0)
+    },
+    async toggleInbox() {
+      // 1.148 renamed the toggle and reshaped the Inbox sections and item actions.
+      if (!ideVersion || ideVersion.major !== 1 || ideVersion.minor < 148) {
+        throw new Error(`Inbox triage requires VS Code 1.148 or later, got ${ideVersion?.major}.${ideVersion?.minor}`)
+      }
+      const toggle = page.locator(`${sessionsHeader} .action-label.codicon-inbox[aria-label^="Toggle Inbox"]`)
+      await expect(toggle).toBeVisible({ timeout: 30_000 })
+      const wasInbox = (await page.locator(`${sessionsHeader}.inbox-layout`).count()) > 0
+      await page.waitForIdle()
+      await toggle.click()
+      await page.waitForIdle()
+      await this.shouldBeInInboxMode(!wasInbox)
+    },
+    async shouldBeInInboxMode(enabled: boolean) {
+      const toggle = page.locator(`${sessionsHeader} .action-label.codicon-inbox[aria-label^="Toggle Inbox"]`)
+      const label = enabled ? 'Inbox' : 'Sessions'
+      await expect(page.locator(`${sessionsHeader} .agent-sessions-header-label`)).toHaveText(label)
+      await expect(page.locator(`${workbench} .sessions-list-control .monaco-list[aria-label="${label}"]`)).toBeVisible()
+      if (enabled) {
+        await expect(page.locator(`${sessionsHeader}.inbox-layout`)).toBeVisible()
+        await expect(toggle).toHaveClass('checked')
+      } else {
+        await expect(page.locator(`${sessionsHeader}.inbox-layout`)).toHaveCount(0)
+        await expect(page.locator(`${sessionsHeader} .action-label.codicon-inbox.checked`)).toHaveCount(0)
+      }
+    },
+    async expandSection(section: InboxSection) {
+      // On hold, Acknowledged and Done start collapsed; expand only a collapsed section.
+      const collapsed = page.locator(`${sectionRows}[aria-expanded="false"][aria-label^="${section}, "]`)
+      if (await collapsed.count()) {
+        await collapsed.click()
+        await page.waitForIdle()
+      }
+      await expect(page.locator(`${sectionRows}[aria-expanded="true"][aria-label^="${section}, "]`)).toBeVisible()
+    },
+    async shouldHaveSessionInSection(title: string, section: InboxSection) {
+      await expect(page.locator(`${sectionRows}[aria-label^="${section}, "]`)).toBeVisible({ timeout: 30_000 })
+      await this.expandSection(section)
+      await expect(rowFor(title)).toBeVisible({ timeout: 30_000 })
+      const deadline = Date.now() + 15_000
+      let actual: { found: boolean; section?: string | null } = { found: false }
+      while (Date.now() < deadline) {
+        actual = await page.evaluateInMainWorld({ expression: sessionSectionExpression(title) })
+        if (actual.found && actual.section === section) return
+        await new Promise((resolve) => setTimeout(resolve, 100))
+      }
+      throw new Error(`Expected session "${title}" in section "${section}", found ${actual.found ? `"${actual.section}"` : 'no row'}`)
+    },
+    async shouldHaveSectionCount(section: InboxSection, count: number) {
+      if (count === 0) {
+        // Empty triage sections are removed; the Inbox section remains with no sessions.
+        await expect(page.locator(`${sectionRows}[aria-label^="${section}, "]:not([aria-label="${section}, 0"])`)).toHaveCount(0, {
+          timeout: 30_000,
+        })
+      } else {
+        await expect(page.locator(`${sectionRows}[aria-label="${section}, ${count}"]`)).toBeVisible({ timeout: 30_000 })
+      }
+    },
+    async triageSession(title: string, action: InboxTriageAction) {
+      const row = rowFor(title)
+      const menu = page.locator(sessionMenu)
+      await expect(row).toBeVisible({ timeout: 30_000 })
+      // Item actions apply to the whole selection, and triage auto-advances it.
+      // Select only the target so a single-session action cannot move a peer.
+      await page.waitForIdle()
+      await row.click()
+      await page.waitForIdle()
+      await expect(page.locator(`${sessionRows}.selected`)).toHaveCount(1)
+      await expect(page.locator(`${sessionRows}.selected`, { hasText: title })).toHaveCount(1)
+      await row.click({ button: 'right' })
+      await expect(menu).toBeVisible()
+      const item = menu.locator('.action-menu-item', { hasText: action })
+      await expect(item).toBeVisible()
+      // Menus ignore mouse moves with zero movement; hover selects the item
+      // for keyboard activation without racing the delayed mouse-up handler.
+      await item.hover({ movementX: 1, movementY: 1 })
+      await expect(menu.locator('.action-item.focused .action-label')).toHaveText(action)
+      await page.keyboard.press('Enter')
+      await expect(menu).toBeHidden()
+      await page.waitForIdle()
     },
     async archiveChat(title: string) {
       const row = rowFor(title)

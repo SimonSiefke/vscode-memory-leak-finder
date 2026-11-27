@@ -54,6 +54,9 @@ export interface PageObjectWindowHandle extends NewWindowHandle {
   shouldBeVisible(): Promise<void>
 }
 
+export type AgentsWindowInboxSection = 'Inbox' | 'Working' | 'On hold' | 'Acknowledged' | 'Done'
+export type AgentsWindowInboxTriageAction = 'Acknowledge' | 'Put on Hold' | 'Return to Inbox' | 'Mark as Done'
+
 export interface AgentsWindow {
   armCanvasObserver(): Promise<void>
   keepCanvasObserver(title: string): Promise<void>
@@ -63,6 +66,12 @@ export interface AgentsWindow {
   hideInboxCanvas(): Promise<void>
   closeInboxEvidence(): Promise<void>
   selectWorkspace(path: string, readinessDirectory: string): Promise<void>
+  toggleInbox(): Promise<void>
+  shouldBeInInboxMode(enabled: boolean): Promise<void>
+  expandSection(section: AgentsWindowInboxSection): Promise<void>
+  shouldHaveSessionInSection(title: string, section: AgentsWindowInboxSection): Promise<void>
+  shouldHaveSectionCount(section: AgentsWindowInboxSection, count: number): Promise<void>
+  triageSession(title: string, action: AgentsWindowInboxTriageAction): Promise<void>
   archiveChat(title: string): Promise<void>
   selectNoWorkspace(): Promise<void>
   shouldBeVisible(): Promise<void>
@@ -292,6 +301,7 @@ export interface Editor {
   renameWithPreview(newText: any): Promise<void>
   replaceActiveLineAndSave(options: { replacement: string }): Promise<void>
   replaceText(options: any): Promise<void>
+  revertAndClose(): Promise<void>
   save(options: any): Promise<void>
   saveAll(): Promise<void>
   scrollDown(options?: { viaKeyBoard?: boolean }): Promise<void>
@@ -310,6 +320,7 @@ export interface Editor {
   shouldHaveCodeLens(options: any): Promise<void>
   shouldHaveCodeLensWithVersion(options: any): Promise<void>
   shouldHaveCursor(estimate: any): Promise<void>
+  shouldHaveDirtyTabs(names: readonly string[]): Promise<void>
   shouldHaveEmptySelection(): Promise<void>
   shouldHaveError(fileName: any): Promise<void>
   shouldHaveExceptionWidget(): Promise<void>
@@ -600,6 +611,9 @@ export interface MultiDiffEditor {
   openSourceControlChanges(): Promise<void>
   shouldHaveFileCount(count: number): Promise<void>
   shouldBeVisible(): Promise<void>
+  shouldBeClosed(): Promise<void>
+  shouldHaveEntry(index: number, options: { fileName: string; modifiedText: string; originalText: string }): Promise<void>
+  shouldUseWebAssemblyDiff(options?: { timeout?: number }): Promise<void>
 }
 export interface Notebook {
   focusReplInput(): Promise<void>
@@ -685,6 +699,8 @@ export interface Profile {
 }
 export interface QuickPick {
   shouldHaveItem(text: string): Promise<void>
+  shouldNotHaveItem(text: string): Promise<void>
+  shouldBeHidden(): Promise<void>
   close(): Promise<void>
   executeCommand(command: any, options?: any): Promise<void>
   focusNext(): Promise<void>
@@ -881,6 +897,7 @@ export interface SourceControl {
   shouldHaveRepository(name: any): Promise<void>
   shouldHaveRepositoryCount(count: any): Promise<void>
   shouldHaveUnstagedFile(name: any): Promise<void>
+  shouldNotHaveUnstagedFile(name: string): Promise<void>
   shouldNotHaveChange(name: string): Promise<void>
   shouldNotHaveHistoryItem(name: any, options?: { timeout?: number }): Promise<void>
   shouldNotHaveRepository(name: any): Promise<void>
@@ -929,6 +946,8 @@ export interface Task {
   run(taskName: any, check?: any): Promise<void>
   runError(options: any): Promise<void>
   selectQuickPickItem(options: any): Promise<void>
+  shouldHaveNoRunningTasks(): Promise<void>
+  terminate(taskName: string): Promise<void>
   unpin(name: any): Promise<void>
 }
 export interface Terminal {
