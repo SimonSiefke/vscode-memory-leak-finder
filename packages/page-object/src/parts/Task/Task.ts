@@ -325,6 +325,54 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to select quickpick item`)
       }
     },
+    async shouldHaveNoRunningTasks() {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({
+          electronApp,
+          expect,
+          ideVersion,
+          page,
+          platform,
+          VError,
+        })
+        await quickPick.executeCommand(WellKnownCommands.TerminateTask, { stayVisible: true })
+        const quickInput = page.locator('.quick-input-widget')
+        const input = quickInput.locator('input[aria-label="Select a task to terminate"]')
+        await expect(input).toBeVisible()
+        const rows = quickInput.locator('.monaco-list-row')
+        await expect(rows).toHaveCount(1)
+        const noTaskRow = quickInput.locator('.label-name', {
+          hasExactText: 'No task is currently running',
+        })
+        await expect(noTaskRow).toBeVisible()
+        await page.waitForIdle()
+        await quickPick.close()
+      } catch (error) {
+        throw new VError(error, `Failed to assert that no task is running`)
+      }
+    },
+    async terminate(taskName: string) {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({
+          electronApp,
+          expect,
+          ideVersion,
+          page,
+          platform,
+          VError,
+        })
+        await quickPick.executeCommand(WellKnownCommands.TerminateTask, { stayVisible: true })
+        const input = page.locator('.quick-input-widget input[aria-label="Select a task to terminate"]')
+        await expect(input).toBeVisible()
+        await page.waitForIdle()
+        await quickPick.select(taskName)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to terminate task "${taskName}"`)
+      }
+    },
     async unpin(name: string) {
       try {
         const quickPick = page.locator('.quick-input-widget')

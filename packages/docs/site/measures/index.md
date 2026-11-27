@@ -9,13 +9,16 @@ These entries identify what a collector measures, not a promise that every metri
 - [Event latency](./event-latency)
 - [Event loop delay](./event-loop-delay)
 - [Forced layout count](./forced-layout-count)
+- [libuv handle census](./libuv-handle-census)
 - [Linux process I/O](./linux-process-io)
 - [Linux process limits](./linux-process-limits)
+- [Long animation frames](./long-animation-frames)
 - [Idle CPU after scenario](./idle-cpu-after-scenario)
 - [Long renderer tasks](./long-renderer-tasks)
 - [Module resolution](./module-resolution)
 - [Module resolution lookups](./module-resolution-lookups)
 - [Named function count 3](./named-function-count3)
+- [Peak memory high-water](./peak-memory-high-water)
 - [Sampled allocation churn](./sampled-allocation-churn)
 - [Script compilation and evaluation](./script-compilation-evaluation)
 - [Synchronous DOM read count](./synchronous-dom-read-count)
@@ -125,6 +128,7 @@ These entries identify what a collector measures, not a promise that every metri
 | `ipc-message-count`                                     | [IpcMessageCount](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureIpcMessageCount/MeasureIpcMessageCount.ts)                                                                                              |
 | `ipc-messages-from-start`                               | [IpcMessagesFromStart](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureIpcMessagesFromStart/MeasureIpcMessagesFromStart.ts)                                                                               |
 | `javascript-execution-time`                             | [JavascriptExecutionTime](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureJavascriptExecutionTime/MeasureJavascriptExecutionTime.ts)                                                                      |
+| `libuv-handle-census`                                   | [LibuvHandleCensus](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureLibuvHandleCensus/MeasureLibuvHandleCensus.ts)                                                                                        |
 | `largest-array-count`                                   | [LargestArrayCount](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureLargestArrayCount/MeasureLargestArrayCount.ts)                                                                                        |
 | `linux-allocation-stacks`                               | [LinuxAllocationStacks](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureLinuxAllocationStacks/MeasureLinuxAllocationStacks.ts)                                                                            |
 | `linux-process-io`                                      | [LinuxProcessIo](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureLinuxProcessIo/MeasureLinuxProcessIo.ts)                                                                                                 |
@@ -134,6 +138,7 @@ These entries identify what a collector measures, not a promise that every metri
 | `linux-process-tree-resources`                          | [LinuxProcessTreeResources](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureLinuxProcessTreeResources/MeasureLinuxProcessTreeResources.ts)                                                                |
 | `linux-process-tree-resources-from-start`               | [LinuxProcessTreeResourcesFromStart](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureLinuxProcessTreeResourcesFromStart/MeasureLinuxProcessTreeResourcesFromStart.ts)                                     |
 | `linux-slab-memory`                                     | [LinuxSlabMemory](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureLinuxSlabMemory/MeasureLinuxSlabMemory.ts)                                                                                              |
+| `long-animation-frames`                                 | [LongAnimationFrames](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureLongAnimationFrames/MeasureLongAnimationFrames.ts)                                                                                  |
 | `long-renderer-tasks`                                   | [LongRendererTasks](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureLongRendererTasks/MeasureLongRendererTasks.ts)                                                                                        |
 | `map-count`                                             | [MapCount](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureMapCount/MeasureMapCount.ts)                                                                                                                   |
 | `map-size`                                              | [MapSize](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureMapSize/MeasureMapSize.ts)                                                                                                                      |
@@ -165,6 +170,7 @@ These entries identify what a collector measures, not a promise that every metri
 | `object-url-count`                                      | [ObjectUrlCount](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureObjectUrlCount/MeasureObjectUrlCount.ts)                                                                                                 |
 | `offscreen-canvas-count`                                | [OffscreenCanvasCount](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureOffscreenCanvasCount/MeasureOffscreenCanvasCount.ts)                                                                               |
 | `paint-events`                                          | [PaintEvents](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasurePaintEvents/MeasurePaintEvents.ts)                                                                                                          |
+| `peak-memory-high-water`                                | [PeakMemoryHighWater](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasurePeakMemoryHighWater/MeasurePeakMemoryHighWater.ts)                                                                                  |
 | `pending-promise-count`                                 | [PendingPromiseCount](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasurePendingPromiseCount/MeasurePendingPromiseCount.ts)                                                                                  |
 | `pending-promises-with-retainers`                       | [PendingPromisesWithRetainers](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasurePendingPromisesWithRetainers/MeasurePendingPromisesWithRetainers.ts)                                                       |
 | `performance-mark-bytes`                                | [PerformanceMarkBytes](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasurePerformanceMarkBytes/MeasurePerformanceMarkBytes.ts)                                                                               |
