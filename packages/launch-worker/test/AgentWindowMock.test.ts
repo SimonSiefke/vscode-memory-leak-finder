@@ -142,3 +142,23 @@ test('keeps terminal lifecycle settings scoped to its scenario and restores both
   await mock.dispose()
   await expect(readFile(path)).rejects.toMatchObject({ code: 'ENOENT' })
 })
+
+test('enables Inbox triage settings only for its scenario and restores both profiles', async () => {
+  await start()
+  const path = join(directory, 'User', 'settings.json')
+  expect(JSON.parse(await readFile(path, 'utf8'))).not.toHaveProperty('sessions.list.inboxEnabled')
+  await mock!.dispose()
+  mock = await AgentWindowMock.start(directory, false, false, true)
+  for (const relative of ['User/settings.json', 'User/profiles/builtin/agents/settings.json']) {
+    const settings = JSON.parse(await readFile(join(directory, relative), 'utf8'))
+    expect(settings).toMatchObject({
+      'sessions.list.inboxEnabled': true,
+      'chat.experimental.sessionArchiveActionWording': 'done',
+      'sessions.markAsDoneConfetti': false,
+    })
+    expect(settings).not.toHaveProperty('sessions.chatWindows.enabled')
+    expect(settings).not.toHaveProperty('chat.canvases.enabled')
+  }
+  await mock.dispose()
+  await expect(readFile(path)).rejects.toMatchObject({ code: 'ENOENT' })
+})
