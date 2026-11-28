@@ -72,7 +72,9 @@ jobs:
       - run: npm run type-check
       - run: npm run lint
       - run: npm run build
-      - run: npm test
+      - name: Run npm test
+        timeout-minutes: 15
+        run: npm test
       - name: Run headless test
         uses: coactions/setup-xvfb@v1
         with:
