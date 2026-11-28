@@ -869,6 +869,10 @@ export interface SimpleBrowser {
   showLoadError(options: any): Promise<void>
   show(options?: any): Promise<void>
   shouldHaveLoadError(options: any): Promise<void>
+  shouldHaveAuthPrompt(options: { origin: string }): Promise<void>
+  submitAuthPrompt(options: { password: string; username: string }): Promise<void>
+  cancelAuthPrompt(): Promise<void>
+  shouldNotHaveAuthPrompt(): Promise<void>
 }
 export interface SingleIframeWebView {
   shouldHaveLoaded(options: any): Promise<{ readyAt: number }>

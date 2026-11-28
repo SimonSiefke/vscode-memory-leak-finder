@@ -423,6 +423,19 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to navigate simple browser back`)
       }
     },
+    async cancelAuthPrompt() {
+      try {
+        const dialog = this.getAuthPrompt()
+        await expect(dialog).toBeVisible()
+        const cancelButton = dialog.locator('.dialog-buttons [role="button"]', { hasText: 'Cancel' })
+        await expect(cancelButton).toBeVisible()
+        await cancelButton.click()
+        await expect(dialog).toBeHidden()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to cancel integrated browser sign-in prompt`)
+      }
+    },
     async clickLink({ href }: { href: string }) {
       try {
         await page.waitForIdle()
@@ -936,6 +949,10 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
       await this.waitForContentFrameModern({ urlPattern })
       throw new Error('Simple Browser WebContentsView does not expose a Playwright frame in this IDE version')
     },
+    getAuthPrompt() {
+      // The sign-in prompt is a custom workbench dialog; shouldHaveAuthPrompt verifies its message.
+      return page.locator('.monaco-dialog-box')
+    },
     getElectron() {
       return Electron.create({ electronApp, expect, ideVersion, page, platform, VError })
     },
@@ -1252,6 +1269,26 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to reload simple browser`)
       }
     },
+    async shouldHaveAuthPrompt({ origin }: { origin: string }) {
+      try {
+        const dialog = this.getAuthPrompt()
+        await expect(dialog).toBeVisible()
+        await expect(dialog).toHaveCount(1)
+        const message = dialog.locator('.dialog-message-text')
+        await expect(message).toHaveText(`Sign in to ${origin}`)
+        const username = dialog.locator('.dialog-message-input input[placeholder="Username"]')
+        await expect(username).toBeVisible()
+        await expect(username).toHaveAttribute('type', 'text')
+        const password = dialog.locator('.dialog-message-input input[placeholder="Password"]')
+        await expect(password).toBeVisible()
+        await expect(password).toHaveAttribute('type', 'password')
+        const logInButton = dialog.locator('.dialog-buttons [role="button"]', { hasText: 'Log In' })
+        await expect(logInButton).toBeVisible()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to verify integrated browser sign-in prompt for ${origin}`)
+      }
+    },
     async shouldHaveElementScreenshotInChat() {
       try {
         await page.waitForIdle()
@@ -1366,6 +1403,14 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         throw new VError(error, `Failed to verify simple browser text ${text}`)
       }
     },
+    async shouldNotHaveAuthPrompt() {
+      try {
+        await expect(this.getAuthPrompt()).toHaveCount(0)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to verify integrated browser sign-in prompt is closed`)
+      }
+    },
     async shouldNotHaveTabLoadingSpinner() {
       try {
         await this.waitForCondition({
@@ -1450,6 +1495,24 @@ export const create = ({ electronApp, expect, ideVersion, page, platform, VError
         url,
         waitForContentFrame: true,
       })
+    },
+    async submitAuthPrompt({ password, username }: { password: string; username: string }) {
+      try {
+        const dialog = this.getAuthPrompt()
+        await expect(dialog).toBeVisible()
+        const usernameInput = dialog.locator('.dialog-message-input input[placeholder="Username"]')
+        await usernameInput.fill(username)
+        await expect(usernameInput).toHaveValue(username)
+        const passwordInput = dialog.locator('.dialog-message-input input[placeholder="Password"]')
+        await passwordInput.fill(password)
+        await expect(passwordInput).toHaveValue(password)
+        const logInButton = dialog.locator('.dialog-buttons [role="button"]', { hasText: 'Log In' })
+        await logInButton.click()
+        await expect(dialog).toBeHidden()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to submit integrated browser sign-in prompt`)
+      }
     },
     async tryClickFirstVisible(locators: readonly any[]): Promise<boolean> {
       for (const locator of locators) {
