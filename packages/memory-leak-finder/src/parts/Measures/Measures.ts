@@ -99,6 +99,7 @@ export * as MeasureJavascriptExecutionTime from '../MeasureJavascriptExecutionTi
 export * as MeasureLibuvHandleCensus from '../MeasureLibuvHandleCensus/MeasureLibuvHandleCensus.ts'
 export * as MeasureLargestArrayCount from '../MeasureLargestArrayCount/MeasureLargestArrayCount.ts'
 export * as MeasureLinuxAllocationStacks from '../MeasureLinuxAllocationStacks/MeasureLinuxAllocationStacks.ts'
+export * as MeasureLinuxProcessIo from '../MeasureLinuxProcessIo/MeasureLinuxProcessIo.ts'
 export * as MeasureLinuxCgroupMemory from '../MeasureLinuxCgroupMemory/MeasureLinuxCgroupMemory.ts'
 export * as MeasureLinuxProcessMemory from '../MeasureLinuxProcessMemory/MeasureLinuxProcessMemory.ts'
 export * as MeasureLinuxProcessLimits from '../MeasureLinuxProcessLimits/MeasureLinuxProcessLimits.ts'

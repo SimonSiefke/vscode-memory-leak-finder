@@ -10,6 +10,7 @@ These entries identify what a collector measures, not a promise that every metri
 - [Event loop delay](./event-loop-delay)
 - [Forced layout count](./forced-layout-count)
 - [libuv handle census](./libuv-handle-census)
+- [Linux process I/O](./linux-process-io)
 - [Linux process limits](./linux-process-limits)
 - [Long animation frames](./long-animation-frames)
 - [Idle CPU after scenario](./idle-cpu-after-scenario)
@@ -130,6 +131,7 @@ These entries identify what a collector measures, not a promise that every metri
 | `libuv-handle-census`                                   | [LibuvHandleCensus](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureLibuvHandleCensus/MeasureLibuvHandleCensus.ts)                                                                                        |
 | `largest-array-count`                                   | [LargestArrayCount](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureLargestArrayCount/MeasureLargestArrayCount.ts)                                                                                        |
 | `linux-allocation-stacks`                               | [LinuxAllocationStacks](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureLinuxAllocationStacks/MeasureLinuxAllocationStacks.ts)                                                                            |
+| `linux-process-io`                                      | [LinuxProcessIo](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureLinuxProcessIo/MeasureLinuxProcessIo.ts)                                                                                                 |
 | `linux-cgroup-memory`                                   | [LinuxCgroupMemory](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureLinuxCgroupMemory/MeasureLinuxCgroupMemory.ts)                                                                                        |
 | `linux-process-memory`                                  | [LinuxProcessMemory](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureLinuxProcessMemory/MeasureLinuxProcessMemory.ts)                                                                                     |
 | `linux-process-limits`                                  | [LinuxProcessLimits](https://github.com/SimonSiefke/vscode-memory-leak-finder/blob/main/packages/memory-leak-finder/src/parts/MeasureLinuxProcessLimits/MeasureLinuxProcessLimits.ts)                                                                                     |
